@@ -112,7 +112,7 @@ class DashboardService
             'kpis' => [
                 'total_budget'      => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0,
                 'total_spent'       => \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0,
-                'total_remaining'   => \Schema::hasTable('budgets') ? (Budget::sum('allocated_amount') - Budget::sum('spent_amount')) : 0,
+                'total_remaining'   => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0 - \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0,
                 'utilization'       => $this->budgetUtilization(),
                 'pending_vouchers'  => PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count(),
                 'total_expenses'    => ExpenseClaim::sum('amount'),
