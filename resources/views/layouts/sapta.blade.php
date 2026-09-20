@@ -123,8 +123,9 @@
             <div class="tb-right">
                 @auth
                     @php
-                        $unreadCount = auth()->user()->unreadNotifications->count();
-                        $recentNotifications = auth()->user()->notifications()->limit(5)->get();
+                        $hasNotifications = \Schema::hasTable('notifications');
+                        $unreadCount = $hasNotifications ? auth()->user()->unreadNotifications->count() : 0;
+                        $recentNotifications = $hasNotifications ? auth()->user()->notifications()->limit(5)->get() : collect();
                     @endphp
 
                     {{-- NOTIFICATIONS BELL --}}
