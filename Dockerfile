@@ -13,7 +13,14 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
-RUN npm install && npm run build || true
+
+# Build assets — LAZIMA
+RUN npm install
+RUN npm run build
+
+# Hakikisha build ipo
+RUN ls -la public/build/ || echo "BUILD FAILED"
+RUN cat public/build/manifest.json || echo "MANIFEST FAILED"
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
@@ -21,9 +28,10 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 10000
 
-CMD php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
-    echo "=== TABLES ZILIZOPO ===" ; \
-    php artisan tinker --execute="foreach(\DB::select(\"SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name\") as \$t) { echo \$t->table_name . PHP_EOL; }" 2>&1 ; \
-    echo "=== MWISHO WA TABLES ===" ; \
+CMD php artisan config:clear 2>&1 ; \
+    php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
     php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seed failed" ; \
+    php artisan config:cache 2>&1 ; \
+    php artisan route:cache 2>&1 ; \
+    php artisan view:cache 2>&1 ; \
     php artisan serve --host=0.0.0.0 --port=10000
