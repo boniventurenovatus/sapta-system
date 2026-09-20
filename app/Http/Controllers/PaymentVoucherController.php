@@ -179,17 +179,22 @@ class PaymentVoucherController extends Controller
         return view('payment-vouchers.show', ['voucher' => $paymentVoucher, 'versions' => $versions, 'auditLogs' => $auditLogs]);
     }
 
-    public function edit(PaymentVoucher $paymentVoucher)
+public function edit(PaymentVoucher $paymentVoucher)
     {
-        if (!in_array($paymentVoucher->status, ['draft', 'returned'])) {
-            return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
-                ->with('error', 'Only drafts and returned vouchers can be edited.');
-        }
-
         $projects = DB::table('projects')->take(50)->get(['id', 'name']);
         $departments = DB::table('departments')->get(['id', 'name']);
         $users = \App\Models\User::orderBy('username')->get(['id', 'username', 'email']);
-        return view('payment-vouchers.edit', compact('paymentVoucher', 'projects', 'departments', 'users'));
+        
+        // Location data
+        $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
+        $districts = \App\Models\District::orderBy('name')->get(['id', 'name', 'region_id']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'district_id']);
+        $organizations = \App\Models\Organization::orderBy('name')->get(['id', 'name']);
+        
+        return view('payment-vouchers.edit', compact(
+            'paymentVoucher', 'projects', 'departments', 'users',
+            'regions', 'districts', 'wards', 'organizations'
+        ));
     }
 
     public function update(UpdatePaymentVoucherRequest $request, PaymentVoucher $paymentVoucher)

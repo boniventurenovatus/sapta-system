@@ -34,7 +34,66 @@
         {{-- Row 2: Payee + P.O Box --}}
         <div class="flex gap-6">
             <div class="flex-1 flex flex-col">
-                <div class="flex items-center gap-2">
+                
+    {{-- LOCATION FIELDS --}}
+    <div class="mb-4 p-4 bg-slate-50 border border-slate-200 rounded">
+        <div class="text-xs font-bold text-slate-600 mb-2 uppercase">Location Information</div>
+        <div class="grid grid-cols-3 gap-4">
+            <div class="flex flex-col">
+                <label class="font-bold text-xs mb-1">Region</label>
+                <select name="region_id" id="region_id" class="px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option value="">Select Region</option>
+                    @foreach($regions ?? [] as $region)
+                        <option value="{{ $region->id }}" @selected(old('region_id', $paymentVoucher->region_id ?? '') == $region->id)>{{ $region->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="font-bold text-xs mb-1">District</label>
+                <select name="district_id" id="district_id" class="px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option value="">Select District</option>
+                    @foreach($districts ?? [] as $district)
+                        <option value="{{ $district->id }}" @selected(old('district_id', $paymentVoucher->district_id ?? '') == $district->id)>{{ $district->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="font-bold text-xs mb-1">Ward</label>
+                <select name="ward_id" id="ward_id" class="px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option value="">Select Ward</option>
+                    @foreach($wards ?? [] as $ward)
+                        <option value="{{ $ward->id }}" @selected(old('ward_id', $paymentVoucher->ward_id ?? '') == $ward->id)>{{ $ward->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {{-- ORGANIZATION + DEPARTMENT --}}
+    <div class="mb-4 p-4 bg-slate-50 border border-slate-200 rounded">
+        <div class="text-xs font-bold text-slate-600 mb-2 uppercase">Organization Information</div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col">
+                <label class="font-bold text-xs mb-1">Organization</label>
+                <select name="organization_id" id="organization_id" class="px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option value="">Select Organization</option>
+                    @foreach($organizations ?? [] as $org)
+                        <option value="{{ $org->id }}" @selected(old('organization_id', $paymentVoucher->organization_id ?? '') == $org->id)>{{ $org->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="font-bold text-xs mb-1">Department</label>
+                <select name="department_id" id="department_id" class="px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option value="">Select Department</option>
+                    @foreach($departments ?? [] as $dept)
+                        <option value="{{ $dept->id }}" @selected(old('department_id', $paymentVoucher->department_id ?? '') == $dept->id)>{{ $dept->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+<div class="flex items-center gap-2">
                     <span class="font-bold w-32">Name of Payee:</span>
                     <input type="text" name="payee_name" value="{{ old('payee_name', $paymentVoucher->payee_name ?? '') }}" required
                         class="flex-1 px-2 py-1 border border-slate-300 rounded text-sm" placeholder="e.g., LUNEX INVESTMENT"
