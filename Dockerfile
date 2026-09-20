@@ -25,7 +25,8 @@ EXPOSE 10000
 CMD php artisan config:clear 2>&1 ; \
     php artisan migrate --force 2>&1 || echo "Migrate failed 1" ; \
     php artisan migrate --force 2>&1 || echo "Migrate failed 2" ; \
-    php artisan db:seed --class=FullAccessSeeder --force 2>&1 || echo "Seed failed" ; \
+    php artisan db:seed --class=FullAccessSeeder --force 2>&1 || echo "FullAccessSeeder failed" ; \
+    php artisan db:seed --class=LocationSeeder --force 2>&1 || echo "LocationSeeder failed" ; \
     php artisan config:cache 2>&1 ; \
     php artisan route:cache 2>&1 ; \
     php artisan view:cache 2>&1 ; \
