@@ -17,108 +17,55 @@ class FullAccessSeeder extends Seeder
         $this->command->info('=== FullAccessSeeder ===');
 
         // ============================================================
-        // 1. ROLES ZOTE
+        // 1. ROLES
         // ============================================================
-        $roles = [
-            'super_admin' => 'Super Admin',
-            'admin' => 'Admin',
-            'director' => 'Director',
-            'admin_director' => 'Administrative Director',
-            'program_director' => 'Program Director',
-            'hr_manager' => 'HR Manager',
-            'hr_officer' => 'HR Officer',
-            'ceo' => 'Chief Executive Officer',
-            'bod' => 'Board of Directors',
-            'manager' => 'Manager',
-            'staff' => 'Staff',
-            'finance_manager' => 'Finance Manager',
-            'accountant' => 'Accountant',
-            'ict_manager' => 'ICT Manager',
-            'procurement_manager' => 'Procurement Manager',
-            'logistics_manager' => 'Logistics Manager',
-        ];
+        if (Schema::hasTable('roles')) {
+            $roles = [
+                'super_admin' => 'Super Admin',
+                'admin' => 'Admin',
+                'director' => 'Director',
+                'hr_manager' => 'HR Manager',
+                'hr_officer' => 'HR Officer',
+                'manager' => 'Manager',
+                'staff' => 'Staff',
+                'ceo' => 'CEO',
+                'bod' => 'Board of Directors',
+                'accountant' => 'Accountant',
+            ];
 
-        foreach ($roles as $code => $name) {
-            if (Schema::hasTable('roles')) {
+            foreach ($roles as $code => $name) {
                 Role::firstOrCreate(
                     ['name' => $code],
-                    [
-                        'code' => $code,
-                        'display_name' => $name,
-                        'description' => $name . ' role',
-                    ]
+                    ['code' => $code, 'display_name' => $name]
                 );
             }
+            $this->command->info('✅ Roles zimeundwa');
         }
-        $this->command->info('✅ Roles zimeundwa');
 
         // ============================================================
-        // 2. PERMISSIONS ZOTE
+        // 2. PERMISSIONS
         // ============================================================
-        $permissions = [
-            // Employees
-            'view_employees', 'create_employees', 'edit_employees', 'delete_employees',
-            // Users
-            'view_users', 'create_users', 'edit_users', 'delete_users',
-            // Roles
-            'view_roles', 'create_roles', 'edit_roles', 'delete_roles',
-            // Permissions
-            'view_permissions', 'create_permissions', 'edit_permissions', 'delete_permissions',
-            // Departments
-            'view_departments', 'create_departments', 'edit_departments', 'delete_departments',
-            // Positions
-            'view_positions', 'create_positions', 'edit_positions', 'delete_positions',
-            // Attendance
-            'view_attendance', 'create_attendance', 'edit_attendance', 'delete_attendance',
-            // Leave
-            'view_leave', 'create_leave', 'approve_leave', 'reject_leave',
-            // Budgets
-            'view_budgets', 'create_budgets', 'edit_budgets', 'delete_budgets',
-            // Receipts
-            'view_receipts', 'create_receipts', 'edit_receipts', 'delete_receipts',
-            // Payment Vouchers
-            'view_payment_vouchers', 'create_payment_vouchers', 'approve_payment_vouchers', 'delete_payment_vouchers',
-            // Payroll
-            'view_payroll', 'create_payroll', 'edit_payroll', 'delete_payroll',
-            // Documents
-            'view_documents', 'create_documents', 'edit_documents', 'delete_documents',
-            // Projects
-            'view_projects', 'create_projects', 'edit_projects', 'delete_projects',
-            // Tasks
-            'view_tasks', 'create_tasks', 'edit_tasks', 'delete_tasks',
-            // Reports
-            'view_reports', 'export_reports',
-            // Activity Logs
-            'view_activity_logs',
-            // Settings
-            'view_settings', 'edit_settings',
-            // Notifications
-            'view_notifications',
-            // Communication
-            'view_communication', 'send_communication',
-            // Trainings
-            'view_trainings', 'create_trainings', 'edit_trainings', 'delete_trainings',
-            // Recruitment
-            'view_recruitment', 'create_recruitment', 'edit_recruitment', 'delete_recruitment',
-            // Performance
-            'view_performance', 'create_performance', 'edit_performance', 'delete_performance',
-            // Procurement
-            'view_procurement', 'create_procurement', 'edit_procurement', 'delete_procurement',
-            // Suppliers
-            'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers',
-            // Drafts
-            'view_drafts', 'create_drafts', 'edit_drafts', 'delete_drafts',
-        ];
+        if (Schema::hasTable('permissions')) {
+            $permissions = [
+                'view_employees', 'create_employees', 'edit_employees', 'delete_employees',
+                'view_users', 'create_users', 'edit_users', 'delete_users',
+                'view_roles', 'view_permissions', 'view_departments', 'view_positions',
+                'view_attendance', 'view_leave', 'view_budgets', 'view_receipts',
+                'view_payment_vouchers', 'view_payroll', 'view_documents', 'view_projects',
+                'view_tasks', 'view_reports', 'view_activity_logs', 'view_settings',
+                'view_notifications', 'view_communication', 'view_trainings',
+                'view_recruitment', 'view_performance', 'view_procurement',
+                'view_drafts',
+            ];
 
-        foreach ($permissions as $permission) {
-            if (Schema::hasTable('permissions')) {
+            foreach ($permissions as $permission) {
                 Permission::firstOrCreate(
                     ['name' => $permission],
                     ['display_name' => ucwords(str_replace('_', ' ', $permission))]
                 );
             }
+            $this->command->info('✅ Permissions zimeundwa');
         }
-        $this->command->info('✅ Permissions zimeundwa');
 
         // ============================================================
         // 3. SUPERADMIN USER
@@ -142,27 +89,25 @@ class FullAccessSeeder extends Seeder
         }
 
         // ============================================================
-        // 4. ROLE super_admin KWA SUPERADMIN
+        // 4. ONGEZA ROLE super_admin KWA SUPERADMIN
         // ============================================================
         if (Schema::hasTable('roles') && Schema::hasTable('user_roles')) {
             $superAdminRole = Role::where('name', 'super_admin')->first();
             
             if ($superAdminRole) {
-                // Ondoa roles zote za zamani
+                // Ondoa roles zote
                 DB::table('user_roles')->where('user_id', $user->id)->delete();
                 
                 // Ongeza super_admin
                 DB::table('user_roles')->insert([
                     'user_id' => $user->id,
                     'role_id' => $superAdminRole->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
                 
                 $this->command->info('✅ Role super_admin imeongezwa');
                 
                 // Permissions zote kwa super_admin
-                if (Schema::hasTable('role_permissions')) {
+                if (Schema::hasTable('role_permissions') && Schema::hasTable('permissions')) {
                     DB::table('role_permissions')->where('role_id', $superAdminRole->id)->delete();
                     
                     $allPermissions = Permission::all();
@@ -170,40 +115,11 @@ class FullAccessSeeder extends Seeder
                         DB::table('role_permissions')->insert([
                             'role_id' => $superAdminRole->id,
                             'permission_id' => $perm->id,
-                            'created_at' => now(),
-                            'updated_at' => now(),
                         ]);
                     }
-                    $this->command->info('✅ Permissions zote zimeongezwa kwa super_admin');
+                    $this->command->info('✅ Permissions zote zimeongezwa');
                 }
             }
-        }
-
-        // ============================================================
-        // 5. HAKIKISHA ADMIN ANA ROLE admin
-        // ============================================================
-        if (Schema::hasTable('roles') && Schema::hasTable('user_roles')) {
-            $adminUser = User::where('username', 'admin')->first();
-            $adminRole = Role::where('name', 'admin')->first();
-            
-            if ($adminUser && $adminRole) {
-                DB::table('user_roles')->where('user_id', $adminUser->id)->delete();
-                DB::table('user_roles')->insert([
-                    'user_id' => $adminUser->id,
-                    'role_id' => $adminRole->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $this->command->info('✅ Role admin imeongezwa kwa admin user');
-            }
-        }
-
-        // ============================================================
-        // 6. HAKIKISHA EMPLOYEES WOTE WANA employment_status
-        // ============================================================
-        if (Schema::hasTable('employees')) {
-            DB::table('employees')->whereNull('employment_status')->update(['employment_status' => 'active']);
-            $this->command->info('✅ Employees wote wana employment_status');
         }
 
         $this->command->info('✅ FullAccessSeeder imekamilika!');
