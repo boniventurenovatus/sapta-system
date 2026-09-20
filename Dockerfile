@@ -22,5 +22,8 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 10000
 
 CMD php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
+    echo "=== TABLES ZILIZOPO ===" ; \
+    php artisan tinker --execute="foreach(\DB::select(\"SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name\") as \$t) { echo \$t->table_name . PHP_EOL; }" 2>&1 ; \
+    echo "=== MWISHO WA TABLES ===" ; \
     php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seed failed" ; \
     php artisan serve --host=0.0.0.0 --port=10000
