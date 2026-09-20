@@ -1,0 +1,138 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\Models\UserActivityLog;
+use App\Models\Role;
+use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Support\Facades\Hash;
+
+class UserController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = User::with('roles');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('username', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('account_status', $request->status);
+        }
+
+        $users = $query->orderBy('username')->paginate(10)->withQueryString();
+
+        $totalUsers = User::count();
+        $activeUsers = User::where('account_status', 'active')->count();
+        $suspendedUsers = User::where('account_status', 'suspended')->count();
+
+        return view('users.index', compact('users', 'totalUsers', 'activeUsers', 'suspendedUsers'));
+    }
+
+public function create()
+    {
+        $roles = Role::all();
+        $employees = \App\Models\Employee::where('employment_status', 'active')
+            ->orderBy('first_name')
+            ->get();
+        return view('users.create', compact('roles', 'employees'));
+    }
+
+    public function store(StoreUserRequest $request)
+    {
+        $validated = $request->validated();
+
+        $user = User::create([
+            'employee_id' => $validated['employee_id'] ?? null,
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'password_hash' => Hash::make($validated['password']),
+            'account_status' => $validated['account_status'],
+        ]);
+
+        if ($request->role_id) {
+            $user->roles()->attach($request->role_id);
+        }
+
+        return redirect()->route('users.index')->with('success', 'User created successfully');
+    }
+
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
+    }
+
+    public function edit(User $user)
+    {
+        $roles = Role::all();
+        $employees = \App\Models\Employee::where('employment_status', 'active')
+            ->orderBy('first_name')
+            ->get();
+        $user->load('employee');
+        return view('users.edit', compact('user', 'roles', 'employees'));
+    }
+
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $validated = $request->validated();
+
+        $data = [
+            'employee_id' => $validated['employee_id'] ?? null,
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'account_status' => $validated['account_status'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $data['password_hash'] = Hash::make($validated['password']);
+        }
+
+        $user->update($data);
+        
+        if ($request->role_id) {
+            $user->roles()->sync([$request->role_id]);
+        }
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully');
+    }
+
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return redirect()->route('users.index')->with('success', 'User deleted successfully');
+    }
+
+    public function suspend(User $user)
+    {
+        $user->update(['account_status' => 'suspended']);
+                UserActivityLog::log(
+            action: 'user_suspend',
+            module: 'user',
+            description: 'Suspended user: ' . $user->username,
+            subjectId: $user->id,
+            subjectType: 'App\Models\User'
+        );
+
+        return redirect()->route('users.index')->with('success', 'User suspended successfully');
+    }
+
+    public function activate(User $user)
+    {
+        $user->update(['account_status' => 'active']);
+        return redirect()->route('users.index')->with('success', 'User activated successfully');
+    }
+}
+
+
+
+

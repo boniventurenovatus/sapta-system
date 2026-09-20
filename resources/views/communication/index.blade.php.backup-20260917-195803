@@ -1,0 +1,29 @@
+@extends('layouts.app')
+
+@section('title', 'Communication')
+
+@section('content')
+<div class="container-fluid py-4">
+    <h1 class="h3 mb-4"><i class="fas fa-comments me-2"></i>Communication</h1>
+
+    <div class="row g-3 mb-4">
+        @foreach(['inbox' => 'Inbox', 'sent' => 'Sent', 'drafts' => 'Drafts', 'conversations' => 'Conversations', 'groups' => 'Groups', 'announcements' => 'Announcements'] as $key => $label)
+            <div class="col-md-2">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ $label }}</div>
+                        <div class="h3 mb-0">{{ $stats[$key] }}</div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-tools fs-1 text-muted mb-3"></i>
+            <p class="text-muted">Communication module inajengwa...</p>
+        </div>
+    </div>
+</div>
+@endsection

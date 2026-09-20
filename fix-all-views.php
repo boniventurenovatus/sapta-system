@@ -1,0 +1,113 @@
+<?php
+$views = [
+    'resources/views/departments/index.blade.php',
+    'resources/views/departments/create.blade.php',
+    'resources/views/departments/edit.blade.php',
+    'resources/views/departments/show.blade.php',
+    'resources/views/positions/index.blade.php',
+    'resources/views/positions/create.blade.php',
+    'resources/views/positions/edit.blade.php',
+    'resources/views/positions/show.blade.php',
+    'resources/views/employees/index.blade.php',
+    'resources/views/employees/create.blade.php',
+    'resources/views/employees/edit.blade.php',
+    'resources/views/employees/show.blade.php',
+    'resources/views/projects/index.blade.php',
+    'resources/views/projects/create.blade.php',
+    'resources/views/projects/edit.blade.php',
+    'resources/views/projects/show.blade.php',
+    'resources/views/tasks/index.blade.php',
+    'resources/views/tasks/create.blade.php',
+    'resources/views/tasks/edit.blade.php',
+    'resources/views/tasks/show.blade.php',
+    'resources/views/leave-requests/index.blade.php',
+    'resources/views/leave-requests/create.blade.php',
+    'resources/views/leave-requests/edit.blade.php',
+    'resources/views/leave-requests/show.blade.php',
+    'resources/views/attendances/index.blade.php',
+    'resources/views/attendances/create.blade.php',
+    'resources/views/attendances/edit.blade.php',
+    'resources/views/attendances/show.blade.php',
+    'resources/views/trainings/index.blade.php',
+    'resources/views/trainings/create.blade.php',
+    'resources/views/trainings/edit.blade.php',
+    'resources/views/trainings/show.blade.php',
+    'resources/views/recruitment/index.blade.php',
+    'resources/views/recruitment/create.blade.php',
+    'resources/views/recruitment/edit.blade.php',
+    'resources/views/recruitment/show.blade.php',
+    'resources/views/performance-reviews/index.blade.php',
+    'resources/views/performance-reviews/create.blade.php',
+    'resources/views/performance-reviews/edit.blade.php',
+    'resources/views/performance-reviews/show.blade.php',
+    'resources/views/payroll/index.blade.php',
+    'resources/views/payroll/salaries.blade.php',
+    'resources/views/payroll/create-salary.blade.php',
+    'resources/views/payroll/edit-salary.blade.php',
+    'resources/views/payroll/show.blade.php',
+    'resources/views/payment-vouchers/index.blade.php',
+    'resources/views/payment-vouchers/create.blade.php',
+    'resources/views/payment-vouchers/edit.blade.php',
+    'resources/views/payment-vouchers/show.blade.php',
+    'resources/views/receipts/index.blade.php',
+    'resources/views/receipts/create.blade.php',
+    'resources/views/receipts/edit.blade.php',
+    'resources/views/receipts/show.blade.php',
+    'resources/views/budgets/index.blade.php',
+    'resources/views/budgets/create.blade.php',
+    'resources/views/budgets/edit.blade.php',
+    'resources/views/budgets/show.blade.php',
+    'resources/views/documents/index.blade.php',
+    'resources/views/documents/create.blade.php',
+    'resources/views/documents/edit.blade.php',
+    'resources/views/documents/show.blade.php',
+    'resources/views/users/index.blade.php',
+    'resources/views/users/create.blade.php',
+    'resources/views/users/edit.blade.php',
+    'resources/views/users/show.blade.php',
+    'resources/views/roles/index.blade.php',
+    'resources/views/roles/create.blade.php',
+    'resources/views/roles/edit.blade.php',
+    'resources/views/roles/show.blade.php',
+    'resources/views/permissions/index.blade.php',
+    'resources/views/permissions/create.blade.php',
+    'resources/views/permissions/edit.blade.php',
+    'resources/views/permissions/show.blade.php',
+    'resources/views/audit-logs/index.blade.php',
+    'resources/views/audit-logs/show.blade.php',
+    'resources/views/settings/index.blade.php',
+    'resources/views/notifications/index.blade.php',
+    'resources/views/notifications/show.blade.php',
+    'resources/views/reports/index.blade.php',
+    'resources/views/reports/employees.blade.php',
+    'resources/views/reports/attendance.blade.php',
+    'resources/views/reports/leaves.blade.php',
+    'resources/views/reports/projects.blade.php',
+    'resources/views/reports/tasks.blade.php',
+    'resources/views/reports/payroll.blade.php',
+    'resources/views/reports/payment-vouchers.blade.php',
+    'resources/views/reports/receipts.blade.php',
+    'resources/views/reports/budgets.blade.php',
+    'resources/views/reports/trainings.blade.php',
+    'resources/views/reports/recruitment.blade.php',
+    'resources/views/reports/performance.blade.php',
+    'resources/views/reports/documents.blade.php',
+];
+
+$fixed = 0;
+$old = chr(63) . chr(63) . chr(32) . chr(39) . chr(63) . chr(39);
+$new = chr(63) . chr(63) . chr(32) . chr(39) . chr(226) . chr(128) . chr(148) . chr(39);
+
+foreach ($views as $view) {
+    if (file_exists($view)) {
+        $content = file_get_contents($view);
+        if (strpos($content, $old) !== false) {
+            $content = str_replace($old, $new, $content);
+            file_put_contents($view, $content);
+            $fixed++;
+            echo "Fixed: $view\n";
+        }
+    }
+}
+
+echo "\nTotal fixed: $fixed files\n";

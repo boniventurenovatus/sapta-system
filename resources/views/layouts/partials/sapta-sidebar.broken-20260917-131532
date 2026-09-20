@@ -1,0 +1,28 @@
+@php
+    $user = auth()->user();
+    $roleCodes = $user->roles->pluck('code')->toArray();
+@endphp
+
+@if(in_array('super_admin', $roleCodes) || in_array('admin', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-admin')
+@elseif(in_array('bod', $roleCodes) || in_array('ceo', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-executive')
+@elseif(in_array('hr_manager', $roleCodes) || in_array('hr_officer', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-hr')
+@elseif(in_array('finance_manager', $roleCodes) || in_array('accountant', $roleCodes) || in_array('procurement_manager', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-finance')
+@elseif(in_array('program_director', $roleCodes) || in_array('project_manager', $roleCodes) || in_array('project_officer', $roleCodes) || in_array('field_trainer', $roleCodes) || in_array('partnerships_manager', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-program')
+@elseif(in_array('meal_manager', $roleCodes) || in_array('meal_officer', $roleCodes) || in_array('research_officer', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-meal')
+@elseif(in_array('community_manager', $roleCodes) || in_array('ict_manager', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-ict')
+@elseif(in_array('director', $roleCodes) || in_array('admin_director', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-director')
+@elseif(in_array('manager', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-manager')
+@elseif(in_array('staff', $roleCodes))
+    @include('layouts.partials.sapta-sidebar-staff')
+@else
+    @include('layouts.partials.sapta-sidebar-staff')
+@endif

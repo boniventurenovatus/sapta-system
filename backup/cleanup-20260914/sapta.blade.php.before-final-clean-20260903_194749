@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'SAPTA Management System')</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+        /* FORCE ALL FORMS TO TOP */
+        .sapta-content {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            display: block !important;
+        }
+        
+        .sapta-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Remove any scroll hiding */
+        .form-container,
+        .form-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        /* Push content up */
+        .sapta-main-area {
+            padding-top: 60px !important;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+        
+        .sapta-app { display: flex; min-height: 100vh; }
+        
+        .sapta-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: #1a1a2e;
+            color: #a8b2c1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .sapta-brand {
+            flex-shrink: 0;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #1a1a2e;
+        }
+        .sapta-brand a { display: flex; flex-direction: column; text-decoration: none; }
+        .sapta-brand .brand-title { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+        .sapta-brand .brand-title span { color: #4fc3f7; }
+        .sapta-brand .brand-sub { font-size: 10px; color: #6b7a8f; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        
+        .sapta-sidebar-scroll { flex: 1;  padding: 12px 16px 20px; }
+        .sidebar-section-title { font-size: 10px; font-weight: 700; color: #4a5a6f; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 12px 6px; }
+        
+        .sidebar-single-link, .sidebar-menu-button {
+            width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; padding: 8px 12px; border-radius: 8px; color: #a8b2c1; font-size: 14px;
+            font-weight: 500; transition: all 0.2s ease; text-align: left; text-decoration: none !important;
+        }
+        .sidebar-single-link:hover, .sidebar-menu-button:hover { background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none !important; }
+        .sidebar-single-link.active, .sidebar-menu-button.active { background: rgba(79, 195, 247, 0.12); color: #4fc3f7; font-weight: 600; }
+        
+        .sidebar-menu-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .sidebar-menu-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6b7a8f; }
+        .sidebar-menu-icon svg { width: 18px; height: 18px; }
+        .sidebar-menu-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-chevron { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.25s ease; color: #4a5a6f; }
+        .sidebar-chevron.rotate { transform: rotate(180deg); }
+        
+        .sidebar-submenu { display: none; margin: 4px 0 6px 32px; padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.06); }
+        .sidebar-submenu.open { display: block; }
+        .sidebar-submenu-link {
+            min-height: 34px; display: flex; align-items: center; padding: 4px 12px; border-radius: 6px;
+            color: #8898aa; font-size: 13px; font-weight: 500; transition: all 0.15s ease; text-decoration: none !important;
+        }
+        .sidebar-submenu-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none !important; }
+        .sidebar-submenu-link.active { background: rgba(79, 195, 247, 0.08); color: #4fc3f7; font-weight: 600; }
+        .sidebar-submenu-label { font-size: 9px; font-weight: 700; color: #4a5a6f; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 12px 2px; }
+        
+        .sapta-sidebar-footer { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06); background: #1a1a2e; }
+        .sidebar-account-link { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; color: #a8b2c1; transition: all 0.15s; text-decoration: none !important; }
+        .sidebar-account-link:hover { background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none !important; }
+        .sidebar-account-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: #a8b2c1; flex-shrink: 0; }
+        .sidebar-account-icon svg { width: 18px; height: 18px; }
+        .sidebar-account-title { font-size: 13px; font-weight: 600; color: #ffffff; }
+        .sidebar-account-subtitle { font-size: 11px; color: #6b7a8f; }
+        
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px; margin-left: 260px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; background: #f0f2f5; }
+        
+        .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            position: sticky; top: 0; z-index: 100; min-height: 56px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 20px; background: #ffffff; border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        
+        .topbar-logo-icon { width: 42px; height: 42px; border-radius: 10px; background: #1a1a2e; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 22px; flex-shrink: 0; }
+        .topbar-logo-text { font-size: 20px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; }
+        .topbar-logo-text span { color: #1a5276; }
+        .topbar-logo-sub { font-size: 9px; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .lang-switcher { display: flex; gap: 4px; background: #f0f2f5; padding: 4px; border-radius: 8px; border: 1px solid #e8ecf1; }
+        .lang-switcher button { padding: 6px 14px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #8898aa; }
+        .lang-switcher button.active { background: white; color: #1a5276; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .lang-switcher button:hover { opacity: 0.8; }
+        
+        .topbar-user { display: flex; align-items: center; gap: 12px; padding: 4px 12px 4px 4px; border-radius: 10px; transition: all 0.2s; cursor: pointer; }
+        .topbar-user:hover { background: #f8f9fa; }
+        .topbar-avatar { width: 38px; height: 38px; border-radius: 50%; background: #1a5276; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
+        .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .topbar-user-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+        .topbar-user-role { font-size: 12px; color: #8898aa; }
+        .topbar-date { font-size: 13px; color: #8898aa; padding-left: 16px; border-left: 1px solid #e8ecf1; white-space: nowrap; }
+        
+        .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px); flex: 1; padding: 5px 10px; width: 100%; }
+        .sapta-container { max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        .sapta-footer { flex-shrink: 0; padding: 16px 32px; border-top: 1px solid #e8ecf1; background: #fff; color: #8898aa; font-size: 13px; text-align: center; }
+        
+        .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
+        .alert-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
+        
+        .mobile-menu-button { display: none; width: 40px; height: 40px; border: 2px solid #e8ecf1; border-radius: 10px; background: #fff; align-items: center; justify-content: center; color: #1a1a2e; }
+        .mobile-menu-button:hover { background: #f8f9fa; border-color: #1a5276; }
+        .sapta-sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        .sapta-sidebar-overlay.show { display: block; }
+        
+        @media (max-width: 768px) {
+            .sapta-sidebar { transform: translateX(-100%); width: 280px; }
+            .sapta-sidebar.mobile-open { transform: translateX(0); }
+            .sapta-sidebar-overlay.show { display: block; }
+            .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px; margin-left: 0; width: 100%; }
+            .mobile-menu-button { display: inline-flex; }
+            .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0; padding: 0 16px; min-height: 60px; flex-wrap: wrap; }
+            .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px); padding: 16px; }
+            .topbar-date { display: none; }
+            .topbar-user-info { display: none; }
+        }
+            
+        /* ==================== STANDARDIZED FONT SIZES - eGA COMPLIANT ==================== */
+        
+        /* Base - 16px = 1rem */
+        html { font-size: 16px; }
+        
+        /* Body Text - 16px */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #1a1a2e;
+        }
+        
+        /* Headings */
+        h1 { font-size: 2rem; font-weight: 700; }      /* 32px */
+        h2 { font-size: 1.75rem; font-weight: 700; }   /* 28px */
+        h3 { font-size: 1.5rem; font-weight: 600; }    /* 24px */
+        h4 { font-size: 1.25rem; font-weight: 600; }   /* 20px */
+        h5 { font-size: 1.125rem; font-weight: 600; }  /* 18px */
+        h6 { font-size: 1rem; font-weight: 600; }      /* 16px */
+        
+        /* Paragraphs */
+        p { font-size: 1rem; line-height: 1.6; }       /* 16px */
+        
+        /* Small Text - 14px */
+        .text-small,
+        small,
+        .small-text { font-size: 0.875rem; }           /* 14px */
+        
+        /* Very Small Text - 12px */
+        .text-xs,
+        .very-small { font-size: 0.75rem; }            /* 12px */
+        
+        /* ==================== SIDEBAR ==================== */
+        .sidebar-section-title {
+            font-size: 0.625rem;                       /* 10px */
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #4a5a6f;
+        }
+        .sidebar-single-link,
+        .sidebar-menu-button {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 500;
+        }
+        .sidebar-menu-text {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .sidebar-submenu-link {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        .sidebar-submenu-label {
+            font-size: 0.5625rem;                      /* 9px */
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .sidebar-account-title {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 600;
+        }
+        .sidebar-account-subtitle {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== TOPBAR ==================== */
+        .topbar-logo-text {
+            font-size: 1.25rem;                        /* 20px */
+            font-weight: 800;
+        }
+        .topbar-logo-sub {
+            font-size: 0.5625rem;                      /* 9px */
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .topbar-search input {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .topbar-lang {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 600;
+        }
+        .topbar-user-name {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .topbar-user-role {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        .topbar-date {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .btn-sm { font-size: 0.8125rem; }              /* 13px */
+        .btn-lg { font-size: 1rem; }                   /* 16px */
+        
+        /* ==================== FORMS ==================== */
+        .form-label {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .form-control,
+        .form-control input,
+        .form-control select,
+        .form-control textarea {
+            font-size: 1rem;                           /* 16px - prevents iOS zoom */
+            font-family: 'Montserrat', sans-serif;
+        }
+        .form-control::placeholder {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .help-text,
+        .form-text {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== TABLES ==================== */
+        .table th {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table td {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .table .badge {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 600;
+        }
+        
+        /* ==================== CARDS ==================== */
+        .card-title {
+            font-size: 1.125rem;                       /* 18px */
+            font-weight: 600;
+        }
+        .card-subtitle {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .card-text {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== STATS ==================== */
+        .stat-number {
+            font-size: 1.75rem;                        /* 28px */
+            font-weight: 800;
+        }
+        .stat-label {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        
+        /* ==================== BADGES ==================== */
+        .badge {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 600;
+        }
+        
+        /* ==================== FOOTER ==================== */
+        .footer-text,
+        .sapta-footer {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== BREADCRUMBS ==================== */
+        .breadcrumb {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== MODALS ==================== */
+        .modal-title {
+            font-size: 1.25rem;                        /* 20px */
+            font-weight: 700;
+        }
+        .modal-body {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== DASHBOARD ==================== */
+        .dashboard-stat-number {
+            font-size: 1.75rem;                        /* 28px */
+            font-weight: 800;
+        }
+        .dashboard-stat-label {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        .quick-action-btn .label {
+            font-size: 0.6875rem;                      /* 11px */
+            font-weight: 500;
+        }
+        .activity-info .title {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 500;
+        }
+        .activity-info .desc {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        .activity-time {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== NOTIFICATIONS ==================== */
+        .notification-item .content .text {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        .notification-item .content .time {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== PAGINATION ==================== */
+        .pagination {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== CHARTS ==================== */
+        .chart-label {
+            font-size: 0.625rem;                       /* 10px */
+        }
+        .chart-legend {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        
+        /* ==================== EMPLOYEE FORM ==================== */
+        .section-title {
+            font-size: 1.125rem;                       /* 18px */
+            font-weight: 700;
+        }
+        
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.75rem; }                 /* 28px */
+            h2 { font-size: 1.5rem; }                  /* 24px */
+            h3 { font-size: 1.25rem; }                 /* 20px */
+            h4 { font-size: 1.125rem; }                /* 18px */
+            .stat-number { font-size: 1.5rem; }        /* 24px */
+            .dashboard-stat-number { font-size: 1.5rem; } /* 24px */
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5rem; }                  /* 24px */
+            h2 { font-size: 1.25rem; }                 /* 20px */
+            .stat-number { font-size: 1.25rem; }       /* 20px */
+            .dashboard-stat-number { font-size: 1.25rem; } /* 20px */
+        }
+            
+        /* Fix scrolling issues */
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px);
+            flex: 1;
+            
+            padding: 5px 10px;
+        }
+        
+        .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .sapta-footer {
+            flex-shrink: 0;
+        }
+        
+        /* Fix for collapsed sidebar */
+        .sapta-main-area.expanded {
+            margin-left: 70px;
+            margin-left: 70px;
+        }
+            
+        /* FORM CONTAINER - Short Scroll */
+        .form-container {
+            
+            
+            padding: 20px 24px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .form-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .form-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@yield('title', 'SAPTA Management System')</title>
+
+    <style>
+        /* =========================================================
+           SAPTA MANAGEMENT SYSTEM - MAIN LAYOUT
+           ========================================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f0f2f5;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* =========================================================
+           SIDEBAR
+           ========================================================= */
+
+        .sapta-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            width: 270px;
+            z-index: 1100;
+
+            background: #172033;
+            color: #ffffff;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            transition: width 0.3s ease;
+        }
+
+        .sapta-sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sapta-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sapta-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        /* =========================================================
+           MAIN AREA
+           ========================================================= */
+
+        .sapta-main-area {
+            margin-left: 270px;
+            min-height: 100vh;
+
+            background: #f0f2f5;
+
+            transition: margin-left 0.3s ease;
+        }
+
+        .sapta-main-area.expanded {
+            margin-left: 70px;
+        }
+
+        /* =========================================================
+           TOPBAR
+           ========================================================= */
+
+        .sapta-topbar {
+            position: fixed;
+
+            top: 0;
+            left: 270px;
+            right: 0;
+
+            height: 64px;
+
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 20px;
+
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+            transition: left 0.3s ease;
+        }
+
+        .sapta-main-area.expanded .sapta-topbar {
+            left: 70px;
+        }
+
+        /* =========================================================
+           CONTENT
+           ========================================================= */
+
+        .sapta-content {
+            min-height: 100vh;
+
+            padding: 84px 20px 30px;
+
+            background: #f0f2f5;
+        }
+
+        .sapta-container {
+            width: 100%;
+            max-width: 1200px;
+
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* =========================================================
+           FORMS
+           ========================================================= */
+
+        .form-container {
+            width: 100%;
+            max-width: 850px;
+
+            margin: 0 auto;
+
+            padding: 20px;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section-title {
+            margin: 0 0 15px;
+
+            padding-bottom: 10px;
+
+            font-size: 18px;
+            font-weight: 600;
+
+            color: #172033;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .form-row {
+            display: grid;
+
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            width: 100%;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+
+            padding: 10px 12px;
+
+            font-size: 14px;
+
+            color: #111827;
+
+            background: #ffffff;
+
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
+
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 20px;
+            padding-top: 15px;
+
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* =========================================================
+           BUTTONS
+           ========================================================= */
+
+        .btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-height: 40px;
+
+            padding: 9px 18px;
+
+            border: 0;
+            border-radius: 6px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* =========================================================
+           ALERTS
+           ========================================================= */
+
+        .alert {
+            width: 100%;
+
+            margin-bottom: 15px;
+            padding: 12px 15px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* =========================================================
+           SIDEBAR COLLAPSE BUTTON
+           ========================================================= */
+
+        .sapta-sidebar-toggle {
+            position: fixed;
+
+            top: 72px;
+            left: 250px;
+
+            width: 36px;
+            height: 36px;
+
+            z-index: 1200;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 0;
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: #ffffff;
+
+            cursor: pointer;
+
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+
+            transition:
+                left 0.3s ease,
+                transform 0.2s ease;
+        }
+
+        .sapta-sidebar-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .sapta-sidebar.collapsed ~ .sapta-sidebar-toggle {
+            left: 52px;
+        }
+
+        /* =========================================================
+           MOBILE OVERLAY
+           ========================================================= */
+
+        .sapta-mobile-overlay {
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 1050;
+
+            background: rgba(0,0,0,0.45);
+        }
+
+        .sapta-mobile-overlay.show {
+            display: block;
+        }
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media (max-width: 768px) {
+
+            .sapta-sidebar {
+                width: 270px;
+
+                transform: translateX(-100%);
+
+                transition:
+                    transform 0.3s ease;
+            }
+
+            .sapta-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .sapta-sidebar.collapsed {
+                width: 270px;
+            }
+
+            .sapta-main-area,
+            .sapta-main-area.expanded {
+                margin-left: 0;
+            }
+
+            .sapta-topbar,
+            .sapta-main-area.expanded .sapta-topbar {
+                left: 0;
+            }
+
+            .sapta-content {
+                padding: 78px 10px 20px;
+            }
+
+            .form-container {
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+            .sapta-sidebar-toggle {
+                left: 15px;
+                top: 14px;
+            }
+
+            .sapta-sidebar.collapsed ~ .sapta-sidebar-toggle {
+                left: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {{-- =========================================================
+         SIDEBAR
+         ========================================================= --}}
+
+    <aside class="sapta-sidebar" id="saptaSidebar">
+
+        {{-- YOUR EXISTING SIDEBAR CONTENT GOES HERE --}}
+
+    </aside>
+
+
+    {{-- =========================================================
+         SIDEBAR TOGGLE
+         ========================================================= --}}
+
+    <button
+        type="button"
+        class="sapta-sidebar-toggle"
+        id="saptaSidebarToggle"
+        onclick="toggleSidebar()"
+        aria-label="Toggle sidebar"
+    >
+        ☰
+    </button>
+
+
+    {{-- =========================================================
+         MOBILE OVERLAY
+         ========================================================= --}}
+
+    <div
+        class="sapta-mobile-overlay"
+        id="saptaMobileOverlay"
+        onclick="closeMobileSidebar()"
+    ></div>
+
+
+    {{-- =========================================================
+         MAIN AREA
+         ========================================================= --}}
+
+    <div class="sapta-main-area" id="saptaMainArea">
+
+        {{-- TOPBAR --}}
+        <header class="sapta-topbar">
+
+            <div>
+                <strong>
+                    @yield('page-title', 'SAPTA Management System')
+                </strong>
+            </div>
+
+            <div>
+                @auth
+                    {{ Auth::user()->name ?? 'User' }}
+                @endauth
+            </div>
+
+        </header>
+
+
+        {{-- CONTENT --}}
+        <main class="sapta-content">
+
+            <div class="sapta-container">
+
+                {{-- SUCCESS MESSAGE --}}
+                @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+
+                {{-- ERROR MESSAGE --}}
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>Please correct the following:</strong>
+
+                        <ul style="margin:8px 0 0 20px;">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+
+                {{-- PAGE CONTENT --}}
+                @yield('content')
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script>
+        /* =========================================================
+           SIDEBAR
+           ========================================================= */
+
+        function toggleSidebar() {
+
+            const sidebar = document.getElementById('saptaSidebar');
+            const mainArea = document.getElementById('saptaMainArea');
+
+            if (!sidebar || !mainArea) {
+                return;
+            }
+
+            sidebar.classList.toggle('collapsed');
+            mainArea.classList.toggle('expanded');
+
+            const collapsed =
+                sidebar.classList.contains('collapsed');
+
+            localStorage.setItem(
+                'saptaSidebarCollapsed',
+                collapsed ? '1' : '0'
+            );
+        }
+
+
+        /* =========================================================
+           RESTORE SIDEBAR STATE
+           ========================================================= */
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const mainArea =
+                document.getElementById('saptaMainArea');
+
+            if (!sidebar || !mainArea) {
+                return;
+            }
+
+            const savedState =
+                localStorage.getItem('saptaSidebarCollapsed');
+
+            if (savedState === '1' &&
+                window.innerWidth > 768) {
+
+                sidebar.classList.add('collapsed');
+                mainArea.classList.add('expanded');
+            }
+        });
+
+
+        /* =========================================================
+           KEYBOARD SHORTCUT
+           CTRL+B / CMD+B
+           ========================================================= */
+
+        document.addEventListener('keydown', function (event) {
+
+            if ((event.ctrlKey || event.metaKey) &&
+                event.key.toLowerCase() === 'b') {
+
+                event.preventDefault();
+
+                toggleSidebar();
+            }
+        });
+
+
+        /* =========================================================
+           MOBILE SIDEBAR
+           ========================================================= */
+
+        function openMobileSidebar() {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const overlay =
+                document.getElementById('saptaMobileOverlay');
+
+            if (!sidebar || !overlay) {
+                return;
+            }
+
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('show');
+
+            document.body.style.overflow = 'hidden';
+        }
+
+
+        function closeMobileSidebar() {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const overlay =
+                document.getElementById('saptaMobileOverlay');
+
+            if (!sidebar || !overlay) {
+                return;
+            }
+
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('show');
+
+            document.body.style.overflow = '';
+        }
+
+
+        /* =========================================================
+           MOBILE RESIZE
+           ========================================================= */
+
+        window.addEventListener('resize', function () {
+
+            if (window.innerWidth > 768) {
+                closeMobileSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>

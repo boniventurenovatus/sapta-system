@@ -1,0 +1,46 @@
+@extends('layouts.sapta')
+
+@section('title', 'Dashboard')
+
+@section('content')
+<style>
+    .dashboard-container { padding: 16px 0; }
+    .dashboard-title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px 0; }
+    .dashboard-subtitle { color: #8898aa; font-size: 14px; margin: 0 0 20px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: 12px; padding: 16px 20px; border: 1px solid #e8ecf1; transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+    .stat-card .stat-number { font-size: 26px; font-weight: 800; color: #1a1a2e; }
+    .stat-card .stat-label { font-size: 13px; color: #8898aa; font-weight: 500; margin-top: 2px; }
+    .stat-card .stat-icon { font-size: 24px; opacity: 0.6; }
+    .stat-card .stat-row { display: flex; justify-content: space-between; align-items: center; }
+    .quick-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .quick-link { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e8ecf1; text-decoration: none; color: #1a1a2e; text-align: center; transition: all 0.3s ease; }
+    .quick-link:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); text-decoration: none; color: #1a1a2e; }
+    .quick-link .icon { font-size: 28px; display: block; margin-bottom: 4px; }
+    .quick-link .label { font-size: 13px; font-weight: 500; }
+    .quick-link .count { font-size: 11px; color: #8898aa; }
+    @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr 1fr; } .quick-links { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } .quick-links { grid-template-columns: 1fr; } }
+</style>
+
+<div class="dashboard-container" style="padding:10px 0;text-align:center;">
+    <h1 class="dashboard-title" data-en="Dashboard" data-sw="Dashibodi">Dashboard</h1>
+    <p class="dashboard-subtitle" data-en="Welcome to SAPTA Management System" data-sw="Karibu kwenye Mfumo wa Usimamizi wa SAPTA">Welcome to SAPTA Management System</p>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-row"><div><div class="stat-number">{{ $totalOrganizations ?? 0 }}</div><div class="stat-label" data-en="Organizations" data-sw="Mashirika">Organizations</div></div><div class="stat-icon">??</div></div></div>
+        <div class="stat-card"><div class="stat-row"><div><div class="stat-number">{{ $totalEmployees ?? 0 }}</div><div class="stat-label" data-en="Employees" data-sw="Wafanyakazi">Employees</div></div><div class="stat-icon">??</div></div></div>
+        <div class="stat-card"><div class="stat-row"><div><div class="stat-number">{{ $totalUsers ?? 0 }}</div><div class="stat-label" data-en="Users" data-sw="Watumiaji">Users</div></div><div class="stat-icon">??</div></div></div>
+        <div class="stat-card"><div class="stat-row"><div><div class="stat-number">{{ $totalProjects ?? 0 }}</div><div class="stat-label" data-en="Projects" data-sw="Miradi">Projects</div></div><div class="stat-icon">??</div></div></div>
+    </div>
+
+    <div class="quick-links">
+        <a href="{{ route('employees.index') }}" class="quick-link"><span class="icon">??</span><div class="label" data-en="Employees" data-sw="Wafanyakazi">Employees</div><div class="count">{{ $totalEmployees ?? 0 }} <span data-en="records" data-sw="rekodi">records</span></div></a>
+        <a href="{{ route('projects.index') }}" class="quick-link"><span class="icon">??</span><div class="label" data-en="Projects" data-sw="Miradi">Projects</div><div class="count">{{ $totalProjects ?? 0 }} <span data-en="records" data-sw="rekodi">records</span></div></a>
+        <a href="{{ route('attendances.index') }}" class="quick-link"><span class="icon">??</span><div class="label" data-en="Attendance" data-sw="Mahudhurio">Attendance</div><div class="count">{{ $todayAttendance ?? 0 }} <span data-en="today" data-sw="leo">today</span></div></a>
+        <a href="{{ route('leave-requests.index') }}" class="quick-link"><span class="icon">???</span><div class="label" data-en="Leave Requests" data-sw="Maombi ya Likizo">Leave Requests</div><div class="count">{{ $pendingLeaves ?? 0 }} <span data-en="pending" data-sw="yanasubiri">pending</span></div></a>
+    </div>
+</div>
+@endsection
+

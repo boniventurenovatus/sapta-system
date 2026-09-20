@@ -1,0 +1,157 @@
+@extends('layouts.sapta')
+
+@section('title', 'Reports Dashboard')
+
+@section('content')
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-size: 24px; font-weight: 700; color: #1a1a2e; margin: 0; }
+    .page-header p { color: #8898aa; margin: 4px 0 0; font-size: 14px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 16px 20px; border: 1px solid #e8ecf1; transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .stat-card .stat-number { font-size: 28px; font-weight: 800; color: #1a1a2e; }
+    .stat-card .stat-label { font-size: 13px; color: #8898aa; font-weight: 500; }
+    .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-card .stat-top { display: flex; justify-content: space-between; align-items: center; }
+    .stat-card .stat-icon.blue { background: #dbeafe; color: #1a5276; }
+    .stat-card .stat-icon.green { background: #d4edda; color: #28a745; }
+    .stat-card .stat-icon.orange { background: #fff3cd; color: #ffc107; }
+    .stat-card .stat-icon.purple { background: #e8d5f5; color: #6f42c1; }
+    .stat-card .stat-icon.red { background: #f8d7da; color: #dc3545; }
+    .stat-card .stat-icon.teal { background: #d1ecf1; color: #17a2b8; }
+    
+    .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+    .report-card { background: white; border-radius: 12px; border: 1px solid #e8ecf1; padding: 20px; transition: all 0.3s ease; text-decoration: none; color: #1a1a2e; display: block; }
+    .report-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); text-decoration: none; color: #1a1a2e; }
+    .report-card .report-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+    .report-card .report-title { font-size: 16px; font-weight: 600; }
+    .report-card .report-desc { font-size: 13px; color: #8898aa; margin-top: 4px; }
+    .report-card .report-count { font-size: 13px; color: #1a5276; font-weight: 600; margin-top: 8px; }
+    
+    .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .activity-icon.blue { background: #dbeafe; color: #1a5276; }
+    .activity-icon.green { background: #d4edda; color: #28a745; }
+    .activity-icon.orange { background: #fff3cd; color: #ffc107; }
+    .activity-icon.purple { background: #e8d5f5; color: #6f42c1; }
+    .activity-info { flex: 1; }
+    .activity-info .title { font-size: 14px; font-weight: 500; color: #1a1a2e; }
+    .activity-info .desc { font-size: 12px; color: #8898aa; }
+    .activity-time { font-size: 11px; color: #b0b8c4; white-space: nowrap; }
+    
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: 1fr 1fr; }
+        .report-cards { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1 data-en="Reports Dashboard" data-sw="Dashibodi ya Ripoti">Reports Dashboard</h1>
+        <p data-en="Overview of all system reports" data-sw="Muhtasari wa ripoti zote za mfumo">Overview of all system reports</p>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-top">
+            <div>
+                <div class="stat-number">{{ $totalEmployees ?? 0 }}</div>
+                <div class="stat-label" data-en="Employees" data-sw="Wafanyakazi">Employees</div>
+            </div>
+            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-top">
+            <div>
+                <div class="stat-number">{{ $totalProjects ?? 0 }}</div>
+                <div class="stat-label" data-en="Projects" data-sw="Miradi">Projects</div>
+            </div>
+            <div class="stat-icon green"><i class="fas fa-project-diagram"></i></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-top">
+            <div>
+                <div class="stat-number">{{ $totalTasks ?? 0 }}</div>
+                <div class="stat-label" data-en="Tasks" data-sw="Kazi">Tasks</div>
+            </div>
+            <div class="stat-icon orange"><i class="fas fa-tasks"></i></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-top">
+            <div>
+                <div class="stat-number">{{ $totalUsers ?? 0 }}</div>
+                <div class="stat-label" data-en="System Users" data-sw="Watumiaji wa Mfumo">System Users</div>
+            </div>
+            <div class="stat-icon purple"><i class="fas fa-user-cog"></i></div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Cards -->
+<div class="report-cards">
+    <a href="{{ route('reports.employees') }}" class="report-card">
+        <span class="report-icon">??</span>
+        <div class="report-title" data-en="Employee Report" data-sw="Ripoti ya Wafanyakazi">Employee Report</div>
+        <div class="report-desc" data-en="View employee statistics and details" data-sw="Tazama takwimu na maelezo ya wafanyakazi">View employee statistics and details</div>
+        <div class="report-count">{{ $totalEmployees ?? 0 }} <span data-en="employees" data-sw="wafanyakazi">employees</span></div>
+    </a>
+    
+    <a href="{{ route('reports.attendance') }}" class="report-card">
+        <span class="report-icon">??</span>
+        <div class="report-title" data-en="Attendance Report" data-sw="Ripoti ya Mahudhurio">Attendance Report</div>
+        <div class="report-desc" data-en="View attendance records and statistics" data-sw="Tazama rekodi na takwimu za mahudhurio">View attendance records and statistics</div>
+        <div class="report-count"><span data-en="Today" data-sw="Leo">Today</span>: {{ ($presentToday ?? 0) + ($absentToday ?? 0) + ($lateToday ?? 0) }} <span data-en="records" data-sw="rekodi">records</span></div>
+    </a>
+    
+    <a href="{{ route('reports.projects') }}" class="report-card">
+        <span class="report-icon">??</span>
+        <div class="report-title" data-en="Project Report" data-sw="Ripoti ya Miradi">Project Report</div>
+        <div class="report-desc" data-en="View project progress and status" data-sw="Tazama maendeleo na hali ya miradi">View project progress and status</div>
+        <div class="report-count">{{ $activeProjects ?? 0 }} <span data-en="active" data-sw="zinazoendelea">active</span> | {{ $completedProjects ?? 0 }} <span data-en="completed" data-sw="zimekamilika">completed</span></div>
+    </a>
+    
+    <a href="{{ route('reports.tasks') }}" class="report-card">
+        <span class="report-icon">?</span>
+        <div class="report-title" data-en="Task Report" data-sw="Ripoti ya Kazi">Task Report</div>
+        <div class="report-desc" data-en="View task completion and status" data-sw="Tazama ukamilishaji na hali ya kazi">View task completion and status</div>
+        <div class="report-count">{{ $doneTasks ?? 0 }} <span data-en="completed" data-sw="zimekamilika">completed</span> | {{ $inProgressTasks ?? 0 }} <span data-en="in progress" data-sw="zinaendelea">in progress</span></div>
+    </a>
+    
+    <a href="{{ route('reports.leaves') }}" class="report-card">
+        <span class="report-icon">???</span>
+        <div class="report-title" data-en="Leave Report" data-sw="Ripoti ya Likizo">Leave Report</div>
+        <div class="report-desc" data-en="View leave requests and approvals" data-sw="Tazama maombi na idhini ya likizo">View leave requests and approvals</div>
+        <div class="report-count">{{ $pendingLeaves ?? 0 }} <span data-en="pending" data-sw="zinasubiri">pending</span> | {{ $approvedLeaves ?? 0 }} <span data-en="approved" data-sw="zimekubaliwa">approved</span></div>
+    </a>
+</div>
+
+<!-- Recent Activities -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0" data-en="Recent Activities" data-sw="Shughuli za Hivi Karibuni">Recent Activities</h5>
+    </div>
+    <div class="card-body">
+        @if(isset($recentActivities) && count($recentActivities) > 0)
+            @foreach($recentActivities as $activity)
+            <div class="activity-item">
+                <div class="activity-icon {{ $activity['color'] }}"><i class="fas fa-{{ $activity['icon'] }}"></i></div>
+                <div class="activity-info">
+                    <div class="title">{{ $activity['title'] }}</div>
+                    <div class="desc">{{ $activity['description'] }}</div>
+                </div>
+                <div class="activity-time">{{ $activity['time'] }}</div>
+            </div>
+            @endforeach
+        @else
+            <p class="text-center text-muted py-3" data-en="No recent activities" data-sw="Hakuna shughuli za hivi karibuni">No recent activities</p>
+        @endif
+    </div>
+</div>
+@endsection

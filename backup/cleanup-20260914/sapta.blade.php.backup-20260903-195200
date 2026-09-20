@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>@yield('title', 'SAPTA Management System')</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body>
+
+    {{-- SIDEBAR --}}
+
+<aside class="sapta-sidebar" id="saptaSidebar">
+</aside>
+
+    {{-- SIDEBAR TOGGLE --}}
+
+    <button
+        type="button"
+        class="sapta-sidebar-toggle"
+        id="saptaSidebarToggle"
+        onclick="toggleSidebar()"
+        aria-label="Toggle sidebar"
+    >
+        ☰
+    </button>
+
+    {{-- MOBILE OVERLAY --}}
+
+    <div
+        class="sapta-mobile-overlay"
+        id="saptaMobileOverlay"
+        onclick="closeMobileSidebar()"
+    ></div>
+
+    {{-- MAIN AREA --}}
+
+    <div class="sapta-main-area" id="saptaMainArea">
+
+        <header class="sapta-topbar">
+
+            <div>
+                <strong>
+                    @yield('page-title', 'SAPTA Management System')
+                </strong>
+            </div>
+
+            <div>
+                @auth
+                    {{ Auth::user()->name ?? Auth::user()->username ?? 'User' }}
+                @endauth
+            </div>
+
+        </header>
+
+        <main class="sapta-content">
+
+            <div class="sapta-container">
+
+                @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+
+                        <strong>Please correct the following:</strong>
+
+                        <ul style="margin:8px 0 0 20px;">
+
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+
+                        </ul>
+
+                    </div>
+                @endif
+
+                @yield('content')
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const mainArea =
+                document.getElementById('saptaMainArea');
+
+            if (!sidebar || !mainArea) {
+                return;
+            }
+
+            if (window.innerWidth <= 768) {
+
+                sidebar.classList.toggle('mobile-open');
+
+                const overlay =
+                    document.getElementById('saptaMobileOverlay');
+
+                if (overlay) {
+                    overlay.classList.toggle(
+                        'show',
+                        sidebar.classList.contains('mobile-open')
+                    );
+                }
+
+                return;
+            }
+
+            sidebar.classList.toggle('collapsed');
+            mainArea.classList.toggle('expanded');
+
+            localStorage.setItem(
+                'saptaSidebarCollapsed',
+                sidebar.classList.contains('collapsed') ? '1' : '0'
+            );
+        }
+
+
+        function openMobileSidebar() {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const overlay =
+                document.getElementById('saptaMobileOverlay');
+
+            if (!sidebar || !overlay) {
+                return;
+            }
+
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('show');
+        }
+
+
+        function closeMobileSidebar() {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const overlay =
+                document.getElementById('saptaMobileOverlay');
+
+            if (!sidebar || !overlay) {
+                return;
+            }
+
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('show');
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const sidebar =
+                document.getElementById('saptaSidebar');
+
+            const mainArea =
+                document.getElementById('saptaMainArea');
+
+            if (!sidebar || !mainArea) {
+                return;
+            }
+
+            if (
+                localStorage.getItem('saptaSidebarCollapsed') === '1' &&
+                window.innerWidth > 768
+            ) {
+
+                sidebar.classList.add('collapsed');
+                mainArea.classList.add('expanded');
+            }
+        });
+
+
+        document.addEventListener('keydown', function (event) {
+
+            if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key.toLowerCase() === 'b'
+            ) {
+
+                event.preventDefault();
+
+                toggleSidebar();
+            }
+        });
+
+
+        window.addEventListener('resize', function () {
+
+            if (window.innerWidth > 768) {
+                closeMobileSidebar();
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

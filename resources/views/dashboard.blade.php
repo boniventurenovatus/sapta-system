@@ -1,0 +1,652 @@
+@extends('layouts.sapta')
+
+@section('title', 'Dashboard | SAPTA')
+@section('page_title', 'Dashboard')
+@section('page_subtitle', 'Welcome back, {{ auth()->user()->username ?? "Admin" }}! Here\'s what\'s happening today.')
+
+@section('content')
+<style>
+    .sapta-dashboard {
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* =========================================================
+       RANGI ZA SAPTA
+    ========================================================= */
+    :root {
+        --sapta-blue: #1a5276;
+        --sapta-blue-light: #e8f0f5;
+        --sapta-blue-dark: #0a212f;
+        --sapta-udongo: #8d6e63;
+        --sapta-udongo-light: #f5f0ee;
+        --sapta-green: #27ae60;
+        --sapta-green-light: #eafaf1;
+        --sapta-white: #ffffff;
+        --sapta-black: #1a1a1a;
+        --sapta-gray: #6b7280;
+        --sapta-border: #d7c3bb;
+    }
+
+    /* Stats Grid - 6 cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    @media (max-width: 1200px) {
+        .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+        .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+        background: var(--sapta-white);
+        border-radius: 10px;
+        border: 1px solid var(--sapta-border);
+        padding: 14px 16px;
+        transition: all 0.2s;
+    }
+    .stat-card:hover {
+        border-color: var(--sapta-blue);
+        box-shadow: 0 2px 12px rgba(26, 82, 118, 0.08);
+    }
+    .stat-card .number {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--sapta-black);
+    }
+    .stat-card .label {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--sapta-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+    }
+    .stat-card .icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .icon-blue { background: var(--sapta-blue-light); color: var(--sapta-blue); }
+    .icon-green { background: var(--sapta-green-light); color: var(--sapta-green); }
+    .icon-udongo { background: var(--sapta-udongo-light); color: var(--sapta-udongo); }
+    .icon-dark { background: #eef1ed; color: var(--sapta-black); }
+    .stat-card .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Main Grid - 2 columns */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+        .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+        background: var(--sapta-white);
+        border-radius: 10px;
+        border: 1px solid var(--sapta-border);
+        overflow: hidden;
+    }
+    .panel-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--sapta-border);
+        background: var(--sapta-udongo-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .panel-header h3 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--sapta-black);
+    }
+    .panel-header .panel-sub {
+        font-size: 11px;
+        color: var(--sapta-gray);
+        font-weight: 400;
+    }
+    .panel-header .panel-link {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--sapta-blue);
+        text-decoration: none;
+    }
+    .panel-header .panel-link:hover {
+        text-decoration: underline;
+        color: var(--sapta-blue-dark);
+    }
+    .panel-body {
+        padding: 12px 16px;
+    }
+
+    /* Chart */
+    .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        height: 120px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--sapta-border);
+    }
+    .chart-bar-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+    .chart-bar {
+        width: 100%;
+        max-width: 28px;
+        border-radius: 3px 3px 0 0;
+        min-height: 4px;
+    }
+    .chart-bar.budget { background: var(--sapta-udongo); opacity: 0.5; }
+    .chart-bar.actual { background: var(--sapta-blue); }
+    .chart-label { font-size: 9px; color: var(--sapta-gray); font-weight: 500; }
+    .chart-legend {
+        display: flex;
+        gap: 16px;
+        padding: 10px 0 4px;
+    }
+    .chart-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--sapta-black);
+    }
+    .chart-legend-item .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+    }
+    .dot-budget { background: var(--sapta-udongo); opacity: 0.5; }
+    .dot-actual { background: var(--sapta-blue); }
+
+    .chart-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding-top: 10px;
+    }
+    .chart-summary-item {
+        text-align: center;
+        padding: 6px 8px;
+        background: var(--sapta-udongo-light);
+        border-radius: 6px;
+        border: 1px solid var(--sapta-border);
+    }
+    .chart-summary-item .number {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--sapta-black);
+    }
+    .chart-summary-item .label {
+        font-size: 9px;
+        color: var(--sapta-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    /* Activities */
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--sapta-border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+    .activity-icon.green { background: var(--sapta-green-light); color: var(--sapta-green); }
+    .activity-icon.blue { background: var(--sapta-blue-light); color: var(--sapta-blue); }
+    .activity-icon.udongo { background: var(--sapta-udongo-light); color: var(--sapta-udongo); }
+    .activity-content { flex: 1; min-width: 0; }
+    .activity-title { font-size: 12px; font-weight: 600; color: var(--sapta-black); }
+    .activity-desc { font-size: 11px; color: var(--sapta-gray); }
+    .activity-time { font-size: 10px; color: var(--sapta-gray); flex-shrink: 0; white-space: nowrap; }
+
+    /* Project Status */
+    .project-status-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 4px 0;
+    }
+    .project-status-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 10px;
+        background: var(--sapta-udongo-light);
+        border-radius: 6px;
+        border: 1px solid var(--sapta-border);
+        font-size: 12px;
+    }
+    .project-status-item .ps-label { color: var(--sapta-gray); }
+    .project-status-item .ps-value { font-weight: 600; color: var(--sapta-black); }
+
+    /* Quick Actions */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 8px;
+        padding: 4px 0;
+    }
+    @media (max-width: 600px) {
+        .quick-actions-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 8px;
+        background: var(--sapta-udongo-light);
+        border: 1px solid var(--sapta-border);
+        border-radius: 6px;
+        text-decoration: none;
+        color: var(--sapta-black);
+        transition: 0.2s;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 500;
+        gap: 4px;
+    }
+    .quick-action-btn:hover {
+        border-color: var(--sapta-blue);
+        background: var(--sapta-blue-light);
+        color: var(--sapta-blue);
+        transform: translateY(-2px);
+    }
+    .quick-action-btn .qa-icon svg {
+        width: 16px;
+        height: 16px;
+        color: var(--sapta-blue);
+    }
+    .quick-action-btn .qa-label {
+        font-size: 10px;
+        color: var(--sapta-gray);
+    }
+
+    /* Notifications */
+    .notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--sapta-border);
+    }
+    .notification-item:last-child { border-bottom: none; }
+    .notification-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 4px;
+        background: var(--sapta-blue);
+    }
+    .notification-dot.read { background: var(--sapta-border); }
+    .notification-content { flex: 1; }
+    .notification-title { font-size: 12px; font-weight: 600; color: var(--sapta-black); }
+    .notification-desc { font-size: 11px; color: var(--sapta-gray); }
+    .notification-time { font-size: 10px; color: var(--sapta-gray); flex-shrink: 0; white-space: nowrap; }
+    .notification-mark-all {
+        display: block;
+        text-align: center;
+        padding: 8px 0 0;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sapta-blue);
+        text-decoration: none;
+        border-top: 1px solid var(--sapta-border);
+        margin-top: 4px;
+    }
+    .notification-mark-all:hover { text-decoration: underline; }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--sapta-gray);
+        margin-bottom: 12px;
+    }
+    .breadcrumb .current { color: var(--sapta-black); font-weight: 500; }
+</style>
+
+<div class="sapta-dashboard">
+
+    <div class="breadcrumb">
+        <span class="current">Dashboard</span>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['organizations'] ?? 0 }}</div>
+                    <div class="label">Organizations</div>
+                </div>
+                <div class="icon icon-blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['employees'] ?? 0 }}</div>
+                    <div class="label">Employees</div>
+                </div>
+                <div class="icon icon-green">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['departments'] ?? 0 }}</div>
+                    <div class="label">Departments</div>
+                </div>
+                <div class="icon icon-udongo">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['users'] ?? 0 }}</div>
+                    <div class="label">System Users</div>
+                </div>
+                <div class="icon icon-blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['roles'] ?? 0 }}</div>
+                    <div class="label">Roles</div>
+                </div>
+                <div class="icon icon-dark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="top">
+                <div>
+                    <div class="number">{{ $stats['permissions'] ?? 0 }}</div>
+                    <div class="label">Permissions</div>
+                </div>
+                <div class="icon icon-udongo">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+
+        <!-- Left Column -->
+        <div>
+
+            <!-- Budget vs Actual Chart -->
+            <div class="panel" style="margin-bottom:20px;">
+                <div class="panel-header">
+                    <div>
+                        <h3>Budget vs Actual (This Year)</h3>
+                        <span class="panel-sub">Financial performance overview</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-bars">
+                        @php
+                            $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            $budgetData = $budgetData ?? array_fill(0, 12, 0);
+                            $actualData = $actualData ?? array_fill(0, 12, 0);
+                            $maxValue = max(array_merge($budgetData, $actualData, [1]));
+                        @endphp
+                        @foreach($months as $index => $month)
+                            <div class="chart-bar-group">
+                                <div class="chart-bar budget" style="height: {{ ($budgetData[$index] / $maxValue) * 100 }}%;"></div>
+                                <div class="chart-bar actual" style="height: {{ ($actualData[$index] / $maxValue) * 100 }}%;"></div>
+                                <div class="chart-label">{{ $month }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="chart-legend">
+                        <div class="chart-legend-item">
+                            <span class="dot dot-budget"></span>
+                            Budget
+                        </div>
+                        <div class="chart-legend-item">
+                            <span class="dot dot-actual"></span>
+                            Actual
+                        </div>
+                    </div>
+                    <div class="chart-summary">
+                        <div class="chart-summary-item">
+                            <div class="number">${{ number_format($totalBudget ?? 0) }}</div>
+                            <div class="label">Total Budget</div>
+                        </div>
+                        <div class="chart-summary-item">
+                            <div class="number">${{ number_format($totalActual ?? 0) }}</div>
+                            <div class="label">Total Actual</div>
+                        </div>
+                        <div class="chart-summary-item">
+                            <div class="number" style="color:var(--sapta-blue);">{{ number_format($performance ?? 0, 2) }}%</div>
+                            <div class="label">Performance</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3>Recent Activities</h3>
+                        <span class="panel-sub">Latest system activities</span>
+                    </div>
+                    <a href="#" class="panel-link">View All ?</a>
+                </div>
+                <div class="panel-body">
+                    @forelse($recentActivities ?? [] as $activity)
+                    <div class="activity-item">
+                        <div class="activity-icon {{ $activity['icon_class'] ?? 'blue' }}">
+                            {!! $activity['icon'] ?? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' !!}
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ $activity['title'] ?? 'Activity' }}</div>
+                            <div class="activity-desc">{{ $activity['description'] ?? '' }}</div>
+                        </div>
+                        <div class="activity-time">{{ $activity['time'] ?? '' }}</div>
+                    </div>
+                    @empty
+                    <div class="activity-item">
+                        <div class="activity-icon blue">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">No recent activities</div>
+                            <div class="activity-desc">System activities will appear here</div>
+                        </div>
+                        <div class="activity-time">�</div>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column -->
+        <div>
+
+            <!-- Project Status -->
+            <div class="panel" style="margin-bottom:20px;">
+                <div class="panel-header">
+                    <div>
+                        <h3>Project Status</h3>
+                        <span class="panel-sub">Current project progress</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="project-status-grid">
+                        <div class="project-status-item">
+                            <span class="ps-label">Completed</span>
+                            <span class="ps-value" style="color:var(--sapta-green);">{{ $projectStatus['completed'] ?? 0 }} ({{ $projectStatus['completed_percent'] ?? 0 }}%)</span>
+                        </div>
+                        <div class="project-status-item">
+                            <span class="ps-label">In Progress</span>
+                            <span class="ps-value" style="color:var(--sapta-blue);">{{ $projectStatus['in_progress'] ?? 0 }} ({{ $projectStatus['in_progress_percent'] ?? 0 }}%)</span>
+                        </div>
+                        <div class="project-status-item">
+                            <span class="ps-label">Planned</span>
+                            <span class="ps-value" style="color:#d97706;">{{ $projectStatus['planned'] ?? 0 }} ({{ $projectStatus['planned_percent'] ?? 0 }}%)</span>
+                        </div>
+                        <div class="project-status-item">
+                            <span class="ps-label">On Hold</span>
+                            <span class="ps-value" style="color:#dc2626;">{{ $projectStatus['on_hold'] ?? 0 }} ({{ $projectStatus['on_hold_percent'] ?? 0 }}%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="panel" style="margin-bottom:20px;">
+                <div class="panel-header">
+                    <div>
+                        <h3>Quick Actions</h3>
+                        <span class="panel-sub">Common management tasks</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="quick-actions-grid">
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                            </span>
+                            <span class="qa-label">Apply Leave</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                            </span>
+                            <span class="qa-label">Expense Claim</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            </span>
+                            <span class="qa-label">New Procurement</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v-2a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5v2"/><circle cx="12" cy="16" r="5"/><path d="M12 11v5"/><path d="M9 16h6"/></svg>
+                            </span>
+                            <span class="qa-label">New Project</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </span>
+                            <span class="qa-label">Upload Document</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                            </span>
+                            <span class="qa-label">View Reports</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </span>
+                            <span class="qa-label">My Tasks</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <span class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </span>
+                            <span class="qa-label">Messages</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Notifications -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3>My Notifications</h3>
+                        <span class="panel-sub">Recent updates for you</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    @forelse($notifications ?? [] as $notification)
+                    <div class="notification-item">
+                        <span class="notification-dot {{ $notification['is_read'] ? 'read' : '' }}"></span>
+                        <div class="notification-content">
+                            <div class="notification-title">{{ $notification['title'] ?? 'Notification' }}</div>
+                            <div class="notification-desc">{{ $notification['description'] ?? '' }}</div>
+                        </div>
+                        <div class="notification-time">{{ $notification['time'] ?? '' }}</div>
+                    </div>
+                    @empty
+                    <div class="notification-item">
+                        <span class="notification-dot read"></span>
+                        <div class="notification-content">
+                            <div class="notification-title">No notifications</div>
+                            <div class="notification-desc">You're all caught up</div>
+                        </div>
+                        <div class="notification-time">�</div>
+                    </div>
+                    @endforelse
+                    <a href="#" class="notification-mark-all">Mark all as read ?</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+@endsection

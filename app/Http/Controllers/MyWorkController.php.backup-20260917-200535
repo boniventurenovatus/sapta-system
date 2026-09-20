@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
+
+class MyWorkController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+        $employeeId = $user->employee_id;
+
+        $stats = [
+            'drafts'       => 0, // Baadaye: Draft forms
+            'my_tasks'     => Task::where('assigned_to', $employeeId)->count(),
+            'pending_tasks'=> Task::where('assigned_to', $employeeId)->where('status', '!=', 'done')->count(),
+            'approvals'    => 0, // Baadaye: Approvals
+        ];
+
+        $recentTasks = Task::where('assigned_to', $employeeId)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('my-work.index', compact('stats', 'recentTasks'));
+    }
+
+    public function drafts()
+    {
+        return view('my-work.drafts');
+    }
+
+    public function tasks()
+    {
+        $user = Auth::user();
+        $tasks = Task::where('assigned_to', $user->employee_id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('my-work.tasks', compact('tasks'));
+    }
+
+    public function approvals()
+    {
+        return view('my-work.approvals');
+    }
+}

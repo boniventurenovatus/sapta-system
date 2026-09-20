@@ -1,0 +1,200 @@
+@extends('layouts.sapta')
+@section('title', 'Payment Voucher Details')
+@section('page-title', 'Payment Voucher Details')
+
+@section('content')
+<div class="p-6 max-w-7xl mx-auto">
+
+    <x-page-header 
+        title="{{ $paymentVoucher->voucher_number }}" 
+        subtitle="{{ $paymentVoucher->payee_name }} — {{ $paymentVoucher->currency }} {{ number_format($paymentVoucher->amount, 2) }}"
+        icon="fa-file-invoice"
+        gradient="blue"
+    />
+
+    @if(session('success'))
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl mb-6 flex items-center gap-3">
+            <i class="fas fa-check-circle text-xl"></i>
+            <div class="font-bold">{{ session('success') }}</div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6 flex items-center gap-3">
+            <i class="fas fa-exclamation-circle text-xl"></i>
+            <div class="font-bold">{{ session('error') }}</div>
+        </div>
+    @endif
+
+    @if($paymentVoucher->status === 'returned' && $paymentVoucher->return_reason)
+        <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6">
+            <div class="font-bold mb-2 flex items-center gap-2">
+                <i class="fas fa-undo text-xl"></i>
+                Returned for Correction
+            </div>
+            <div class="text-sm">{{ $paymentVoucher->return_reason }}</div>
+        </div>
+    @endif
+
+    {{-- ACTIONS --}}
+    <div class="flex flex-wrap gap-3 mb-6">
+        <x-btn href="{{ route('payment-vouchers.index') }}" icon="fa-arrow-left" color="slate">Back</x-btn>
+
+        <a href="{{ route('payment-vouchers.pdf', $paymentVoucher->id) }}" 
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition">
+            <i class="fas fa-file-pdf"></i> Download PDF
+        </a>
+
+        <a href="{{ route('payment-vouchers.print', $paymentVoucher->id) }}" target="_blank"
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-bold rounded-xl transition">
+            <i class="fas fa-print"></i> Print
+        </a>
+
+        @if(in_array($paymentVoucher->status, ['draft', 'returned']))
+            <a href="{{ route('payment-vouchers.edit', $paymentVoucher->id) }}" 
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        @endif
+
+        @if(in_array($paymentVoucher->status, ['pending_approval', 'submitted']))
+            <form action="{{ route('payment-vouchers.approve', $paymentVoucher->id) }}" method="POST" 
+                  onsubmit="SAPTA.confirm(this, {action: 'approve', item: 'Voucher {{ $paymentVoucher->voucher_number }}'})">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+            </form>
+
+            <form action="{{ route('payment-vouchers.return', $paymentVoucher->id) }}" method="POST" 
+                  onsubmit="SAPTA.confirm(this, {action: 'return', item: 'Voucher {{ $paymentVoucher->voucher_number }}'})">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition">
+                    <i class="fas fa-undo"></i> Return for Correction
+                </button>
+            </form>
+        @endif
+
+        @if($paymentVoucher->status === 'approved')
+            <form action="{{ route('payment-vouchers.paid', $paymentVoucher->id) }}" method="POST" 
+                  onsubmit="SAPTA.confirm(this, {action: 'complete', item: 'Voucher {{ $paymentVoucher->voucher_number }}'})">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition">
+                    <i class="fas fa-money-bill"></i> Mark as Paid
+                </button>
+            </form>
+        @endif
+    </div>
+
+    {{-- KPI CARDS --}}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <x-kpi-card label="Status" value="{{ ucfirst(str_replace('_', ' ', $paymentVoucher->status)) }}" icon="fa-info-circle" color="blue" />
+        <x-kpi-card label="Amount" value="{{ $paymentVoucher->currency }} {{ number_format($paymentVoucher->amount, 0) }}" icon="fa-money-bill" color="green" />
+        <x-kpi-card label="Payment Date" value="{{ $paymentVoucher->payment_date ? \Carbon\Carbon::parse($paymentVoucher->payment_date)->format('d M Y') : '-' }}" icon="fa-calendar" color="purple" />
+        <x-kpi-card label="Method" value="{{ ucfirst(str_replace('_', ' ', $paymentVoucher->payment_method)) }}" icon="fa-credit-card" color="yellow" />
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <x-card title="Voucher Details" icon="fa-file-alt">
+                <div class="space-y-3">
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Voucher Number</span>
+                        <span class="font-mono text-blue-600 font-bold">{{ $paymentVoucher->voucher_number }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Payee Name</span>
+                        <span class="font-semibold text-slate-900">{{ $paymentVoucher->payee_name }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Payee Type</span>
+                        <span class="text-slate-900">{{ ucfirst($paymentVoucher->payee_type) }}</span>
+                    </div>
+                    @if($paymentVoucher->payee_contact)
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Contact</span>
+                        <span class="text-slate-900">{{ $paymentVoucher->payee_contact }}</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Amount</span>
+                        <span class="font-bold text-slate-900">{{ $paymentVoucher->currency }} {{ number_format($paymentVoucher->amount, 2) }}</span>
+                    </div>
+                    @if($paymentVoucher->project)
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Project</span>
+                        <span class="text-slate-900">{{ $paymentVoucher->project }}</span>
+                    </div>
+                    @endif
+                    @if($paymentVoucher->department)
+                    <div class="flex justify-between py-2 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Department</span>
+                        <span class="text-slate-900">{{ $paymentVoucher->department }}</span>
+                    </div>
+                    @endif
+                    @if($paymentVoucher->description)
+                    <div class="py-2 border-b border-slate-50">
+                        <div class="text-sm font-bold text-slate-500 uppercase mb-1">Description</div>
+                        <div class="text-slate-700">{{ $paymentVoucher->description }}</div>
+                    </div>
+                    @endif
+                    @if($paymentVoucher->notes)
+                    <div class="py-2 border-b border-slate-50">
+                        <div class="text-sm font-bold text-slate-500 uppercase mb-1">Notes</div>
+                        <div class="text-slate-700">{{ $paymentVoucher->notes }}</div>
+                    </div>
+                    @endif
+                </div>
+            </x-card>
+        </div>
+
+        <div class="lg:col-span-1">
+            <x-card title="Version History" icon="fa-code-branch">
+                @if($versions->isEmpty())
+                    <p class="text-sm text-slate-500 text-center py-4">No versions yet.</p>
+                @else
+                    <div class="space-y-3">
+                        @foreach($versions as $version)
+                            <div class="p-3 bg-slate-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-slate-900">v{{ $version->version_number }}</span>
+                                    <x-badge color="blue" :label="$version->action" />
+                                </div>
+                                <div class="text-xs text-slate-500">{{ $version->created_at->format('d M Y H:i') }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </x-card>
+        </div>
+    </div>
+
+    <div class="mt-6">
+        <x-card title="Audit Trail" icon="fa-history">
+            @if($auditLogs->isEmpty())
+                <p class="text-sm text-slate-500 text-center py-4">No audit logs yet.</p>
+            @else
+                <div class="space-y-2">
+                    @foreach($auditLogs as $log)
+                        <div class="flex items-start gap-3 p-3 border-b border-slate-50">
+                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-circle text-xs"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-slate-900">{{ $log->user?->username ?? 'System' }} — {{ $log->action }}</span>
+                                    <span class="text-xs text-slate-500">{{ $log->created_at->format('d M Y H:i') }}</span>
+                                </div>
+                                @if($log->comment)
+                                    <div class="text-sm text-slate-600 mt-1">{{ $log->comment }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </x-card>
+    </div>
+
+</div>
+@endsection

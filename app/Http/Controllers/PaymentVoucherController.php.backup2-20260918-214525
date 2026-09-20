@@ -1,0 +1,359 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\PaymentVoucher;
+use App\Models\Submission;
+use App\Models\AuditLog;
+use App\Services\WorkflowService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class PaymentVoucherController extends Controller
+{
+    protected WorkflowService $workflow;
+
+    public function __construct(WorkflowService $workflow)
+    {
+        $this->workflow = $workflow;
+    }
+
+    public function index(Request $request)
+    {
+        $query = PaymentVoucher::query()->with(['creator', 'approver']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('voucher_number', 'like', "%{$request->search}%")
+                  ->orWhere('payee_name', 'like', "%{$request->search}%");
+            });
+        }
+
+        $vouchers = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        $stats = [
+            'total'    => PaymentVoucher::count(),
+            'draft'    => PaymentVoucher::where('status', 'draft')->count(),
+            'pending'  => PaymentVoucher::whereIn('status', ['submitted', 'pending_approval'])->count(),
+            'approved' => PaymentVoucher::whereIn('status', ['approved', 'paid', 'completed'])->count(),
+        ];
+
+        return view('payment-vouchers.index', compact('vouchers', 'stats'));
+    }
+
+    public function create()
+    {
+        $projects = DB::table('projects')->take(50)->get(['id', 'name']);
+        $departments = DB::table('departments')->get(['id', 'name']);
+        return view('payment-vouchers.create', compact('projects', 'departments'));
+    }
+
+    public function store(Request $request)
+    {
+        $action = $request->input('action', 'draft');
+
+        $validated = $request->validate([
+            'payee_name'     => 'required|string|max:255',
+            'payee_type'     => 'required|in:individual,company,government,ngo',
+            'payee_contact'  => 'nullable|string|max:255',
+            'amount'         => 'required|numeric|min:0.01',
+            'currency'       => 'required|string|max:10',
+            'payment_method' => 'required|in:bank_transfer,cash,cheque,mobile_money',
+            'project_id'     => 'nullable|integer',
+            'department_id'  => 'nullable|integer',
+            'payment_date'   => 'required|date',
+            'description'    => 'nullable|string|max:2000',
+            'notes'          => 'nullable|string|max:2000',
+            'payee_pobox'    => 'nullable|string|max:255',
+            'batch'          => 'nullable|string|max:50',
+            'mode'           => 'nullable|string|in:transfer,cheque,cash,mobile_money',
+            'items'          => 'required|array|min:1',
+            'items.*.account_invoice_no' => 'nullable|string|max:100',
+            'items.*.details' => 'required|string',
+            'items.*.amount'  => 'required|numeric|min:0',
+        ]);
+
+        // Chukua jina la project na department (string) kutoka ID
+        $projectName = null;
+        if (!empty($validated['project_id'])) {
+            $projectName = DB::table('projects')->where('id', $validated['project_id'])->value('name');
+        }
+        $departmentName = null;
+        if (!empty($validated['department_id'])) {
+            $departmentName = DB::table('departments')->where('id', $validated['department_id'])->value('name');
+        }
+
+        $voucher = PaymentVoucher::create([
+            'voucher_number' => PaymentVoucher::generateVoucherNumber(),
+            'payee_name'     => $validated['payee_name'],
+            'payee_type'     => $validated['payee_type'],
+            'payee_contact'  => $validated['payee_contact'] ?? null,
+            'project_id'     => $validated['project_id'] ?? null,
+            'project'        => $projectName,
+            'department'     => $departmentName,
+            'amount'         => $validated['amount'],
+            'currency'       => $validated['currency'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date'   => $validated['payment_date'],
+            'description'    => $validated['description'] ?? null,
+            'notes'          => $validated['notes'] ?? null,
+            'created_by'     => Auth::id(),
+            'status'         => $action === 'submit' ? 'pending_approval' : 'draft',
+            'submitted_at'   => $action === 'submit' ? now() : null,
+            'payee_pobox'    => $validated['payee_pobox'] ?? null,
+            'batch'          => $validated['batch'] ?? null,
+            'mode'           => $validated['mode'] ?? null,
+        ]);
+
+        // Hifadhi line items
+        $totalAmount = 0;
+        foreach (($validated['items'] ?? []) as $index => $item) {
+            $voucher->items()->create([
+                'account_invoice_no' => $item['account_invoice_no'] ?? null,
+                'details'            => $item['details'],
+                'amount'             => $item['amount'],
+                'sort_order'         => $index,
+            ]);
+            $totalAmount += (float) $item['amount'];
+        }
+
+        // Update total na amount_in_words
+        $svc = app(\App\Services\PaymentVoucherService::class);
+        $voucher->update([
+            'amount'          => $totalAmount,
+            'amount_in_words' => $svc->amountInWords($totalAmount, $voucher->currency ?? 'TZS'),
+        ]);
+
+        AuditLog::create([
+            'auditable_type'  => PaymentVoucher::class,
+            'auditable_id'    => $voucher->id,
+            'user_id'         => Auth::id(),
+            'action'          => $action === 'submit' ? 'submitted' : 'created',
+            'previous_status' => null,
+            'new_status'      => $voucher->status,
+            'comment'         => $action === 'submit' ? 'Payment voucher submitted for approval' : 'Payment voucher saved as draft',
+            'ip_address'      => $request->ip(),
+            'user_agent'      => $request->userAgent(),
+        ]);
+
+        if ($action === 'submit') {
+            $this->workflow->submit(
+                formType: 'payment_voucher',
+                title: 'Payment Voucher ' . $voucher->voucher_number . ' — ' . $voucher->payee_name,
+                data: $voucher->toArray(),
+                submittableType: PaymentVoucher::class,
+                submittableId: $voucher->id
+            );
+
+            return redirect()->route('payment-vouchers.show', $voucher->id)
+                ->with('success', 'Payment Voucher ' . $voucher->voucher_number . ' submitted successfully for approval!');
+        }
+
+        return redirect()->route('payment-vouchers.show', $voucher->id)
+            ->with('success', 'Payment Voucher ' . $voucher->voucher_number . ' saved as draft successfully!');
+    }
+
+    public function show(PaymentVoucher $paymentVoucher)
+    {
+        $submission = Submission::where('submittable_type', PaymentVoucher::class)
+            ->where('submittable_id', $paymentVoucher->id)
+            ->first();
+
+        $versions = $submission ? $submission->versions : collect();
+        $auditLogs = AuditLog::where('auditable_type', PaymentVoucher::class)
+            ->where('auditable_id', $paymentVoucher->id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('payment-vouchers.show', compact('paymentVoucher', 'versions', 'auditLogs'));
+    }
+
+    public function edit(PaymentVoucher $paymentVoucher)
+    {
+        if (!in_array($paymentVoucher->status, ['draft', 'returned'])) {
+            return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+                ->with('error', 'Only drafts and returned vouchers can be edited.');
+        }
+
+        $projects = DB::table('projects')->take(50)->get(['id', 'name']);
+        $departments = DB::table('departments')->get(['id', 'name']);
+        return view('payment-vouchers.edit', compact('paymentVoucher', 'projects', 'departments'));
+    }
+
+    public function update(Request $request, PaymentVoucher $paymentVoucher)
+    {
+        $action = $request->input('action', 'draft');
+
+        $validated = $request->validate([
+            'payee_name'     => 'required|string|max:255',
+            'payee_type'     => 'required|in:individual,company,government,ngo',
+            'payee_contact'  => 'nullable|string|max:255',
+            'amount'         => 'required|numeric|min:0.01',
+            'currency'       => 'required|string|max:10',
+            'payment_method' => 'required|in:bank_transfer,cash,cheque,mobile_money',
+            'project_id'     => 'nullable|integer',
+            'department_id'  => 'nullable|integer',
+            'payment_date'   => 'required|date',
+            'description'    => 'nullable|string|max:2000',
+            'notes'          => 'nullable|string|max:2000',
+        ]);
+
+        // Chukua jina la project na department
+        $projectName = $paymentVoucher->project;
+        if (!empty($validated['project_id']) && $validated['project_id'] != $paymentVoucher->project_id) {
+            $projectName = DB::table('projects')->where('id', $validated['project_id'])->value('name');
+        }
+        $departmentName = $paymentVoucher->department;
+        if (!empty($validated['department_id']) && $validated['department_id'] != $paymentVoucher->department_id) {
+            $departmentName = DB::table('departments')->where('id', $validated['department_id'])->value('name');
+        }
+
+        $status = $paymentVoucher->status;
+        $submittedAt = $paymentVoucher->submitted_at;
+
+        if ($action === 'submit') {
+            $status = 'pending_approval';
+            $submittedAt = now();
+        }
+
+        $paymentVoucher->update([
+            'payee_name'     => $validated['payee_name'],
+            'payee_type'     => $validated['payee_type'],
+            'payee_contact'  => $validated['payee_contact'] ?? null,
+            'project_id'     => $validated['project_id'] ?? null,
+            'project'        => $projectName,
+            'department'     => $departmentName,
+            'amount'         => $validated['amount'],
+            'currency'       => $validated['currency'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date'   => $validated['payment_date'],
+            'description'    => $validated['description'] ?? null,
+            'notes'          => $validated['notes'] ?? null,
+            'status'         => $status,
+            'submitted_at'   => $submittedAt,
+        ]);
+
+        if ($action === 'submit') {
+            $submission = Submission::where('submittable_type', PaymentVoucher::class)
+                ->where('submittable_id', $paymentVoucher->id)
+                ->first();
+
+            if ($submission && $paymentVoucher->getOriginal('status') === 'returned') {
+                $this->workflow->resubmit($submission, $paymentVoucher->toArray());
+            } elseif (!$submission) {
+                $this->workflow->submit(
+                    formType: 'payment_voucher',
+                    title: 'Payment Voucher ' . $paymentVoucher->voucher_number,
+                    data: $paymentVoucher->toArray(),
+                    submittableType: PaymentVoucher::class,
+                    submittableId: $paymentVoucher->id
+                );
+            }
+
+            return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+                ->with('success', 'Payment Voucher submitted successfully for approval!');
+        }
+
+        return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+            ->with('success', 'Payment Voucher updated successfully!');
+    }
+
+    public function approve(Request $request, PaymentVoucher $paymentVoucher)
+    {
+        $paymentVoucher->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
+
+        $submission = Submission::where('submittable_type', PaymentVoucher::class)
+            ->where('submittable_id', $paymentVoucher->id)
+            ->first();
+
+        if ($submission) {
+            $this->workflow->approve($submission, $request->input('comment'));
+        }
+
+        return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+            ->with('success', 'Payment Voucher approved successfully!');
+    }
+
+    public function returnVoucher(Request $request, PaymentVoucher $paymentVoucher)
+    {
+        $request->validate(['reason' => 'required|string|max:1000']);
+
+        $paymentVoucher->update([
+            'status' => 'returned',
+            'return_reason' => $request->reason,
+        ]);
+
+        $submission = Submission::where('submittable_type', PaymentVoucher::class)
+            ->where('submittable_id', $paymentVoucher->id)
+            ->first();
+
+        if ($submission) {
+            $this->workflow->returnForCorrection($submission, $request->reason);
+        }
+
+        return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+            ->with('success', 'Payment Voucher returned for correction.');
+    }
+
+    public function markPaid(PaymentVoucher $paymentVoucher)
+    {
+        $paymentVoucher->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        return redirect()->route('payment-vouchers.show', $paymentVoucher->id)
+            ->with('success', 'Payment Voucher marked as paid successfully!');
+    }
+
+    public function destroy(PaymentVoucher $paymentVoucher)
+    {
+        $paymentVoucher->delete();
+        return redirect()->route('payment-vouchers.index')
+            ->with('success', 'Payment Voucher deleted successfully.');
+    }
+
+    public function downloadPdf(PaymentVoucher $paymentVoucher)
+    {
+        if (!class_exists('Barryvdh\DomPDF\Facade\Pdf')) {
+            return back()->with('error', 'PDF package haipo. Endesha: composer require barryvdh/laravel-dompdf');
+        }
+
+        $data = [
+            'voucher'    => $paymentVoucher,
+            'creator'    => $paymentVoucher->creator,
+            'approver'   => $paymentVoucher->approver,
+            'project'    => $paymentVoucher->project_id ? DB::table('projects')->where('id', $paymentVoucher->project_id)->first() : null,
+            'department' => DB::table('departments')->where('name', $paymentVoucher->department)->first(),
+            'generated_at' => now(),
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('payment-vouchers.pdf', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download('Payment-Voucher-' . $paymentVoucher->voucher_number . '.pdf');
+    }
+
+    public function print(PaymentVoucher $paymentVoucher)
+    {
+        $data = [
+            'voucher'    => $paymentVoucher,
+            'creator'    => $paymentVoucher->creator,
+            'approver'   => $paymentVoucher->approver,
+            'project'    => $paymentVoucher->project_id ? DB::table('projects')->where('id', $paymentVoucher->project_id)->first() : null,
+            'department' => DB::table('departments')->where('name', $paymentVoucher->department)->first(),
+            'generated_at' => now(),
+        ];
+
+        return view('payment-vouchers.print', $data);
+    }
+}

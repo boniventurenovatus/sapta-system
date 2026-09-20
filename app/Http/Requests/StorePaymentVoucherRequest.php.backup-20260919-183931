@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StorePaymentVoucherRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return auth()->check();
+    }
+
+    public function rules(): array
+    {
+        return [
+            // ===== HEADER FIELDS =====
+            'trans_no' => [
+                'nullable', 'string', 'max:20',
+                'regex:/^[A-Z]{2}[0-9]{5}$/', // PY00001
+                'unique:payment_vouchers,trans_no',
+            ],
+            'payment_date' => 'required|date|before_or_equal:today',
+            'currency' => 'required|in:TZS,USD,EUR',
+            'payee_name' => [
+                'required', 'string', 'min:2', 'max:255',
+                // Herufi, namba, nafasi, - . ' & , ( )
+                'regex:/^[a-zA-Z0-9\s\-\.\'&,()]+$/u',
+            ],
+            'payee_pobox' => [
+                'nullable', 'string', 'max:255',
+                'regex:/^[a-zA-Z0-9\s\-\.\,]+$/u',
+            ],
+            'payee_type' => 'required|in:individual,company,government,ngo',
+            'payee_contact' => [
+                'nullable', 'string', 'max:255',
+                // Namba 10-15 au email
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) return;
+                    $isPhone = preg_match('/^[0-9]{10,15}$/', $value);
+                    $isEmail = filter_var($value, FILTER_VALIDATE_EMAIL);
+                    if (!$isPhone && !$isEmail) {
+                        $fail('The payee contact must be a valid phone number (10-15 digits) or email address.');
+                    }
+                },
+            ],
+            'batch' => [
+                'nullable', 'string', 'max:50',
+                // Format: [digits]/[digits].[digits] e.g. 186400/3.00
+                'regex:/^[0-9]{1,10}\/[0-9]{1,5}(\.[0-9]{1,2})?$/',
+            ],
+            'bank' => [
+                'nullable', 'string', 'max:50',
+                'regex:/^[0-9]{1,15}$/', // Namba pekee
+            ],
+            'mode' => 'required|in:transfer,cheque,cash,mobile_money',
+            'cheque_number' => [
+                'nullable', 'string', 'max:50',
+                'regex:/^[0-9]{1,15}$/', // Namba pekee
+            ],
+
+            // ===== ITEMS =====
+            'items' => 'required|array|min:1|max:50',
+            'items.*.account_invoice_no' => [
+                'nullable', 'string', 'max:100',
+                'regex:/^[a-zA-Z0-9\s\-\/\.]+$/u',
+            ],
+            'items.*.details' => [
+                'required', 'string', 'min:2', 'max:500',
+                'regex:/^[a-zA-Z0-9\s\-\.\,\'&()\/]+$/u',
+            ],
+            'items.*.amount' => 'required|numeric|min:0|max:999999999999.99',
+
+            // ===== SIGNATURES =====
+            'prepared_by_id' => 'nullable|exists:users,id',
+            'checked_by_id' => 'nullable|exists:users,id',
+            'authorized_by_id' => 'nullable|exists:users,id',
+
+            // ===== NOTES =====
+            'description' => 'nullable|string|max:2000',
+            'notes' => 'nullable|string|max:2000',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            // ===== TRANS NO =====
+            'trans_no.regex' => 'Trans No must be in format PY00001 (2 letters + 5 digits).',
+            'trans_no.unique' => 'This Trans No already exists.',
+
+            // ===== DATE =====
+            'payment_date.required' => 'Date is required.',
+            'payment_date.before_or_equal' => 'Date cannot be in the future.',
+
+            // ===== CURRENCY =====
+            'currency.required' => 'Currency is required.',
+            'currency.in' => 'Currency must be TZS, USD, or EUR.',
+
+            // ===== PAYEE NAME =====
+            'payee_name.required' => 'Name of Payee is required.',
+            'payee_name.min' => 'Name of Payee must be at least 2 characters.',
+            'payee_name.regex' => 'Name of Payee can only contain letters, numbers, spaces, and - . \' & , ( ).',
+
+            // ===== PAYEE P.O BOX =====
+            'payee_pobox.regex' => 'P.O Box can only contain letters, numbers, spaces, and - . ,',
+
+            // ===== PAYEE TYPE =====
+            'payee_type.required' => 'Payee Type is required.',
+
+            // ===== BATCH =====
+            'batch.regex' => 'Batch must be in format [number]/[rate] e.g. 186400/3.00.',
+
+            // ===== BANK =====
+            'bank.regex' => 'Bank must contain numbers only.',
+
+            // ===== MODE =====
+            'mode.required' => 'Mode is required.',
+            'mode.in' => 'Mode must be Transfer, Cheque, Cash, or Mobile Money.',
+
+            // ===== CHEQUE NUMBER =====
+            'cheque_number.regex' => 'Cheque Number must contain numbers only.',
+
+            // ===== ITEMS =====
+            'items.required' => 'At least one line item is required.',
+            'items.min' => 'At least one line item is required.',
+            'items.max' => 'Maximum 50 line items allowed.',
+            'items.*.details.required' => 'Details are required for every line item.',
+            'items.*.details.regex' => 'Details can only contain letters, numbers, and basic punctuation.',
+            'items.*.amount.required' => 'Amount is required for every line item.',
+            'items.*.amount.numeric' => 'Amount must be a valid number.',
+            'items.*.amount.min' => 'Amount cannot be negative.',
+            'items.*.amount.max' => 'Amount is too large.',
+
+            // ===== SIGNATURES =====
+            'prepared_by_id.exists' => 'Selected Prepared By user does not exist.',
+            'checked_by_id.exists' => 'Selected Checked By user does not exist.',
+            'authorized_by_id.exists' => 'Selected Authorized By user does not exist.',
+        ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        // Trim strings
+        $this->merge([
+            'payee_name' => trim($this->payee_name ?? ''),
+            'payee_pobox' => trim($this->payee_pobox ?? ''),
+            'payee_contact' => trim($this->payee_contact ?? ''),
+            'bank' => trim($this->bank ?? ''),
+            'cheque_number' => trim($this->cheque_number ?? ''),
+        ]);
+    }
+}

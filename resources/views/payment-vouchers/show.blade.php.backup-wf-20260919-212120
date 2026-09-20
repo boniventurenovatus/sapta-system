@@ -1,0 +1,31 @@
+@extends('layouts.sapta')
+@section('title', 'Payment Voucher Details')
+@section('page-title', 'Payment Voucher Details')
+
+@section('content')
+
+@include('payment-vouchers._css')
+
+<div style="max-width:1000px; margin:0 auto; padding:20px;">
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+        <a href="{{ route('payment-vouchers.index') }}" style="padding:10px 20px; background:#f1f5f9; color:#334155; text-decoration:none; border-radius:12px; font-weight:bold; font-size:14px;">Back</a>
+        <a href="{{ route('payment-vouchers.print', $voucher->id) }}" target="_blank" style="padding:10px 20px; background:#475569; color:white; text-decoration:none; border-radius:12px; font-weight:bold; font-size:14px;">Print</a>
+        <a href="{{ route('payment-vouchers.pdf', $voucher->id) }}" style="padding:10px 20px; background:#dc2626; color:white; text-decoration:none; border-radius:12px; font-weight:bold; font-size:14px;">PDF</a>
+        @if(in_array($voucher->status, ['draft', 'returned']))
+            <a href="{{ route('payment-vouchers.edit', $voucher->id) }}" style="padding:10px 20px; background:#d97706; color:white; text-decoration:none; border-radius:12px; font-weight:bold; font-size:14px;">Edit</a>
+        @endif
+        <form action="{{ route('payment-vouchers.destroy', $voucher->id) }}" method="POST" style="display:inline;" onsubmit="SAPTA.confirm(this, {action: 'delete', item: 'Voucher {{ $voucher->voucher_number }}'})">
+            @csrf
+            @method('DELETE')
+            <button type="submit" style="padding:10px 20px; background:#f1f5f9; color:#475569; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer;">Delete</button>
+        </form>
+    </div>
+
+    <div style="background:#fff; border:2px solid #0f172a; padding:30px;">
+        @include('payment-vouchers._voucher')
+    </div>
+
+</div>
+
+@endsection

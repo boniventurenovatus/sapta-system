@@ -1,0 +1,1060 @@
+@extends('layouts.sapta')
+
+@section('title', 'Edit Employee')
+@section('page-title', 'Edit Employee')
+
+@section('content')
+
+<style>
+    .employee-edit-page {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .employee-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .employee-page-header h2 {
+        margin: 0;
+        color: #1a1a2e;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .employee-page-header p {
+        margin: 6px 0 0;
+        color: #8898aa;
+        font-size: 14px;
+    }
+
+    .employee-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #eef1f5;
+        color: #4a5a6f;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all .2s ease;
+    }
+
+    .employee-back-btn:hover {
+        background: #dfe4ea;
+        color: #1a1a2e;
+    }
+
+    .employee-form {
+        display: grid;
+        gap: 20px;
+    }
+
+    .employee-form-card {
+        background: #fff;
+        border: 1px solid #e8ecf1;
+        border-radius: 14px;
+        padding: 24px;
+    }
+
+    .employee-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .employee-section-title i {
+        color: #1a5276;
+        font-size: 16px;
+    }
+
+    .employee-section-title h3 {
+        margin: 0;
+        color: #1a1a2e;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .employee-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .employee-form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .employee-form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .employee-form-group label {
+        margin-bottom: 7px;
+        color: #344054;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .required {
+        color: #c0392b;
+    }
+
+    .employee-form-group input,
+    .employee-form-group select,
+    .employee-form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #dfe4ea;
+        border-radius: 8px;
+        padding: 11px 12px;
+        background: #fff;
+        color: #1a1a2e;
+        font-size: 14px;
+        outline: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .employee-form-group input:focus,
+    .employee-form-group select:focus,
+    .employee-form-group textarea:focus {
+        border-color: #1a5276;
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, .10);
+    }
+
+    .employee-form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .employee-help {
+        margin-top: 6px;
+        color: #98a2b3;
+        font-size: 12px;
+    }
+
+    .employee-error {
+        margin-top: 6px;
+        color: #c0392b;
+        font-size: 12px;
+    }
+
+    .employee-current-image {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+        padding: 12px;
+        background: #f8fafc;
+        border: 1px solid #edf0f4;
+        border-radius: 8px;
+    }
+
+    .employee-current-image img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #e8ecf1;
+    }
+
+    .employee-current-image-text {
+        color: #667085;
+        font-size: 13px;
+    }
+
+    .employee-form-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 4px;
+    }
+
+    .employee-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all .2s ease;
+    }
+
+    .employee-btn-cancel {
+        background: #eef1f5;
+        color: #4a5a6f;
+    }
+
+    .employee-btn-cancel:hover {
+        background: #dfe4ea;
+        color: #1a1a2e;
+    }
+
+    .employee-btn-save {
+        background: #1a5276;
+        color: #fff;
+    }
+
+    .employee-btn-save:hover {
+        background: #154360;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 760px) {
+        .employee-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .employee-form-group.full-width {
+            grid-column: auto;
+        }
+
+        .employee-page-header {
+            align-items: stretch;
+        }
+
+        .employee-back-btn {
+            justify-content: center;
+        }
+
+        .employee-form-footer {
+            flex-direction: column-reverse;
+        }
+
+        .employee-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+@php
+    $currentOrganizationId = old(
+        'organization_id',
+        $employee->organization_id
+    );
+
+    $currentDepartmentId = old(
+        'department_id',
+        $employee->department_id
+    );
+
+    $currentStatus = old(
+        'employment_status',
+        $employee->employment_status
+    );
+@endphp
+
+<div class="employee-edit-page">
+
+    {{-- PAGE HEADER --}}
+    <div class="employee-page-header">
+
+        <div>
+            <h2>
+                Edit Employee
+            </h2>
+
+            <p>
+                Update employee details and organizational assignment.
+            </p>
+        </div>
+
+        <a
+            href="{{ route('employees.show', $employee) }}"
+            class="employee-back-btn"
+        >
+            <i class="fas fa-arrow-left"></i>
+            Back to Employee
+        </a>
+
+    </div>
+
+    {{-- FORM --}}
+    <form
+        action="{{ route('employees.update', $employee) }}"
+        method="POST"
+        enctype="multipart/form-data"
+        class="employee-form"
+    >
+
+        @csrf
+        @method('PUT')
+
+        {{-- PERSONAL INFORMATION --}}
+        <div class="employee-form-card">
+
+            <div class="employee-section-title">
+                <i class="fas fa-user"></i>
+                <h3>Personal Information</h3>
+            </div>
+
+            <div class="employee-form-grid">
+
+                {{-- FIRST NAME --}}
+                <div class="employee-form-group">
+
+                    <label for="first_name">
+                        First Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        value="{{ old('first_name', $employee->first_name) }}"
+                        required
+                    >
+
+                    @error('first_name')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- MIDDLE NAME --}}
+                <div class="employee-form-group">
+
+                    <label for="middle_name">
+                        Middle Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="middle_name"
+                        name="middle_name"
+                        value="{{ old('middle_name', $employee->middle_name) }}"
+                    >
+
+                    @error('middle_name')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- LAST NAME --}}
+                <div class="employee-form-group">
+
+                    <label for="last_name">
+                        Last Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        value="{{ old('last_name', $employee->last_name) }}"
+                        required
+                    >
+
+                    @error('last_name')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- GENDER --}}
+                <div class="employee-form-group">
+
+                    <label for="gender">
+                        Gender
+                    </label>
+
+                    <select
+                        id="gender"
+                        name="gender"
+                    >
+                        <option value="">
+                            Select Gender
+                        </option>
+
+                        <option
+                            value="Male"
+                            {{ old('gender', $employee->gender) === 'Male' ? 'selected' : '' }}
+                        >
+                            Male
+                        </option>
+
+                        <option
+                            value="Female"
+                            {{ old('gender', $employee->gender) === 'Female' ? 'selected' : '' }}
+                        >
+                            Female
+                        </option>
+
+                        <option
+                            value="Other"
+                            {{ old('gender', $employee->gender) === 'Other' ? 'selected' : '' }}
+                        >
+                            Other
+                        </option>
+                    </select>
+
+                    @error('gender')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- DATE OF BIRTH --}}
+                <div class="employee-form-group">
+
+                    <label for="date_of_birth">
+                        Date of Birth
+                    </label>
+
+                    <input
+                        type="date"
+                        id="date_of_birth"
+                        name="date_of_birth"
+                        value="{{ old('date_of_birth', $employee->date_of_birth?->format('Y-m-d')) }}"
+                    >
+
+                    @error('date_of_birth')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- EMAIL --}}
+                <div class="employee-form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ old('email', $employee->email) }}"
+                    >
+
+                    @error('email')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- PHONE --}}
+                <div class="employee-form-group">
+
+                    <label for="phone">
+                        Phone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        value="{{ old('phone', $employee->phone) }}"
+                    >
+
+                    @error('phone')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- ADDRESS --}}
+                <div class="employee-form-group full-width">
+
+                    <label for="address">
+                        Address
+                    </label>
+
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value="{{ old('address', $employee->address) }}"
+                    >
+
+                    @error('address')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- REGION --}}
+                <div class="employee-form-group">
+
+                    <label for="region_id">
+                        Region
+                        <span class="required">*</span>
+                    </label>
+
+                    <select
+                        id="region_id"
+                        name="region_id"
+                        required
+                    >
+                        <option value="">Select Region</option>
+                        @foreach($regions as $region)
+                            <option value="{{ $region->id }}" @selected(old('region_id', $employee->region_id) == $region->id)>{{ $region->name }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('region_id')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- DISTRICT --}}
+                <div class="employee-form-group">
+
+                    <label for="district_id">
+                        District
+                        <span class="required">*</span>
+                    </label>
+
+                    <select
+                        id="district_id"
+                        name="district_id"
+                        required
+                    >
+                        <option value="">Select District</option>
+                        @if($employee->district_id)
+                            <option value="{{ $employee->district_id }}" selected>{{ $employee->district?->name }}</option>
+                        @endif
+                    </select>
+
+                    @error('district_id')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- WARD --}}
+                <div class="employee-form-group">
+
+                    <label for="ward_id">
+                        Ward
+                    </label>
+
+                    <select
+                        id="ward_id"
+                        name="ward_id"
+                    >
+                        <option value="">Select Ward</option>
+                        @if($employee->ward_id)
+                            <option value="{{ $employee->ward_id }}" selected>{{ $employee->ward?->name }}</option>
+                        @endif
+                    </select>
+
+                    @error('ward_id')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- EMPLOYMENT INFORMATION --}}
+        <div class="employee-form-card">
+
+            <div class="employee-section-title">
+                <i class="fas fa-briefcase"></i>
+                <h3>Employment Information</h3>
+            </div>
+
+            <div class="employee-form-grid">
+
+                {{-- EMPLOYEE NUMBER --}}
+                <div class="employee-form-group">
+
+                    <label for="employee_number">
+                        Employee Number
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="employee_number"
+                        name="employee_number"
+                        value="{{ old('employee_number', $employee->employee_number) }}"
+                        required
+                    >
+
+                    <div class="employee-help">
+                        Employee number must be unique.
+                    </div>
+
+                    @error('employee_number')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- JOB TITLE --}}
+                <div class="employee-form-group">
+
+                    <label for="job_title">
+                        Job Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="job_title"
+                        name="job_title"
+                        value="{{ old('job_title', $employee->job_title) }}"
+                    >
+
+                    @error('job_title')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- ORGANIZATION --}}
+                <div class="employee-form-group">
+
+                    <label for="organization_id">
+                        Organization
+                    </label>
+
+                    <select
+                        id="organization_id"
+                        name="organization_id"
+                    >
+
+                        <option value="">
+                            Select Organization
+                        </option>
+
+                        @foreach($organizations as $organization)
+
+                            <option
+                                value="{{ $organization->id }}"
+                                {{ (string) $currentOrganizationId === (string) $organization->id ? 'selected' : '' }}
+                            >
+                                {{ $organization->name }}
+
+                                @if($organization->code)
+                                    ({{ $organization->code }})
+                                @endif
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                    @error('organization_id')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- DEPARTMENT --}}
+                <div class="employee-form-group">
+
+                    <label for="department_id">
+                        Department
+                    </label>
+
+                    <select
+                        id="department_id"
+                        name="department_id"
+                    >
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                        @foreach($departments as $department)
+
+                            <option
+                                value="{{ $department->id }}"
+                                data-organization-id="{{ $department->organization_id }}"
+                                {{ (string) $currentDepartmentId === (string) $department->id ? 'selected' : '' }}
+                            >
+                                {{ $department->name }}
+
+                                @if($department->code)
+                                    ({{ $department->code }})
+                                @endif
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                    @error('department_id')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- STATUS --}}
+                <div class="employee-form-group">
+
+                    <label for="employment_status">
+                        Status
+                        <span class="required">*</span>
+                    </label>
+
+                    <select
+                        id="employment_status"
+                        name="employment_status"
+                        required
+                    >
+
+                        <option
+                            value="active"
+                            {{ $currentStatus === 'active' ? 'selected' : '' }}
+                        >
+                            Active
+                        </option>
+
+                        <option
+                            value="inactive"
+                            {{ $currentStatus === 'inactive' ? 'selected' : '' }}
+                        >
+                            Inactive
+                        </option>
+
+                        <option
+                            value="on_leave"
+                            {{ $currentStatus === 'on_leave' ? 'selected' : '' }}
+                        >
+                            On Leave
+                        </option>
+
+                        <option
+                            value="suspended"
+                            {{ $currentStatus === 'suspended' ? 'selected' : '' }}
+                        >
+                            Suspended
+                        </option>
+
+                        <option
+                            value="terminated"
+                            {{ $currentStatus === 'terminated' ? 'selected' : '' }}
+                        >
+                            Terminated
+                        </option>
+
+                    </select>
+
+                    @error('employment_status')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                {{-- HIRE DATE --}}
+                <div class="employee-form-group">
+
+                    <label for="hire_date">
+                        Hire Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="hire_date"
+                        name="hire_date"
+                        value="{{ old('hire_date', $employee->hire_date?->format('Y-m-d')) }}"
+                    >
+
+                    @error('hire_date')
+                        <div class="employee-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- PROFILE IMAGE --}}
+        <div class="employee-form-card">
+
+            <div class="employee-section-title">
+                <i class="fas fa-image"></i>
+                <h3>Profile Image</h3>
+            </div>
+
+            @if($employee->profile_image)
+
+                <div class="employee-current-image">
+
+                    <img
+                        src="{{ $employee->profile_image_url }}"
+                        alt="{{ $employee->full_name }}"
+                    >
+
+                    <div class="employee-current-image-text">
+                        Current profile image
+                    </div>
+
+                </div>
+
+            @endif
+
+            <div class="employee-form-group">
+
+                <label for="profile_image">
+                    Change Profile Image
+                </label>
+
+                <input
+                    type="file"
+                    id="profile_image"
+                    name="profile_image"
+                    accept=".jpg,.jpeg,.png,.gif"
+                >
+
+                <div class="employee-help">
+                    Maximum 2MB. JPG, PNG, or GIF.
+                </div>
+
+                @error('profile_image')
+                    <div class="employee-error">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+            </div>
+
+        </div>
+
+        {{-- NOTES --}}
+        <div class="employee-form-card">
+
+            <div class="employee-section-title">
+                <i class="fas fa-note-sticky"></i>
+                <h3>Notes</h3>
+            </div>
+
+            <div class="employee-form-group">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    placeholder="Add any additional employee notes..."
+                >{{ old('notes', $employee->notes) }}</textarea>
+
+                @error('notes')
+                    <div class="employee-error">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+            </div>
+
+        </div>
+
+        {{-- FORM ACTIONS --}}
+        <div class="employee-form-footer">
+
+            <a
+                href="{{ route('employees.show', $employee) }}"
+                class="employee-btn employee-btn-cancel"
+            >
+                <i class="fas fa-xmark"></i>
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="employee-btn employee-btn-save"
+            >
+                <i class="fas fa-floppy-disk"></i>
+                Update Employee
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const organizationSelect =
+        document.getElementById('organization_id');
+
+    const departmentSelect =
+        document.getElementById('department_id');
+
+    if (!organizationSelect || !departmentSelect) {
+        return;
+    }
+
+    const departmentOptions =
+        Array.from(
+            departmentSelect.querySelectorAll(
+                'option[data-organization-id]'
+            )
+        );
+
+    function filterDepartments() {
+
+        const organizationId =
+            organizationSelect.value;
+
+        departmentOptions.forEach(function (option) {
+
+            const departmentOrganizationId =
+                option.dataset.organizationId;
+
+            if (!organizationId) {
+                option.hidden = false;
+                return;
+            }
+
+            option.hidden =
+                departmentOrganizationId !== organizationId;
+        });
+
+        const selectedOption =
+            departmentSelect.options[
+                departmentSelect.selectedIndex
+            ];
+
+        if (
+            selectedOption &&
+            selectedOption.dataset.organizationId &&
+            selectedOption.dataset.organizationId !== organizationId
+        ) {
+            departmentSelect.value = '';
+        }
+    }
+
+    organizationSelect.addEventListener(
+        'change',
+        filterDepartments
+    );
+
+    filterDepartments();
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOCATION ? Dependent Dropdowns (Edit)
+    |--------------------------------------------------------------------------
+    */
+
+    const regionSelect = document.getElementById('region_id');
+    const districtSelect = document.getElementById('district_id');
+    const wardSelect = document.getElementById('ward_id');
+
+    const savedDistrictId = '{{ old('district_id', $employee->district_id) }}';
+    const savedWardId = '{{ old('ward_id', $employee->ward_id) }}';
+
+    if (regionSelect && districtSelect && wardSelect) {
+
+        regionSelect.addEventListener('change', function() {
+            const regionId = this.value;
+            districtSelect.innerHTML = '<option value="">Loading...</option>';
+            wardSelect.innerHTML = '<option value="">Select Ward</option>';
+
+            if (!regionId) {
+                districtSelect.innerHTML = '<option value="">Select District</option>';
+                return;
+            }
+
+            fetch('/location/districts?region_id=' + regionId)
+                .then(res => res.json())
+                .then(data => {
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+                    data.forEach(d => {
+                        const sel = (d.id == savedDistrictId) ? ' selected' : '';
+                        districtSelect.innerHTML += `<option value="${d.id}"${sel}>${d.name}</option>`;
+                    });
+                    if (savedDistrictId) {
+                        districtSelect.dispatchEvent(new Event('change'));
+                    }
+                });
+        });
+
+        districtSelect.addEventListener('change', function() {
+            const districtId = this.value;
+            wardSelect.innerHTML = '<option value="">Loading...</option>';
+
+            if (!districtId) {
+                wardSelect.innerHTML = '<option value="">Select Ward</option>';
+                return;
+            }
+
+            fetch('/location/wards?district_id=' + districtId)
+                .then(res => res.json())
+                .then(data => {
+                    wardSelect.innerHTML = '<option value="">Select Ward</option>';
+                    data.forEach(w => {
+                        const sel = (w.id == savedWardId) ? ' selected' : '';
+                        wardSelect.innerHTML += `<option value="${w.id}"${sel}>${w.name}</option>`;
+                    });
+                });
+        });
+
+        // Trigger on page load kama region ipo
+        if (regionSelect.value) {
+            regionSelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+});
+</script>
+
+@endsection
+

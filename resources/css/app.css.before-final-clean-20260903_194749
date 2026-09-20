@@ -1,0 +1,1308 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* =========================================================
+   SAPTA MANAGEMENT SYSTEM
+   CLEAN MASTER CSS
+   ========================================================= */
+
+:root {
+    --sapta-sidebar: 270px;
+    --sapta-sidebar-collapsed: 70px;
+    --sapta-topbar: 64px;
+
+    --sapta-primary: #1a1a2e;
+    --sapta-primary-light: #252542;
+    --sapta-accent: #4f46e5;
+    --sapta-accent-hover: #4338ca;
+
+    --sapta-bg: #f0f2f5;
+    --sapta-card: #ffffff;
+    --sapta-text: #1a1a2e;
+    --sapta-muted: #6b7280;
+    --sapta-border: #e5e7eb;
+
+    --sapta-success: #16a34a;
+    --sapta-warning: #d97706;
+    --sapta-danger: #dc2626;
+    --sapta-info: #2563eb;
+
+    --sapta-radius: 10px;
+    --sapta-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--sapta-bg);
+    color: var(--sapta-text);
+    font-family: Montserrat, 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+h5 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sapta-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: var(--sapta-sidebar);
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--sapta-primary);
+    color: #fff;
+    transition: width 0.25s ease, transform 0.25s ease;
+}
+
+.sapta-brand {
+    flex-shrink: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sapta-brand a {
+    display: flex;
+    flex-direction: column;
+}
+
+.sapta-brand .brand-title {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.sapta-brand .brand-title span {
+    color: #4fc3f7;
+}
+
+.sapta-brand .brand-sub {
+    margin-top: 2px;
+    color: #6b7a8f;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sapta-sidebar-scroll {
+    flex: 1;
+    padding: 12px 16px 20px;
+}
+
+.sidebar-section-title {
+    padding: 12px 12px 6px;
+    color: #4a5a6f;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.sidebar-single-link,
+.sidebar-menu-button {
+    width: 100%;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 3px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #a8b2c1;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-single-link:hover,
+.sidebar-menu-button:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.sidebar-single-link.active,
+.sidebar-menu-button.active {
+    background: rgba(79, 195, 247, 0.12);
+    color: #4fc3f7;
+    font-weight: 600;
+}
+
+.sidebar-menu-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-menu-icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7a8f;
+}
+
+.sidebar-menu-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sidebar-menu-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sidebar-chevron {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #4a5a6f;
+    transition: transform 0.25s ease;
+}
+
+.sidebar-chevron.rotate {
+    transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+    display: none;
+    margin: 4px 0 6px 32px;
+    padding-left: 16px;
+    border-left: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-submenu.open {
+    display: block;
+}
+
+.sidebar-submenu-link {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 6px;
+    color: #8898aa;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sidebar-submenu-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.sidebar-submenu-link.active {
+    background: rgba(79, 195, 247, 0.08);
+    color: #4fc3f7;
+    font-weight: 600;
+}
+
+.sidebar-submenu-label {
+    padding: 6px 12px 2px;
+    color: #4a5a6f;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.sapta-sidebar-footer {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-account-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #a8b2c1;
+}
+
+.sidebar-account-link:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.sidebar-account-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-account-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sidebar-account-title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sidebar-account-subtitle {
+    color: #6b7a8f;
+    font-size: 11px;
+}
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.sapta-topbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: var(--sapta-sidebar);
+    z-index: 900;
+    height: var(--sapta-topbar);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #e8ecf1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: left 0.25s ease;
+}
+
+.topbar-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-right {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-logo-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--sapta-primary);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.topbar-logo-text {
+    color: var(--sapta-primary);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.topbar-logo-text span {
+    color: #1a5276;
+}
+
+.topbar-logo-sub {
+    color: #8898aa;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lang-switcher {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #f0f2f5;
+    border: 1px solid #e8ecf1;
+    border-radius: 8px;
+}
+
+.lang-switcher button {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #8898aa;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lang-switcher button.active {
+    background: #fff;
+    color: #1a5276;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 12px 4px 4px;
+    border-radius: 10px;
+}
+
+.topbar-user:hover {
+    background: #f8f9fa;
+}
+
+.topbar-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #1a5276;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.topbar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.topbar-user-name {
+    color: var(--sapta-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.topbar-user-role {
+    color: #8898aa;
+    font-size: 12px;
+}
+
+.topbar-date {
+    padding-left: 16px;
+    border-left: 1px solid #e8ecf1;
+    color: #8898aa;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   MAIN AREA
+   ========================================================= */
+
+.sapta-main-area {
+    min-height: 100vh;
+    margin-left: var(--sapta-sidebar);
+    padding-top: var(--sapta-topbar);
+    background: var(--sapta-bg);
+    transition: margin-left 0.25s ease;
+}
+
+.sapta-content {
+    width: 100%;
+    min-height: calc(100vh - var(--sapta-topbar));
+    padding: 20px;
+}
+
+.sapta-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sapta-footer {
+    padding: 16px 32px;
+    border-top: 1px solid #e8ecf1;
+    background: #fff;
+    color: #8898aa;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-header,
+.sapta-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.page-title,
+.sapta-page-title {
+    margin: 0;
+    color: var(--sapta-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.page-subtitle {
+    margin: 4px 0 0;
+    color: var(--sapta-muted);
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card,
+.sapta-card,
+.dashboard-card {
+    background: #fff;
+    border: 1px solid var(--sapta-border);
+    border-radius: var(--sapta-radius);
+    box-shadow: var(--sapta-shadow);
+}
+
+.card-header,
+.sapta-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--sapta-border);
+}
+
+.card-body,
+.sapta-card-body {
+    padding: 20px;
+}
+
+.card-footer,
+.sapta-card-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--sapta-border);
+}
+
+.card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.card-subtitle,
+.card-text {
+    font-size: 0.875rem;
+}
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+.stats-grid,
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid var(--sapta-border);
+    border-radius: var(--sapta-radius);
+    box-shadow: var(--sapta-shadow);
+}
+
+.stat-card-label,
+.stat-label,
+.dashboard-stat-label {
+    margin-bottom: 8px;
+    color: var(--sapta-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.stat-card-value,
+.stat-number,
+.dashboard-stat-number {
+    color: var(--sapta-primary);
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.stat-card-change {
+    margin-top: 8px;
+    font-size: 0.8rem;
+}
+
+.quick-action-btn .label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+}
+
+.activity-info .title {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.activity-info .desc {
+    font-size: 0.75rem;
+}
+
+.activity-time {
+    font-size: 0.6875rem;
+}
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.form-section,
+.sapta-form-section,
+.form-container {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    background: #fff;
+    border: 1px solid var(--sapta-border);
+    border-radius: 12px;
+    box-shadow: var(--sapta-shadow);
+}
+
+.form-section-title,
+.sapta-form-section-title,
+.section-title {
+    margin: 0 0 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--sapta-border);
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.form-group,
+.field {
+    margin-bottom: 16px;
+}
+
+.form-row,
+.fields-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.form-label,
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.form-control,
+.form-select,
+.form-section input,
+.form-section select,
+.form-section textarea,
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    outline: none;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    color: var(--sapta-text);
+    font-family: Montserrat, 'Instrument Sans', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: var(--sapta-accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+textarea.form-control,
+.form-section textarea,
+.field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.form-control::placeholder {
+    font-size: 0.875rem;
+}
+
+.help-text,
+.form-text {
+    font-size: 0.8125rem;
+}
+
+.form-actions,
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 15px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--sapta-accent);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--sapta-accent-hover);
+}
+
+.btn-secondary {
+    background: #fff;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #f9fafb;
+}
+
+.btn-success {
+    background: var(--sapta-success);
+    color: #fff;
+}
+
+.btn-danger {
+    background: var(--sapta-danger);
+    color: #fff;
+}
+
+.btn-warning {
+    background: var(--sapta-warning);
+    color: #fff;
+}
+
+.btn-sm {
+    font-size: 0.8125rem;
+}
+
+.btn-lg {
+    font-size: 1rem;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.table-container,
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid var(--sapta-border);
+    border-radius: var(--sapta-radius);
+    box-shadow: var(--sapta-shadow);
+}
+
+table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+}
+
+.table th,
+thead th {
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--sapta-border);
+    color: #374151;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.table td,
+tbody td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #eef0f2;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background: #fafafa;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.alert,
+.alert-error,
+.alert-success {
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+}
+
+.alert-success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.alert-danger,
+.alert-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.alert-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.alert-info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+}
+
+/* =========================================================
+   BREADCRUMBS
+   ========================================================= */
+
+.breadcrumb,
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    color: var(--sapta-muted);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+}
+
+.breadcrumb a,
+.breadcrumbs a {
+    color: var(--sapta-accent);
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 18px;
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+}
+
+.pagination a,
+.pagination span {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    background: #fff;
+    border: 1px solid var(--sapta-border);
+    border-radius: 6px;
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.modal-backdrop,
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.modal,
+.sapta-modal {
+    width: 100%;
+    max-width: 600px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--sapta-border);
+}
+
+.modal-body {
+    padding: 20px;
+    font-size: 0.875rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--sapta-border);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-bottom: 1px solid var(--sapta-border);
+}
+
+.notification-item:last-child {
+    border-bottom: 0;
+}
+
+.notification-item.unread {
+    background: #f8faff;
+}
+
+.notification-item .content .text {
+    font-size: 0.8125rem;
+}
+
+.notification-item .content .time {
+    font-size: 0.6875rem;
+}
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobile-menu-button {
+    width: 40px;
+    height: 40px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e8ecf1;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--sapta-primary);
+}
+
+.mobile-menu-button:hover {
+    background: #f8f9fa;
+    border-color: #1a5276;
+}
+
+.sapta-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: none;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+}
+
+.sapta-sidebar-overlay.show {
+    display: block;
+}
+
+/* =========================================================
+   COLLAPSED SIDEBAR
+   ========================================================= */
+
+body.sidebar-collapsed .sapta-sidebar {
+    width: var(--sapta-sidebar-collapsed);
+}
+
+body.sidebar-collapsed .sapta-topbar {
+    left: var(--sapta-sidebar-collapsed);
+}
+
+body.sidebar-collapsed .sapta-main-area {
+    margin-left: var(--sapta-sidebar-collapsed);
+}
+
+body.sidebar-collapsed .sapta-brand .brand-title,
+body.sidebar-collapsed .sapta-brand .brand-sub,
+body.sidebar-collapsed .sidebar-section-title,
+body.sidebar-collapsed .sidebar-menu-text,
+body.sidebar-collapsed .sidebar-chevron,
+body.sidebar-collapsed .sidebar-submenu,
+body.sidebar-collapsed .sidebar-account-title,
+body.sidebar-collapsed .sidebar-account-subtitle {
+    display: none;
+}
+
+body.sidebar-collapsed .sidebar-single-link,
+body.sidebar-collapsed .sidebar-menu-button {
+    justify-content: center;
+}
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+
+.text-muted {
+    color: var(--sapta-muted);
+}
+
+.text-success {
+    color: var(--sapta-success);
+}
+
+.text-danger {
+    color: var(--sapta-danger);
+}
+
+.text-warning {
+    color: var(--sapta-warning);
+}
+
+.text-info {
+    color: var(--sapta-info);
+}
+
+.text-small,
+small,
+.small-text {
+    font-size: 0.875rem;
+}
+
+.text-xs,
+.very-small {
+    font-size: 0.75rem;
+}
+
+.fw-bold {
+    font-weight: 700;
+}
+
+.w-full {
+    width: 100%;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .stats-grid,
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --sapta-sidebar: 280px;
+        --sapta-topbar: 60px;
+    }
+
+    .sapta-sidebar {
+        width: var(--sapta-sidebar);
+        transform: translateX(-100%);
+    }
+
+    .sapta-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sapta-topbar {
+        left: 0;
+        padding: 0 16px;
+    }
+
+    .sapta-main-area {
+        margin-left: 0;
+    }
+
+    .mobile-menu-button {
+        display: inline-flex;
+    }
+
+    .sapta-content {
+        min-height: calc(100vh - var(--sapta-topbar));
+        padding: 16px;
+    }
+
+    .stats-grid,
+    .dashboard-stats,
+    .form-row,
+    .fields-row {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar-date,
+    .topbar-user-info {
+        display: none;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    h4 {
+        font-size: 1.125rem;
+    }
+
+    .stat-number,
+    .dashboard-stat-number {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sapta-topbar {
+        padding: 0 12px;
+    }
+
+    .sapta-content {
+        padding: 12px;
+    }
+
+    .lang-switcher {
+        display: none;
+    }
+
+    .page-header,
+    .sapta-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .stat-number,
+    .dashboard-stat-number {
+        font-size: 1.25rem;
+    }
+
+    .form-actions,
+    .actions {
+        justify-content: stretch;
+    }
+
+    .form-actions .btn,
+    .actions .btn {
+        flex: 1 1 auto;
+    }
+}

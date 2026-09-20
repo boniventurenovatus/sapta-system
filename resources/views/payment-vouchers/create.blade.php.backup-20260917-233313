@@ -1,0 +1,35 @@
+@extends('layouts.sapta')
+@section('title', 'New Payment Voucher')
+@section('page-title', 'New Payment Voucher')
+
+@section('content')
+<div class="p-6 max-w-4xl mx-auto">
+
+    <x-page-header title="New Payment Voucher" subtitle="Create a new payment voucher" icon="fa-plus-circle" gradient="blue" />
+
+    @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6">
+            <div class="font-bold mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Please fix the following errors:</div>
+            <ul class="list-disc list-inside text-sm space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- FORM 1: Save as Draft --}}
+    <form id="form-draft" action="{{ route('payment-vouchers.store') }}" method="POST" class="bg-white rounded-2xl border border-slate-200 p-8">
+        @csrf
+        <input type="hidden" name="action" value="draft">
+        @include('payment-vouchers._form')
+    </form>
+
+    {{-- FORM 2: Submit for Approval --}}
+    <form id="form-submit" action="{{ route('payment-vouchers.store') }}" method="POST" class="hidden">
+        @csrf
+        <input type="hidden" name="action" value="submit">
+    </form>
+
+</div>
+@endsection

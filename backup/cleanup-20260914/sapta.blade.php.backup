@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'SAPTA Management System')</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+        /* FORCE ALL FORMS TO TOP */
+        .sapta-content {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            display: block !important;
+        }
+        
+        .sapta-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Remove any scroll hiding */
+        .form-container,
+        .form-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        /* Push content up */
+        .sapta-main-area {
+            padding-top: 60px !important;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+        
+        .sapta-app { display: flex; min-height: 100vh; }
+        
+        .sapta-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: #1a1a2e;
+            color: #a8b2c1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .sapta-brand {
+            flex-shrink: 0;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #1a1a2e;
+        }
+        .sapta-brand a { display: flex; flex-direction: column; text-decoration: none; }
+        .sapta-brand .brand-title { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+        .sapta-brand .brand-title span { color: #4fc3f7; }
+        .sapta-brand .brand-sub { font-size: 10px; color: #6b7a8f; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        
+        .sapta-sidebar-scroll { flex: 1;  padding: 12px 16px 20px; }
+        .sidebar-section-title { font-size: 10px; font-weight: 700; color: #4a5a6f; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 12px 6px; }
+        
+        .sidebar-single-link, .sidebar-menu-button {
+            width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; padding: 8px 12px; border-radius: 8px; color: #a8b2c1; font-size: 14px;
+            font-weight: 500; transition: all 0.2s ease; text-align: left; text-decoration: none !important;
+        }
+        .sidebar-single-link:hover, .sidebar-menu-button:hover { background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none !important; }
+        .sidebar-single-link.active, .sidebar-menu-button.active { background: rgba(79, 195, 247, 0.12); color: #4fc3f7; font-weight: 600; }
+        
+        .sidebar-menu-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .sidebar-menu-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6b7a8f; }
+        .sidebar-menu-icon svg { width: 18px; height: 18px; }
+        .sidebar-menu-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-chevron { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.25s ease; color: #4a5a6f; }
+        .sidebar-chevron.rotate { transform: rotate(180deg); }
+        
+        .sidebar-submenu { display: none; margin: 4px 0 6px 32px; padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.06); }
+        .sidebar-submenu.open { display: block; }
+        .sidebar-submenu-link {
+            min-height: 34px; display: flex; align-items: center; padding: 4px 12px; border-radius: 6px;
+            color: #8898aa; font-size: 13px; font-weight: 500; transition: all 0.15s ease; text-decoration: none !important;
+        }
+        .sidebar-submenu-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none !important; }
+        .sidebar-submenu-link.active { background: rgba(79, 195, 247, 0.08); color: #4fc3f7; font-weight: 600; }
+        .sidebar-submenu-label { font-size: 9px; font-weight: 700; color: #4a5a6f; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 12px 2px; }
+        
+        .sapta-sidebar-footer { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06); background: #1a1a2e; }
+        .sidebar-account-link { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; color: #a8b2c1; transition: all 0.15s; text-decoration: none !important; }
+        .sidebar-account-link:hover { background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none !important; }
+        .sidebar-account-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: #a8b2c1; flex-shrink: 0; }
+        .sidebar-account-icon svg { width: 18px; height: 18px; }
+        .sidebar-account-title { font-size: 13px; font-weight: 600; color: #ffffff; }
+        .sidebar-account-subtitle { font-size: 11px; color: #6b7a8f; }
+        
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px; margin-left: 260px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; background: #f0f2f5; }
+        
+        .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            position: sticky; top: 0; z-index: 100; min-height: 56px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 20px; background: #ffffff; border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        
+        .topbar-logo-icon { width: 42px; height: 42px; border-radius: 10px; background: #1a1a2e; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 22px; flex-shrink: 0; }
+        .topbar-logo-text { font-size: 20px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; }
+        .topbar-logo-text span { color: #1a5276; }
+        .topbar-logo-sub { font-size: 9px; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .lang-switcher { display: flex; gap: 4px; background: #f0f2f5; padding: 4px; border-radius: 8px; border: 1px solid #e8ecf1; }
+        .lang-switcher button { padding: 6px 14px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #8898aa; }
+        .lang-switcher button.active { background: white; color: #1a5276; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .lang-switcher button:hover { opacity: 0.8; }
+        
+        .topbar-user { display: flex; align-items: center; gap: 12px; padding: 4px 12px 4px 4px; border-radius: 10px; transition: all 0.2s; cursor: pointer; }
+        .topbar-user:hover { background: #f8f9fa; }
+        .topbar-avatar { width: 38px; height: 38px; border-radius: 50%; background: #1a5276; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
+        .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .topbar-user-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+        .topbar-user-role { font-size: 12px; color: #8898aa; }
+        .topbar-date { font-size: 13px; color: #8898aa; padding-left: 16px; border-left: 1px solid #e8ecf1; white-space: nowrap; }
+        
+        .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px); flex: 1; padding: 5px 10px; width: 100%; }
+        .sapta-container { max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        .sapta-footer { flex-shrink: 0; padding: 16px 32px; border-top: 1px solid #e8ecf1; background: #fff; color: #8898aa; font-size: 13px; text-align: center; }
+        
+        .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
+        .alert-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
+        
+        .mobile-menu-button { display: none; width: 40px; height: 40px; border: 2px solid #e8ecf1; border-radius: 10px; background: #fff; align-items: center; justify-content: center; color: #1a1a2e; }
+        .mobile-menu-button:hover { background: #f8f9fa; border-color: #1a5276; }
+        .sapta-sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        .sapta-sidebar-overlay.show { display: block; }
+        
+        @media (max-width: 768px) {
+            .sapta-sidebar { transform: translateX(-100%); width: 280px; }
+            .sapta-sidebar.mobile-open { transform: translateX(0); }
+            .sapta-sidebar-overlay.show { display: block; }
+            .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px; margin-left: 0; width: 100%; }
+            .mobile-menu-button { display: inline-flex; }
+            .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0; padding: 0 16px; min-height: 60px; flex-wrap: wrap; }
+            .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px); padding: 16px; }
+            .topbar-date { display: none; }
+            .topbar-user-info { display: none; }
+        }
+            
+        /* ==================== STANDARDIZED FONT SIZES - eGA COMPLIANT ==================== */
+        
+        /* Base - 16px = 1rem */
+        html { font-size: 16px; }
+        
+        /* Body Text - 16px */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #1a1a2e;
+        }
+        
+        /* Headings */
+        h1 { font-size: 2rem; font-weight: 700; }      /* 32px */
+        h2 { font-size: 1.75rem; font-weight: 700; }   /* 28px */
+        h3 { font-size: 1.5rem; font-weight: 600; }    /* 24px */
+        h4 { font-size: 1.25rem; font-weight: 600; }   /* 20px */
+        h5 { font-size: 1.125rem; font-weight: 600; }  /* 18px */
+        h6 { font-size: 1rem; font-weight: 600; }      /* 16px */
+        
+        /* Paragraphs */
+        p { font-size: 1rem; line-height: 1.6; }       /* 16px */
+        
+        /* Small Text - 14px */
+        .text-small,
+        small,
+        .small-text { font-size: 0.875rem; }           /* 14px */
+        
+        /* Very Small Text - 12px */
+        .text-xs,
+        .very-small { font-size: 0.75rem; }            /* 12px */
+        
+        /* ==================== SIDEBAR ==================== */
+        .sidebar-section-title {
+            font-size: 0.625rem;                       /* 10px */
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #4a5a6f;
+        }
+        .sidebar-single-link,
+        .sidebar-menu-button {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 500;
+        }
+        .sidebar-menu-text {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .sidebar-submenu-link {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        .sidebar-submenu-label {
+            font-size: 0.5625rem;                      /* 9px */
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .sidebar-account-title {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 600;
+        }
+        .sidebar-account-subtitle {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== TOPBAR ==================== */
+        .topbar-logo-text {
+            font-size: 1.25rem;                        /* 20px */
+            font-weight: 800;
+        }
+        .topbar-logo-sub {
+            font-size: 0.5625rem;                      /* 9px */
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .topbar-search input {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .topbar-lang {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 600;
+        }
+        .topbar-user-name {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .topbar-user-role {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        .topbar-date {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .btn-sm { font-size: 0.8125rem; }              /* 13px */
+        .btn-lg { font-size: 1rem; }                   /* 16px */
+        
+        /* ==================== FORMS ==================== */
+        .form-label {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 600;
+        }
+        .form-control,
+        .form-control input,
+        .form-control select,
+        .form-control textarea {
+            font-size: 1rem;                           /* 16px - prevents iOS zoom */
+            font-family: 'Montserrat', sans-serif;
+        }
+        .form-control::placeholder {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .help-text,
+        .form-text {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== TABLES ==================== */
+        .table th {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table td {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .table .badge {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 600;
+        }
+        
+        /* ==================== CARDS ==================== */
+        .card-title {
+            font-size: 1.125rem;                       /* 18px */
+            font-weight: 600;
+        }
+        .card-subtitle {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        .card-text {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== STATS ==================== */
+        .stat-number {
+            font-size: 1.75rem;                        /* 28px */
+            font-weight: 800;
+        }
+        .stat-label {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        
+        /* ==================== BADGES ==================== */
+        .badge {
+            font-size: 0.75rem;                        /* 12px */
+            font-weight: 600;
+        }
+        
+        /* ==================== FOOTER ==================== */
+        .footer-text,
+        .sapta-footer {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        
+        /* ==================== BREADCRUMBS ==================== */
+        .breadcrumb {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== MODALS ==================== */
+        .modal-title {
+            font-size: 1.25rem;                        /* 20px */
+            font-weight: 700;
+        }
+        .modal-body {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== DASHBOARD ==================== */
+        .dashboard-stat-number {
+            font-size: 1.75rem;                        /* 28px */
+            font-weight: 800;
+        }
+        .dashboard-stat-label {
+            font-size: 0.8125rem;                      /* 13px */
+            font-weight: 500;
+        }
+        .quick-action-btn .label {
+            font-size: 0.6875rem;                      /* 11px */
+            font-weight: 500;
+        }
+        .activity-info .title {
+            font-size: 0.875rem;                       /* 14px */
+            font-weight: 500;
+        }
+        .activity-info .desc {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        .activity-time {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== NOTIFICATIONS ==================== */
+        .notification-item .content .text {
+            font-size: 0.8125rem;                      /* 13px */
+        }
+        .notification-item .content .time {
+            font-size: 0.6875rem;                      /* 11px */
+        }
+        
+        /* ==================== PAGINATION ==================== */
+        .pagination {
+            font-size: 0.875rem;                       /* 14px */
+        }
+        
+        /* ==================== CHARTS ==================== */
+        .chart-label {
+            font-size: 0.625rem;                       /* 10px */
+        }
+        .chart-legend {
+            font-size: 0.75rem;                        /* 12px */
+        }
+        
+        /* ==================== EMPLOYEE FORM ==================== */
+        .section-title {
+            font-size: 1.125rem;                       /* 18px */
+            font-weight: 700;
+        }
+        
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.75rem; }                 /* 28px */
+            h2 { font-size: 1.5rem; }                  /* 24px */
+            h3 { font-size: 1.25rem; }                 /* 20px */
+            h4 { font-size: 1.125rem; }                /* 18px */
+            .stat-number { font-size: 1.5rem; }        /* 24px */
+            .dashboard-stat-number { font-size: 1.5rem; } /* 24px */
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5rem; }                  /* 24px */
+            h2 { font-size: 1.25rem; }                 /* 20px */
+            .stat-number { font-size: 1.25rem; }       /* 20px */
+            .dashboard-stat-number { font-size: 1.25rem; } /* 20px */
+        }
+            
+        /* Fix scrolling issues */
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px);
+            flex: 1;
+            
+            padding: 5px 10px;
+        }
+        
+        .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .sapta-footer {
+            flex-shrink: 0;
+        }
+        
+        /* Fix for collapsed sidebar */
+        .sapta-main-area.expanded {
+            margin-left: 70px;
+            margin-left: 70px;
+        }
+            
+        /* FORM CONTAINER - Short Scroll */
+        .form-container {
+            
+            
+            padding: 20px 24px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .form-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .form-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        /* Form sections */
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border: 1px solid #f0f2f5;
+        }
+        
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-section .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+        
+        /* Form fields */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .form-group label .required {
+            color: #dc2626;
+            margin-left: 4px;
+        }
+        
+        .form-group .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e8ecf1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1a1a2e;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group .form-control:focus {
+            border-color: #1a5276;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(26, 82, 118, 0.08);
+        }
+        
+        .form-group .form-control::placeholder {
+            color: #a8b2c1;
+        }
+        
+        .form-group textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8ecf1;
+        }
+        
+        .form-actions .btn {
+            padding: 8px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .form-actions .btn-primary {
+            background: linear-gradient(135deg, #1a5276, #2d8a9e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 82, 118, 0.2);
+        }
+        
+        .form-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 82, 118, 0.3);
+            color: white;
+        }
+        
+        .form-actions .btn-secondary {
+            background: #e8ecf1;
+            color: #4a5a6f;
+        }
+        
+        .form-actions .btn-secondary:hover {
+            background: #d5d9e0;
+            color: #1a1a2e;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .form-container {
+                
+                padding: 12px 16px;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+            
+        /* MASTER FORM STYLES - PUSH TO TOP */
+        .form-container,
+        .form-wrapper,
+        .emp-form-container,
+        .project-form-container,
+        .attendance-form-container,
+        .leave-form-container {
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 10px 15px 8px !important;
+            background: white !important;
+            border-radius: 10px !important;
+            border: 1px solid #e8ecf1 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        }
+        
+        /* Remove any centering that pushes forms down */
+        .sapta-content {
+            padding-top: 0 !important;
+            display: block !important;
+            align-items: flex-start !important;
+        }
+        
+        .sapta-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Forms should start from top */
+        .sapta-main-area .sapta-content .sapta-container {
+            padding-top: 5px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sapta-app">
+    <div id="saptaSidebarOverlay" class="sapta-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="saptaSidebar" class="sapta-sidebar">
+        <div class="sapta-brand">
+            <a href="{{ route('dashboard') }}">
+                <span class="brand-title">SAP<span>TA</span></span>
+                <span class="brand-sub" data-en="Management System" data-sw="Mfumo wa Usimamizi">Management System</span>
+            </a>
+        </div>
+
+        <div class="sapta-sidebar-scroll">
+            <div class="sidebar-section-title" data-en="Main Menu" data-sw="Menyu Kuu">Main Menu</div>
+
+            <!-- Dashboard -->
+            <div class="sidebar-section">
+                <a href="{{ route('dashboard') }}" class="sidebar-single-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Dashboard" data-sw="Dashibodi">Dashboard</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Employees -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button {{ request()->routeIs('employees.*') ? 'active' : '' }}" onclick="toggleSidebarMenu('employeesMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Employees" data-sw="Wafanyakazi">Employees</span>
+                    </span>
+                    <svg class="sidebar-chevron {{ request()->routeIs('employees.*') ? 'rotate' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="employeesMenu" class="sidebar-submenu {{ request()->routeIs('employees.*') ? 'open' : '' }}">
+                    <a href="{{ route('employees.index') }}" class="sidebar-submenu-link {{ request()->routeIs('employees.index') ? 'active' : '' }}" data-en="All Employees" data-sw="Wafanyakazi Wote">All Employees</a>
+                    <a href="{{ route('employees.create') }}" class="sidebar-submenu-link {{ request()->routeIs('employees.create') ? 'active' : '' }}" data-en="Add Employee" data-sw="Ongeza Mfanyakazi">Add Employee</a>
+                    <div class="sidebar-submenu-label" data-en="Status" data-sw="Hali">Status</div>
+                    <a href="{{ route('employees.index', ['status' => 'active']) }}" class="sidebar-submenu-link" data-en="Active" data-sw="Inayotumika">Active</a>
+                    <a href="{{ route('employees.index', ['status' => 'inactive']) }}" class="sidebar-submenu-link" data-en="Inactive" data-sw="Haijatumika">Inactive</a>
+                    <a href="{{ route('employees.index', ['status' => 'on_leave']) }}" class="sidebar-submenu-link" data-en="On Leave" data-sw="Likizo">On Leave</a>
+                    <a href="{{ route('employees.index', ['status' => 'suspended']) }}" class="sidebar-submenu-link" data-en="Suspended" data-sw="Imesimamishwa">Suspended</a>
+                    <a href="{{ route('employees.index', ['status' => 'terminated']) }}" class="sidebar-submenu-link" data-en="Terminated" data-sw="Imekatishwa">Terminated</a>
+                </div>
+            </div>
+
+            <!-- Organizations -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button" onclick="toggleSidebarMenu('orgMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Organizations" data-sw="Mashirika">Organizations</span>
+                    </span>
+                    <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="orgMenu" class="sidebar-submenu">
+                    <a href="{{ route('organizations.index') }}" class="sidebar-submenu-link" data-en="All Organizations" data-sw="Mashirika Yote">All Organizations</a>
+                    <a href="{{ route('organizations.create') }}" class="sidebar-submenu-link" data-en="Add Organization" data-sw="Ongeza Shirika">Add Organization</a>
+                    <div class="sidebar-submenu-label" data-en="SAPTA Structure" data-sw="Muundo wa SAPTA">SAPTA Structure</div>
+                    <a href="{{ route('organizations.index', ['search' => 'SAPTA']) }}" class="sidebar-submenu-link" data-en="SAPTA Organization" data-sw="Shirika la SAPTA">SAPTA Organization</a>
+                    <a href="{{ route('organizations.index', ['status' => 'active']) }}" class="sidebar-submenu-link" data-en="Active" data-sw="Inayotumika">Active</a>
+                    <a href="{{ route('organizations.index', ['status' => 'inactive']) }}" class="sidebar-submenu-link" data-en="Inactive" data-sw="Haijatumika">Inactive</a>
+                </div>
+            </div>
+
+            <!-- Attendance -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button" onclick="toggleSidebarMenu('attendanceMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Attendance" data-sw="Mahudhurio">Attendance</span>
+                    </span>
+                    <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="attendanceMenu" class="sidebar-submenu">
+                    <a href="{{ route('attendances.index') }}" class="sidebar-submenu-link" data-en="Attendance Records" data-sw="Rekodi za Mahudhurio">Attendance Records</a>
+                    <a href="{{ route('attendances.create') }}" class="sidebar-submenu-link" data-en="Add Attendance" data-sw="Ongeza Mahudhurio">Add Attendance</a>
+                    <div class="sidebar-submenu-label" data-en="Status" data-sw="Hali">Status</div>
+                    <a href="{{ route('attendances.index', ['status' => 'present']) }}" class="sidebar-submenu-link" data-en="Present" data-sw="Yupo">Present</a>
+                    <a href="{{ route('attendances.index', ['status' => 'absent']) }}" class="sidebar-submenu-link" data-en="Absent" data-sw="Hayupo">Absent</a>
+                    <a href="{{ route('attendances.index', ['status' => 'late']) }}" class="sidebar-submenu-link" data-en="Late" data-sw="Amechelewa">Late</a>
+                    <a href="{{ route('attendances.index', ['status' => 'half_day']) }}" class="sidebar-submenu-link" data-en="Half Day" data-sw="Nusu Siku">Half Day</a>
+                    <a href="{{ route('attendances.index', ['status' => 'on_leave']) }}" class="sidebar-submenu-link" data-en="On Leave" data-sw="Likizo">On Leave</a>
+                    <a href="{{ route('attendances.index', ['status' => 'holiday']) }}" class="sidebar-submenu-link" data-en="Holiday" data-sw="Siku ya Mapumziko">Holiday</a>
+                </div>
+            </div>
+
+            <!-- Leave Requests -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button" onclick="toggleSidebarMenu('leaveMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Leave Requests" data-sw="Maombi ya Likizo">Leave Requests</span>
+                    </span>
+                    <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="leaveMenu" class="sidebar-submenu">
+                    <a href="{{ route('leave-requests.index') }}" class="sidebar-submenu-link" data-en="All Requests" data-sw="Maombi Yote">All Requests</a>
+                    <a href="{{ route('leave-requests.create') }}" class="sidebar-submenu-link" data-en="Apply Leave" data-sw="Omba Likizo">Apply Leave</a>
+                    <div class="sidebar-submenu-label" data-en="Status" data-sw="Hali">Status</div>
+                    <a href="{{ route('leave-requests.index', ['status' => 'pending']) }}" class="sidebar-submenu-link" data-en="Pending" data-sw="Inasubiri">Pending</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'approved']) }}" class="sidebar-submenu-link" data-en="Approved" data-sw="Imekubaliwa">Approved</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'rejected']) }}" class="sidebar-submenu-link" data-en="Rejected" data-sw="Imekataliwa">Rejected</a>
+                </div>
+            </div>
+
+                        
+
+            <!-- Reports -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button {{ request()->routeIs('reports.*') ? 'active' : '' }}" onclick="toggleSidebarMenu('reportsMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 20V10"/>
+                                <path d="M12 20V4"/>
+                                <path d="M6 20V14"/>
+                            </svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Reports" data-sw="Ripoti">Reports</span>
+                    </span>
+                    <svg class="sidebar-chevron {{ request()->routeIs('reports.*') ? 'rotate' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="reportsMenu" class="sidebar-submenu {{ request()->routeIs('reports.*') ? 'open' : '' }}">
+                    <a href="{{ route('reports.index') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" data-en="Dashboard" data-sw="Dashibodi">Dashboard</a>
+                    <a href="{{ route('reports.employees') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.employees') ? 'active' : '' }}" data-en="Employee Report" data-sw="Ripoti ya Wafanyakazi">Employee Report</a>
+                    <a href="{{ route('reports.attendance') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.attendance') ? 'active' : '' }}" data-en="Attendance Report" data-sw="Ripoti ya Mahudhurio">Attendance Report</a>
+                    <a href="{{ route('reports.projects') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.projects') ? 'active' : '' }}" data-en="Project Report" data-sw="Ripoti ya Miradi">Project Report</a>
+                    <a href="{{ route('reports.tasks') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.tasks') ? 'active' : '' }}" data-en="Task Report" data-sw="Ripoti ya Kazi">Task Report</a>
+                    <a href="{{ route('reports.leaves') }}" class="sidebar-submenu-link {{ request()->routeIs('reports.leaves') ? 'active' : '' }}" data-en="Leave Report" data-sw="Ripoti ya Likizo">Leave Report</a>
+                </div>
+            </div>
+
+            <!-- System Users -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button" onclick="toggleSidebarMenu('usersMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="System Users" data-sw="Watumiaji wa Mfumo">System Users</span>
+                    </span>
+                    <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="usersMenu" class="sidebar-submenu">
+                    <a href="{{ route('users.index') }}" class="sidebar-submenu-link" data-en="All Users" data-sw="Watumiaji Wote">All Users</a>
+                    <a href="{{ route('users.create') }}" class="sidebar-submenu-link" data-en="Create User" data-sw="Tengeneza Mtumiaji">Create User</a>
+                    <a href="{{ route('roles.index') }}" class="sidebar-submenu-link" data-en="Roles" data-sw="Majukumu">Roles</a>
+                    <a href="{{ route('permissions.index') }}" class="sidebar-submenu-link" data-en="Permissions" data-sw="Ruhusa">Permissions</a>
+                    <div class="sidebar-submenu-label" data-en="Account Status" data-sw="Hali ya Akaunti">Account Status</div>
+                    <a href="{{ route('users.index', ['status' => 'active']) }}" class="sidebar-submenu-link" data-en="Active" data-sw="Inayotumika">Active</a>
+                    <a href="{{ route('users.index', ['status' => 'inactive']) }}" class="sidebar-submenu-link" data-en="Inactive" data-sw="Haijatumika">Inactive</a>
+                    <a href="{{ route('users.index', ['status' => 'suspended']) }}" class="sidebar-submenu-link" data-en="Suspended" data-sw="Imesimamishwa">Suspended</a>
+                </div>
+            </div>
+        </div>
+
+                    <!-- Projects -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button" onclick="toggleSidebarMenu('projectsMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Projects" data-sw="Miradi">Projects</span>
+                    </span>
+                    <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="projectsMenu" class="sidebar-submenu">
+                    <a href="{{ route('projects.index') }}" class="sidebar-submenu-link" data-en="All Projects" data-sw="Miradi Yote">All Projects</a>
+                    <a href="{{ route('projects.create') }}" class="sidebar-submenu-link" data-en="New Project" data-sw="Mradi Mpya">New Project</a>
+                    <div class="sidebar-submenu-label" data-en="Status" data-sw="Hali">Status</div>
+                    <a href="{{ route('projects.index', ['status' => 'planning']) }}" class="sidebar-submenu-link" data-en="Planning" data-sw="Mpango">Planning</a>
+                    <a href="{{ route('projects.index', ['status' => 'in_progress']) }}" class="sidebar-submenu-link" data-en="In Progress" data-sw="Inaendelea">In Progress</a>
+                    <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" class="sidebar-submenu-link" data-en="On Hold" data-sw="Imesimamishwa">On Hold</a>
+                    <a href="{{ route('projects.index', ['status' => 'completed']) }}" class="sidebar-submenu-link" data-en="Completed" data-sw="Imekamilika">Completed</a>
+                    <a href="{{ route('projects.index', ['status' => 'cancelled']) }}" class="sidebar-submenu-link" data-en="Cancelled" data-sw="Imefutwa">Cancelled</a>
+                </div>
+            </div>
+
+                    <!-- Tasks -->
+            <div class="sidebar-section">
+                <button type="button" class="sidebar-menu-button {{ request()->routeIs('tasks.*') ? 'active' : '' }}" onclick="toggleSidebarMenu('tasksMenu', this)">
+                    <span class="sidebar-menu-left">
+                        <span class="sidebar-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </span>
+                        <span class="sidebar-menu-text" data-en="Tasks" data-sw="Kazi">Tasks</span>
+                    </span>
+                    <svg class="sidebar-chevron {{ request()->routeIs('tasks.*') ? 'rotate' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="tasksMenu" class="sidebar-submenu {{ request()->routeIs('tasks.*') ? 'open' : '' }}">
+                    <a href="{{ route('tasks.index') }}" class="sidebar-submenu-link {{ request()->routeIs('tasks.index') ? 'active' : '' }}" data-en="All Tasks" data-sw="Kazi Zote">All Tasks</a>
+                    <a href="{{ route('tasks.create') }}" class="sidebar-submenu-link {{ request()->routeIs('tasks.create') ? 'active' : '' }}" data-en="New Task" data-sw="Kazi Mpya">New Task</a>
+                    <div class="sidebar-submenu-label" data-en="Status" data-sw="Hali">Status</div>
+                    <a href="{{ route('tasks.index', ['status' => 'todo']) }}" class="sidebar-submenu-link" data-en="To Do" data-sw="Kufanya">To Do</a>
+                    <a href="{{ route('tasks.index', ['status' => 'in_progress']) }}" class="sidebar-submenu-link" data-en="In Progress" data-sw="Inaendelea">In Progress</a>
+                    <a href="{{ route('tasks.index', ['status' => 'review']) }}" class="sidebar-submenu-link" data-en="Review" data-sw="Kagua">Review</a>
+                    <a href="{{ route('tasks.index', ['status' => 'done']) }}" class="sidebar-submenu-link" data-en="Done" data-sw="Imekamilika">Done</a>
+                </div>
+            </div>
+
+                    
+            </a>
+        </div>
+    </aside>
+    <!-- ===== SIDEBAR COLLAPSE TOGGLE ===== -->
+    
+        /* FORCE ALL FORMS TO TOP */
+        .sapta-content {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            display: block !important;
+        }
+        
+        .sapta-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Remove any scroll hiding */
+        .form-container,
+        .form-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        /* Push content up */
+        .sapta-main-area {
+            padding-top: 60px !important;
+        }
+        /* Sidebar Collapse States */
+        .sapta-sidebar {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 270px;
+        }
+        
+        /* Collapsed State */
+        .sapta-sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .sapta-sidebar.collapsed .brand-title,
+        .sapta-sidebar.collapsed .brand-sub,
+        .sapta-sidebar.collapsed .sidebar-menu-text,
+        .sapta-sidebar.collapsed .sidebar-chevron,
+        .sapta-sidebar.collapsed .sidebar-account-title,
+        .sapta-sidebar.collapsed .sidebar-account-subtitle,
+        .sapta-sidebar.collapsed .sidebar-section-title {
+            display: none;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-menu-icon {
+            margin-right: 0;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-single-link,
+        .sapta-sidebar.collapsed .sidebar-menu-button {
+            justify-content: center;
+            padding: 8px;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-menu-left {
+            justify-content: center;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-submenu {
+            display: none !important;
+        }
+        
+        .sapta-sidebar.collapsed .sapta-brand {
+            padding: 16px 8px;
+            text-align: center;
+        }
+        
+        .sapta-sidebar.collapsed .sapta-sidebar-footer {
+            padding: 8px;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-account-link {
+            justify-content: center;
+            padding: 8px;
+        }
+        
+        .sapta-sidebar.collapsed .sidebar-account-icon {
+            margin: 0;
+        }
+        
+        /* Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 280px;
+            z-index: 1001;
+            background: #1a5276;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(26, 82, 118, 0.4);
+        }
+        
+        .sidebar-toggle.collapsed {
+            left: 90px;
+        }
+        
+        /* Main area adjustment */
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px;
+            margin-left: 270px;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sapta-main-area.expanded {
+            margin-left: 70px;
+            margin-left: 70px;
+        }
+        
+        /* Tooltip for collapsed mode */
+        .sidebar-tooltip {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1a1a2e;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1002;
+        }
+        
+        .sidebar-tooltip::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-right: 6px solid #1a1a2e;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+        
+        .sidebar-single-link:hover .sidebar-tooltip,
+        .sidebar-menu-button:hover .sidebar-tooltip {
+            opacity: 1;
+        }
+        
+        /* Hover expand on collapsed sidebar */
+        .sapta-sidebar.collapsed:hover {
+            width: 270px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+        }
+        
+        .sapta-sidebar.collapsed:hover .brand-title,
+        .sapta-sidebar.collapsed:hover .brand-sub,
+        .sapta-sidebar.collapsed:hover .sidebar-menu-text,
+        .sapta-sidebar.collapsed:hover .sidebar-chevron,
+        .sapta-sidebar.collapsed:hover .sidebar-account-title,
+        .sapta-sidebar.collapsed:hover .sidebar-account-subtitle,
+        .sapta-sidebar.collapsed:hover .sidebar-section-title {
+            display: block;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sidebar-single-link,
+        .sapta-sidebar.collapsed:hover .sidebar-menu-button {
+            justify-content: space-between;
+            padding: 8px 14px;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sidebar-menu-left {
+            justify-content: flex-start;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sapta-brand {
+            padding: 20px 24px;
+            text-align: left;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sapta-sidebar-footer {
+            padding: 12px 16px;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sidebar-account-link {
+            justify-content: flex-start;
+            padding: 8px 14px;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sidebar-account-icon {
+            margin: 0;
+        }
+        
+        .sapta-sidebar.collapsed:hover .sidebar-tooltip {
+            opacity: 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: none;
+            }
+            .sapta-sidebar.collapsed {
+                width: 270px;
+            }
+            .sapta-sidebar.collapsed .brand-title,
+            .sapta-sidebar.collapsed .brand-sub,
+            .sapta-sidebar.collapsed .sidebar-menu-text,
+            .sapta-sidebar.collapsed .sidebar-chevron,
+            .sapta-sidebar.collapsed .sidebar-account-title,
+            .sapta-sidebar.collapsed .sidebar-account-subtitle,
+            .sapta-sidebar.collapsed .sidebar-section-title {
+                display: block;
+            }
+            .sapta-sidebar.collapsed .sidebar-single-link,
+            .sapta-sidebar.collapsed .sidebar-menu-button {
+                justify-content: space-between;
+                padding: 8px 14px;
+            }
+            .sapta-sidebar.collapsed .sidebar-menu-left {
+                justify-content: flex-start;
+            }
+            .sapta-sidebar.collapsed .sapta-brand {
+                padding: 20px 24px;
+                text-align: left;
+            }
+            .sapta-sidebar.collapsed .sapta-sidebar-footer {
+                padding: 12px 16px;
+            }
+            .sapta-sidebar.collapsed .sidebar-account-link {
+                justify-content: flex-start;
+                padding: 8px 14px;
+            }
+            .sapta-main-area.expanded {
+            margin-left: 70px;
+                margin-left: 0;
+            }
+        }
+            
+        /* Fix scrolling issues */
+        .sapta-main-area {
+            margin-left: 270px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            padding-top: 64px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sapta-content {
+            flex: 1;
+            padding: 5px 10px;
+            width: 100%;
+            
+            height: calc(100vh - 64px);
+            flex: 1;
+            
+            padding: 5px 10px;
+        }
+        
+        .sapta-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .sapta-footer {
+            flex-shrink: 0;
+        }
+        
+        /* Fix for collapsed sidebar */
+        .sapta-main-area.expanded {
+            margin-left: 70px;
+            margin-left: 70px;
+        }
+            
+        /* FORM CONTAINER - Short Scroll */
+        .form-container {
+            
+            
+            padding: 20px 24px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .form-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .form-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        /* Form sections */
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border: 1px solid #f0f2f5;
+        }
+        
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-section .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+        
+        /* Form fields */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .form-group label .required {
+            color: #dc2626;
+            margin-left: 4px;
+        }
+        
+        .form-group .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e8ecf1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1a1a2e;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group .form-control:focus {
+            border-color: #1a5276;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(26, 82, 118, 0.08);
+        }
+        
+        .form-group .form-control::placeholder {
+            color: #a8b2c1;
+        }
+        
+        .form-group textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8ecf1;
+        }
+        
+        .form-actions .btn {
+            padding: 8px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .form-actions .btn-primary {
+            background: linear-gradient(135deg, #1a5276, #2d8a9e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 82, 118, 0.2);
+        }
+        
+        .form-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 82, 118, 0.3);
+            color: white;
+        }
+        
+        .form-actions .btn-secondary {
+            background: #e8ecf1;
+            color: #4a5a6f;
+        }
+        
+        .form-actions .btn-secondary:hover {
+            background: #d5d9e0;
+            color: #1a1a2e;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .form-container {
+                
+                padding: 12px 16px;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+            
+        /* MASTER FORM STYLES - PUSH TO TOP */
+        .form-container,
+        .form-wrapper,
+        .emp-form-container,
+        .project-form-container,
+        .attendance-form-container,
+        .leave-form-container {
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 10px 15px 8px !important;
+            background: white !important;
+            border-radius: 10px !important;
+            border: 1px solid #e8ecf1 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        }
+        
+        /* Remove any centering that pushes forms down */
+        .sapta-content {
+            padding-top: 0 !important;
+            display: block !important;
+            align-items: flex-start !important;
+        }
+        
+        .sapta-container {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Forms should start from top */
+        .sapta-main-area .sapta-content .sapta-container {
+            padding-top: 5px !important;
+        }
+    </style>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <script>
+        // ===== SIDEBAR COLLAPSE FUNCTION =====
+        function toggleSidebar() {
+            const sidebar = document.getElementById('saptaSidebar');
+            const mainArea = document.querySelector('.sapta-main-area');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const icon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('collapsed');
+            toggleBtn.classList.toggle('collapsed');
+            mainArea.classList.toggle('expanded');
+            
+            // Change icon
+            if (sidebar.classList.contains('collapsed')) {
+                icon.className = 'fas fa-chevron-right';
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                icon.className = 'fas fa-chevron-left';
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        }
+        
+        // Load saved state
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true') {
+                const sidebar = document.getElementById('saptaSidebar');
+                const mainArea = document.querySelector('.sapta-main-area');
+                const toggleBtn = document.getElementById('sidebarToggle');
+                const icon = document.getElementById('toggleIcon');
+                
+                sidebar.classList.add('collapsed');
+                toggleBtn.classList.add('collapsed');
+                mainArea.classList.add('expanded');
+                icon.className = 'fas fa-chevron-right';
+            }
+        });
+        
+        // Keyboard shortcut: Ctrl+B to toggle sidebar
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                toggleSidebar();
+            }
+        });
+    </script>
+
+    <!-- Main Area -->
+    <div class="sapta-main-area" style="margin-left:270px;padding-top:64px;min-height:100vh;display:flex;flex-direction:column;background:#f0f2f5;">
+
+        <header class="sapta-topbar" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:#ffffff;border-bottom:1px solid #e8ecf1;box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:64px;display:flex;align-items:flex-start;justify-content:space-between;padding:0 24px;">
+            <div class="topbar-left">
+                <button type="button" class="mobile-menu-button" onclick="openMobileSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+
+                <a href="{{ route('dashboard') }}" style="display:flex;align-items:flex-start;gap:12px;text-decoration:none;">
+                    <div class="topbar-logo-icon">S</div>
+                    <div>
+                        <div class="topbar-logo-text">SAP<span>TA</span></div>
+                        <div class="topbar-logo-sub" data-en="Management System" data-sw="Mfumo wa Usimamizi">Management System</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="topbar-right">
+                <!-- Language Switcher -->
+                <div class="lang-switcher">
+                    <button id="langEn" class="active" onclick="setLanguage('en')">EN</button>
+                    <button id="langSw" onclick="setLanguage('sw')">SW</button>
+                </div>
+
+                @auth
+                <div class="topbar-user">
+                    <div class="topbar-avatar">
+                        {{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 1)) }}
+                    </div>
+                    <div class="topbar-user-info">
+                        <div class="topbar-user-name">{{ auth()->user()->username ?? 'User' }}</div>
+                        <div class="topbar-user-role">Administrator</div>
+                    </div>
+                </div>
+                @endauth
+
+                <div class="topbar-date">{{ now()->format('M d, Y') }}</div>
+            </div>
+        </header>
+
+        <main class="sapta-content" style="padding:5px 10px !important;margin:0 !important;background:#f0f2f5;min-height:auto;">
+            <div class="sapta-container" style="max-width:100%;margin:0;padding:0;">
+                @if($errors->any())
+                <div class="alert-error">
+                    <strong data-en="Please check the following:" data-sw="Tafadhali angalia yafuatayo:">Please check the following:</strong>
+                    <ul style="margin-top:6px;padding-left:20px;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
+                @if(session('success'))
+                <div class="alert-success">{{ session('success') }}</div>
+                @endif
+
+                @if(session('error'))
+                <div class="alert-error">{{ session('error') }}</div>
+                @endif
+
+                @yield('content')
+            </div>
+        </main>
+
+        <footer class="sapta-footer">
+            &copy; {{ date('Y') }} <span data-en="SAPTA Management System" data-sw="Mfumo wa Usimamizi wa SAPTA">SAPTA Management System</span>. <span data-en="All rights reserved" data-sw="Haki zote zimehifadhiwa">All rights reserved</span>.
+        </footer>
+    </div>
+</div>
+
+<script>
+    var currentLang = localStorage.getItem('sapta_lang') || 'en';
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('sapta_lang', lang);
+        
+        document.getElementById('langEn').className = lang === 'en' ? 'active' : '';
+        document.getElementById('langSw').className = lang === 'sw' ? 'active' : '';
+        
+        document.querySelectorAll('[data-en][data-sw]').forEach(function(el) {
+            if (lang === 'en') {
+                el.textContent = el.getAttribute('data-en');
+            } else {
+                el.textContent = el.getAttribute('data-sw');
+            }
+        });
+        
+        document.querySelectorAll('textarea[data-en-placeholder][data-sw-placeholder]').forEach(function(el) {
+            if (lang === 'en') {
+                el.placeholder = el.getAttribute('data-en-placeholder');
+            } else {
+                el.placeholder = el.getAttribute('data-sw-placeholder');
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setLanguage(currentLang);
+    });
+    
+    function toggleSidebarMenu(menuId, button) {
+        const menu = document.getElementById(menuId);
+        if (!menu) return;
+        const isOpen = menu.classList.contains('open');
+        document.querySelectorAll('.sidebar-submenu.open').forEach(el => {
+            if (el.id !== menuId) {
+                el.classList.remove('open');
+                const btn = el.previousElementSibling;
+                if (btn) {
+                    const ch = btn.querySelector('.sidebar-chevron');
+                    if (ch) ch.classList.remove('rotate');
+                }
+            }
+        });
+        if (isOpen) {
+            menu.classList.remove('open');
+        } else {
+            menu.classList.add('open');
+        }
+        const chevron = button.querySelector('.sidebar-chevron');
+        if (chevron) chevron.classList.toggle('rotate', !isOpen);
+    }
+
+    function openMobileSidebar() {
+        document.getElementById('saptaSidebar').classList.add('mobile-open');
+        document.getElementById('saptaSidebarOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMobileSidebar() {
+        document.getElementById('saptaSidebar').classList.remove('mobile-open');
+        document.getElementById('saptaSidebarOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

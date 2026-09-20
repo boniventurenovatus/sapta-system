@@ -1,0 +1,241 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Employee;
+use App\Models\Position;
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\Attendance;
+use App\Models\LeaveRequest;
+use App\Models\Department;
+use App\Models\OrganizationalUnit;
+use App\Models\PerformanceReview;
+use App\Models\Training;
+use App\Models\TrainingEnrollment;
+use App\Models\PaymentVoucher;
+use App\Models\Receipt;
+use App\Models\Budget;
+use App\Models\Document;
+use App\Models\JobPosting;
+use App\Models\JobApplication;
+use Illuminate\Http\Request;
+
+class DashboardController extends Controller
+{
+        public function index()
+    {
+        $user = auth()->user();
+        $roleCodes = $user->roles->pluck('code')->toArray();
+
+        // ================================================================
+        // CHAGUA DASHBOARD KWA ROLE
+        // ================================================================
+        $dashboardMap = [
+            // Executive
+            'bod' => 'dashboard.executive',
+            'ceo' => 'dashboard.executive',
+
+            // Directors
+            'admin_director' => 'dashboard.director',
+            'program_director' => 'dashboard.director',
+
+            // HR
+            'hr_manager' => 'dashboard.hr',
+            'admin_director' => 'dashboard.hr',
+
+            // Finance
+            'finance_manager' => 'dashboard.finance',
+            'accountant' => 'dashboard.finance',
+            'procurement_manager' => 'dashboard.finance',
+
+            // Program
+            'project_manager' => 'dashboard.program',
+            'project_officer' => 'dashboard.program',
+            'field_trainer' => 'dashboard.program',
+            'partnerships_manager' => 'dashboard.program',
+
+            // MEAL
+            'meal_manager' => 'dashboard.meal',
+            'meal_officer' => 'dashboard.meal',
+            'research_officer' => 'dashboard.meal',
+
+            // Comms & ICT
+            'community_manager' => 'dashboard.ict',
+            'ict_manager' => 'dashboard.ict',
+
+            // Staff
+            'staff' => 'dashboard.staff',
+            'manager' => 'dashboard.manager',
+            'director' => 'dashboard.director',
+        ];
+
+        // Chagua dashboard kwa role ya kwanza inayolingana
+        foreach ($roleCodes as $code) {
+            if (isset($dashboardMap[$code])) {
+                $view = $dashboardMap[$code];
+                if (view()->exists($view)) {
+                    return view($view);
+                }
+            }
+        }
+
+        // Super Admin / Admin — dashboard kamili
+        // OVERVIEW
+        $stats = [
+            'employees' => Employee::count(),
+            'positions' => Position::count(),
+            'projects' => Project::count(),
+            'tasks' => Task::count(),
+            'departments' => Department::count(),
+            'units' => OrganizationalUnit::count(),
+        ];
+
+        // HR STATS
+        $hrStats = [
+            'attendance_today' => Attendance::whereDate('attendance_date', today())->count(),
+            'pending_leaves' => LeaveRequest::where('status', 'pending')->count(),
+            'performance_reviews' => PerformanceReview::count(),
+            'trainings' => Training::count(),
+            'active_trainings' => Training::whereIn('status', ['planned', 'ongoing'])->count(),
+        ];
+
+        // FINANCE STATS
+        $financeStats = [
+            'payroll_total' => \App\Models\Payslip::sum('net_salary') ?? 0,
+            'pending_vouchers' => PaymentVoucher::where('status', 'pending')->count(),
+            'approved_vouchers' => PaymentVoucher::where('status', 'approved')->count(),
+            'total_receipts' => Receipt::sum('amount') ?? 0,
+            'budget_allocated' => Budget::sum('allocated_amount') ?? 0,
+            'budget_spent' => Budget::sum('spent_amount') ?? 0,
+        ];
+
+        // RECRUITMENT STATS
+        $recruitmentStats = [
+            'open_jobs' => JobPosting::where('status', 'open')->count(),
+            'total_jobs' => JobPosting::count(),
+            'applications' => JobApplication::count(),
+            'hired' => JobApplication::where('status', 'hired')->count(),
+        ];
+
+        // DOCUMENT STATS
+        $documentStats = [
+            'total' => Document::count(),
+            'expiring' => Document::expiring()->count(),
+        ];
+
+        // RECENT ACTIVITIES
+        $recentEmployees = Employee::orderBy('created_at', 'desc')->limit(5)->get();
+        $recentProjects = Project::orderBy('created_at', 'desc')->limit(5)->get();
+        $recentTrainings = Training::orderBy('created_at', 'desc')->limit(5)->get();
+        $recentVouchers = PaymentVoucher::orderBy('created_at', 'desc')->limit(5)->get();
+        $recentJobs = JobPosting::orderBy('created_at', 'desc')->limit(5)->get();
+
+        // DEPARTMENT DISTRIBUTION
+        $departmentStats = OrganizationalUnit::withCount('positions')
+            ->orderBy('name')
+            ->get();
+
+        // LOCATION STATS (MPYA)
+        $locationStats = [
+            'regions' => \App\Models\Region::count(),
+            'districts' => \App\Models\District::count(),
+            'wards' => \App\Models\Ward::count(),
+        ];
+
+        // Employees kwa Mkoa (top 5)
+        $employeesByRegion = Employee::whereNotNull('region_id')
+            ->with('region')
+            ->get()
+            ->groupBy('region.name')
+            ->map->count()
+            ->sortDesc()
+            ->take(5);
+
+        // Projects kwa Mkoa (top 5)
+        $projectsByRegion = Project::whereNotNull('region_id')
+            ->with('region')
+            ->get()
+            ->groupBy('region.name')
+            ->map->count()
+            ->sortDesc()
+            ->take(5);
+
+        // Employees kwa Wilaya (top 5)
+        $employeesByDistrict = Employee::whereNotNull('district_id')
+            ->with('district')
+            ->get()
+            ->groupBy('district.name')
+            ->map->count()
+            ->sortDesc()
+            ->take(5);
+
+        // Employees kwa Kata (top 5)
+        $employeesByWard = Employee::whereNotNull('ward_id')
+            ->with('ward')
+            ->get()
+            ->groupBy('ward.name')
+            ->map->count()
+            ->sortDesc()
+            ->take(5);
+
+        // ================================================================
+        // CHAGUA DASHBOARD KWA ROLE
+        // ================================================================
+        $user = auth()->user();
+
+        // Director
+        if ($user->hasRole('director')) {
+            return view('dashboard.director');
+        }
+
+        // Manager
+        if ($user->hasRole('manager')) {
+            return view('dashboard.manager');
+        }
+
+        // Staff
+        if ($user->hasRole('staff')) {
+            return view('dashboard.staff');
+        }
+
+        // Super Admin / Admin — dashboard kamili
+        // ================================================================
+        // CHAGUA DASHBOARD KWA ROLE
+        // ================================================================
+        $user = auth()->user();
+
+        if ($user->hasRole('director')) {
+            return view('dashboard.director');
+        }
+
+        if ($user->hasRole('manager')) {
+            return view('dashboard.manager');
+        }
+
+        if ($user->hasRole('staff')) {
+            return view('dashboard.staff');
+        }
+
+        // Super Admin / Admin — dashboard kamili
+        return view('dashboard.index', compact(
+            'stats',
+            'hrStats',
+            'financeStats',
+            'recruitmentStats',
+            'documentStats',
+            'recentEmployees',
+            'recentProjects',
+            'recentTrainings',
+            'recentVouchers',
+            'recentJobs',
+            'departmentStats',
+            'locationStats',
+            'employeesByRegion',
+            'projectsByRegion',
+            'employeesByDistrict',
+            'employeesByWard'
+        ));
+    }
+}
+

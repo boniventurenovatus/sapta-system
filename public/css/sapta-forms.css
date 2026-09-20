@@ -1,0 +1,117 @@
+.sapta-form-page { padding: 1.5rem; max-width: 900px; margin: 0 auto; }
+.sapta-form-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e5e7eb; }
+.sapta-form-header-icon { width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 8px 20px rgba(37,99,235,0.25); flex-shrink: 0; }
+.sapta-form-header h1 { font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0 0 0.25rem; }
+.sapta-form-header p { color: #64748b; margin: 0; font-size: 0.95rem; }
+.sapta-form-card { background: #fff; border-radius: 1rem; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+.sapta-form-section { padding: 1.75rem; }
+.sapta-form-section-title { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; }
+.sapta-form-group { margin-bottom: 1.35rem; }
+.sapta-form-group label { display: flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem; }
+.sapta-form-group label .req { color: #dc2626; font-weight: 700; }
+.sapta-form-group .hint { font-size: 0.75rem; color: #94a3b8; font-weight: 400; margin-left: auto; }
+.sapta-input-wrapper { position: relative; display: flex; align-items: center; }
+.sapta-input-wrapper > i.prefix { position: absolute; left: 0.875rem; color: #94a3b8; font-size: 0.9rem; pointer-events: none; z-index: 1; }
+.sapta-input-wrapper:focus-within > i.prefix { color: #2563eb; }
+.sapta-form-control { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1.5px solid #e2e8f0; border-radius: 0.625rem; font-size: 0.9rem; color: #1e293b; background: #fff; transition: all 0.2s ease; font-family: inherit; line-height: 1.5; }
+.sapta-form-control:hover { border-color: #cbd5e1; }
+.sapta-form-control:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+.sapta-form-control.is-invalid { border-color: #dc2626; background: #fef2f2; }
+select.sapta-form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem; padding-right: 2.75rem; cursor: pointer; }
+textarea.sapta-form-control { resize: vertical; min-height: 110px; padding-left: 1rem; line-height: 1.6; }
+.sapta-error { display: flex; align-items: center; gap: 0.35rem; color: #dc2626; font-size: 0.8rem; margin-top: 0.4rem; font-weight: 500; }
+.sapta-form-actions { display: flex; gap: 0.75rem; padding: 1.25rem 1.75rem; background: #fafbfc; border-top: 1px solid #f1f5f9; flex-wrap: wrap; }
+.sapta-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.625rem; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; text-decoration: none; transition: all 0.2s ease; line-height: 1; font-family: inherit; }
+.sapta-btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.25); flex: 1; max-width: 240px; }
+.sapta-btn-primary:hover { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); transform: translateY(-1px); color: #fff; }
+.sapta-btn-secondary { background: #fff; color: #475569; border: 1.5px solid #e2e8f0; }
+.sapta-btn-secondary:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
+.sapta-btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,0.25); flex: 1; max-width: 240px; }
+.sapta-btn-warning:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); transform: translateY(-1px); color: #fff; }
+.sapta-btn-danger { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,0.25); }
+.sapta-btn-danger:hover { transform: translateY(-1px); color: #fff; }
+.sapta-show-page { padding: 1.5rem; max-width: 900px; margin: 0 auto; }
+.sapta-show-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e5e7eb; }
+.sapta-show-header-icon { width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 8px 20px rgba(37,99,235,0.25); flex-shrink: 0; }
+.sapta-show-header h1 { font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0 0 0.25rem; }
+.sapta-show-header p { color: #64748b; margin: 0; font-size: 0.95rem; }
+.sapta-show-card { background: #fff; border-radius: 1rem; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.sapta-show-hero { padding: 2rem 1.75rem; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; position: relative; overflow: hidden; }
+.sapta-show-hero h2 { margin: 0 0 0.4rem; font-size: 1.5rem; font-weight: 700; position: relative; z-index: 1; }
+.sapta-show-hero .code { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; position: relative; z-index: 1; }
+.sapta-show-body { padding: 1.75rem; }
+.sapta-show-row { display: flex; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+.sapta-show-row:last-child { border-bottom: none; }
+.sapta-show-label { width: 200px; font-weight: 600; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; display: flex; align-items: center; gap: 0.5rem; }
+.sapta-show-label i { color: #2563eb; }
+.sapta-show-value { flex: 1; color: #1e293b; font-size: 0.95rem; }
+.sapta-show-actions { padding: 1.25rem 1.75rem; background: #fafbfc; border-top: 1px solid #f1f5f9; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.sapta-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.sapta-badge-success { background: #dcfce7; color: #15803d; }
+.sapta-badge-secondary { background: #f1f5f9; color: #64748b; }
+@media (max-width: 640px) { .sapta-form-section { padding: 1.25rem; } .sapta-form-actions { padding: 1rem 1.25rem; } .sapta-btn-primary, .sapta-btn-warning { max-width: none; width: 100%; } .sapta-form-header h1 { font-size: 1.4rem; } .sapta-show-body { padding: 1.25rem; } .sapta-show-row { flex-direction: column; gap: 0.3rem; } .sapta-show-label { width: auto; } }
+
+/* ===== TABLE STYLES ===== */
+.sapta-table-wrap { overflow-x: auto; width: 100%; }
+.sapta-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 900px; }
+.sapta-table thead { background: #f8fafc; }
+.sapta-table thead th { padding: 0.875rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+.sapta-table tbody td { padding: 0.875rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+.sapta-table tbody tr { transition: background 0.15s; }
+.sapta-table tbody tr:hover { background: #f8fafc; }
+
+/* Column widths */
+.sapta-table .col-title { min-width: 240px; }
+.sapta-table .col-code { width: 110px; white-space: nowrap; }
+.sapta-table .col-unit { min-width: 220px; }
+.sapta-table .col-org { min-width: 200px; }
+.sapta-table .col-desc { min-width: 280px; }
+.sapta-table .col-count { width: 90px; text-align: center; white-space: nowrap; }
+.sapta-table .col-status { width: 100px; white-space: nowrap; }
+.sapta-table .col-actions { width: 140px; text-align: right; white-space: nowrap; }
+
+/* Cell text wrapping */
+.sapta-table .cell-truncate { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sapta-table .cell-wrap { white-space: normal; line-height: 1.4; }
+.sapta-table code { background: #f1f5f9; padding: 0.2rem 0.55rem; border-radius: 0.3rem; font-size: 0.78rem; color: #475569; font-weight: 700; }
+.sapta-table .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+.sapta-table .badge-success { background: #dcfce7; color: #15803d; }
+.sapta-table .badge-secondary { background: #f1f5f9; color: #64748b; }
+.badge-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.badge-purple { background: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd; }
+.sapta-table .actions { display: inline-flex; gap: 0.35rem; justify-content: flex-end; }
+.sapta-table .action-btn { width: 2rem; height: 2rem; border-radius: 0.4rem; border: 1px solid #e2e8f0; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; text-decoration: none; transition: all 0.15s; cursor: pointer; }
+.sapta-table .action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.sapta-table .action-btn.view:hover { background: #dbeafe; color: #2563eb; }
+.sapta-table .action-btn.edit:hover { background: #fef3c7; color: #d97706; }
+.sapta-table .action-btn.delete:hover { background: #fee2e2; color: #dc2626; }
+.action-btn.deactivate { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+.action-btn.deactivate:hover { background: #d97706; color: #fff; }
+.action-btn.terminate { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+.action-btn.terminate:hover { background: #dc2626; color: #fff; }
+.action-btn.activate { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+.action-btn.activate:hover { background: #16a34a; color: #fff; }
+.action-btn.suspend { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
+.action-btn.suspend:hover { background: #7c3aed; color: #fff; }
+
+.sapta-table .col-actions .actions { display: inline-flex; gap: 0.35rem; justify-content: flex-end; align-items: center; }
+
+/* ===== ACTION BUTTONS (Global) ===== */
+.action-btn { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.4rem; border: 1px solid #e2e8f0; background: #fff; color: #64748b; font-size: 0.8rem; text-decoration: none; transition: all 0.15s; cursor: pointer; margin: 0 0.15rem; }
+.action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.action-btn.view { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+.action-btn.view:hover { background: #2563eb; color: #fff; }
+.action-btn.edit { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+.action-btn.edit:hover { background: #d97706; color: #fff; }
+.action-btn.delete { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+.action-btn.delete:hover { background: #dc2626; color: #fff; }
+
+/* ===== SAPTA TABLE ACTION BUTTONS (base) ===== */
+.sapta-table .action-btn.view { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+.sapta-table .action-btn.edit { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+.sapta-table .action-btn.delete { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+/* ===== SAPTA TABLE ACTION BUTTONS (base) ===== */
+.sapta-table .action-btn.view { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+.sapta-table .action-btn.edit { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+.sapta-table .action-btn.delete { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }

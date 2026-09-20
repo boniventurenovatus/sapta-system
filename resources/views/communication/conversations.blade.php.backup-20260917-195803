@@ -1,0 +1,15 @@
+@extends('layouts.app')
+
+@section('title', 'Communication - conversations')
+
+@section('content')
+<div class="container-fluid py-4">
+    <h1 class="h3 mb-4">Communication - conversations</h1>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-tools fs-1 text-muted mb-3"></i>
+            <p class="text-muted">Inajengwa...</p>
+        </div>
+    </div>
+</div>
+@endsection

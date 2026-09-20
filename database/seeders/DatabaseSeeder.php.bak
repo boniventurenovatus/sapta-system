@@ -1,0 +1,24 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        User::updateOrCreate(
+            ['email' => 'boniventurenovatus@gmail.com'],
+            [
+                'username' => 'admin',
+                'password_hash' => Hash::make('Sapta@2025'),
+                'account_status' => 'active',
+                'is_first_login' => false,
+                'password_changed_at' => now(),
+            ]
+        );
+    }
+}

@@ -1,0 +1,46 @@
+<style>
+@page { size: A4 portrait; margin: 3mm; }
+
+.voucher-wrapper { font-family: Arial, sans-serif; font-size: 9pt; color: #000; line-height: 1.3; width: 100%; box-sizing: border-box; }
+.voucher-title { text-align: center; font-size: 18pt; font-weight: bold; letter-spacing: 3px; margin-bottom: 12px; }
+.header-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.header-table td { vertical-align: top; padding: 0; }
+.header-left { width: 35%; }
+.header-center { width: 30%; text-align: center; }
+.header-right { width: 35%; }
+.company { font-size: 12pt; font-weight: bold; margin-bottom: 2px; }
+.company-addr { font-size: 10pt; line-height: 1.3; }
+.logo { height: 90px; width: auto; display: inline-block; }
+.field-row { margin-bottom: 4px; }
+.lbl { font-weight: bold; display: inline-block; min-width: 80px; }
+.val { display: inline-block; border-bottom: 1px dotted #666; min-width: 150px; padding-left: 4px; }
+.info-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.info-table td { vertical-align: top; padding: 0; }
+.info-left { width: 55%; padding-right: 20px; }
+.info-right { width: 45%; }
+.items-table { width: 100%; border-collapse: collapse; border: 2px solid #000; margin-bottom: 12px; box-sizing: border-box; }
+.items-table thead th { background: #e8e8e8; font-weight: bold; font-size: 8pt; text-align: left; padding: 4px 3px; border: 1px solid #000; box-sizing: border-box; word-wrap: break-word; }
+.col-account { width: 20%; }
+.col-details { width: 56%; }
+.col-amount { width: 24%; text-align: right; }
+.items-table tbody td { padding: 4px 3px; border: 1px solid #000; font-size: 8pt; vertical-align: top; box-sizing: border-box; word-wrap: break-word; }
+.items-table tbody td.col-amount { width: 24%; text-align: right; white-space: nowrap; }
+.items-table tfoot td { padding: 5px 4px; border: 1px solid #000; vertical-align: top; box-sizing: border-box; word-wrap: break-word; }
+.words-cell { width: 76%; }
+.total-cell { width: 24%; text-align: right; }
+.words-label { font-weight: bold; margin-right: 4px; }
+.total-label { font-weight: bold; font-size: 11pt; margin-right: 6px; }
+.total-value { font-weight: bold; font-size: 12pt; white-space: nowrap; }
+.signatures-table { width: 100%; border-collapse: collapse; border: 2px solid #000; margin-bottom: 12px; box-sizing: border-box; }
+.signatures-table thead th { background: #e8e8e8; font-weight: bold; font-size: 9pt; text-align: left; padding: 5px 4px; border: 1px solid #000; box-sizing: border-box; word-wrap: break-word; }
+.sig-role { width: 20%; }
+.sig-name { width: 40%; }
+.sig-sig { width: 25%; }
+.sig-date { width: 15%; }
+.signatures-table tbody td { padding: 8px 4px; border: 1px solid #000; font-size: 9pt; vertical-align: middle; height: 35px; box-sizing: border-box; word-wrap: break-word; }
+.signatures-table tbody td.sig-role { font-weight: bold; }
+.received-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.received-table td { padding: 6px 0; font-size: 10pt; vertical-align: bottom; }
+.received-label { font-weight: bold; width: 40%; text-align: right; padding-right: 10px; }
+.received-line { border-bottom: 1px solid #000; width: 60%; padding-left: 6px; height: 22px; }
+</style>

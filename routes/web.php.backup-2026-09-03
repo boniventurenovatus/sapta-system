@@ -1,0 +1,81 @@
+<?<?<?<?<?php
+
+// Reports Routes
+Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/employees', [App\Http\Controllers\ReportController::class, 'employees'])->name('reports.employees');
+Route::get('/reports/attendance', [App\Http\Controllers\ReportController::class, 'attendance'])->name('reports.attendance');
+Route::get('/reports/projects', [App\Http\Controllers\ReportController::class, 'projects'])->name('reports.projects');
+Route::get('/reports/tasks', [App\Http\Controllers\ReportController::class, 'tasks'])->name('reports.tasks');
+Route::get('/reports/leaves', [App\Http\Controllers\ReportController::class, 'leaves'])->name('reports.leaves');
+
+// Reports Routes
+Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/employees', [App\Http\Controllers\ReportController::class, 'employees'])->name('reports.employees');
+Route::get('/reports/attendance', [App\Http\Controllers\ReportController::class, 'attendance'])->name('reports.attendance');
+Route::get('/reports/projects', [App\Http\Controllers\ReportController::class, 'projects'])->name('reports.projects');
+Route::get('/reports/tasks', [App\Http\Controllers\ReportController::class, 'tasks'])->name('reports.tasks');
+Route::get('/reports/leaves', [App\Http\Controllers\ReportController::class, 'leaves'])->name('reports.leaves');
+
+// Tasks Routes
+Route::get('/tasks', [App\Http\Controllers\TaskController::class, 'index'])->name('tasks.index');
+Route::get('/tasks/create', [App\Http\Controllers\TaskController::class, 'create'])->name('tasks.create');
+Route::post('/tasks', [App\Http\Controllers\TaskController::class, 'store'])->name('tasks.store');
+Route::get('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'show'])->name('tasks.show');
+Route::get('/tasks/{task}/edit', [App\Http\Controllers\TaskController::class, 'edit'])->name('tasks.edit');
+Route::put('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'update'])->name('tasks.update');
+Route::delete('/tasks/{task}', [App\Http\Controllers\TaskController::class, 'destroy'])->name('tasks.destroy');
+Route::post('/tasks/{task}/update-status', [App\Http\Controllers\TaskController::class, 'updateStatus'])->name('tasks.update-status');
+
+// Projects Routes
+Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+Route::get('/projects/create', [App\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
+Route::post('/projects', [App\Http\Controllers\ProjectController::class, 'store'])->name('projects.store');
+Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project}/edit', [App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+Route::put('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'update'])->name('projects.update');
+Route::delete('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
+Route::post('/projects/{project}/update-progress', [App\Http\Controllers\ProjectController::class, 'updateProgress'])->name('projects.update-progress');
+
+// Test Language Route
+Route::get('/test-language', function() {
+    $locale = session('locale', 'en');
+    return "Current language: " . $locale . " - <a href=\"/language/switch?lang=en\">EN</a> | <a href=\"/language/switch?lang=sw\">SW</a>";
+})->name('test.language');
+
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
+
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::resource('employees', EmployeeController::class);
+Route::resource('organizations', OrganizationController::class);
+Route::resource('attendances', AttendanceController::class);
+Route::resource('leave-requests', LeaveRequestController::class);
+Route::resource('users', UserController::class);
+Route::resource('roles', RoleController::class);
+Route::resource('permissions', PermissionController::class);
+
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+
+Route::get('/language/switch', [App\Http\Controllers\LanguageController::class, 'switch'])->name('language.switch');
+
+
+
+
+
+

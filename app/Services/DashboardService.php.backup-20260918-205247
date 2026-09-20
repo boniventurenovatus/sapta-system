@@ -1,0 +1,721 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\User;
+use App\Models\Employee;
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\Department;
+use App\Models\Budget;
+use App\Models\PaymentVoucher;
+use App\Models\LeaveRequest;
+use App\Models\ExpenseClaim;
+use App\Models\Document;
+use App\Models\Training;
+use App\Models\ProcurementRequest;
+use Illuminate\Support\Facades\DB;
+
+class DashboardService
+{
+    /**
+     * ==============================================================
+     * EXECUTIVE DASHBOARD DATA (BOD, CEO)
+     * ==============================================================
+     */
+    public function executiveData(): array
+    {
+        return [
+            'kpis' => [
+                'total_employees'    => Employee::count(),
+                'total_projects'     => Project::count(),
+                'active_projects'    => Project::where('status', 'in_progress')->count(),
+                'total_budget'       => Budget::sum('allocated_amount'),
+                'total_spent'        => Budget::sum('spent_amount'),
+                'budget_utilization' => $this->budgetUtilization(),
+                'total_departments'  => Department::count(),
+                'total_tasks'        => Task::count(),
+                'completed_tasks'    => Task::where('status', 'done')->count(),
+                'pending_tasks'      => Task::where('status', '!=', 'done')->count(),
+            ],
+            'charts' => [
+                'budget_vs_actual' => $this->budgetVsActual(),
+                'projects_by_status' => $this->projectsByStatus(),
+                'employees_by_department' => $this->employeesByDepartment(),
+                'monthly_revenue' => $this->monthlyRevenue(),
+            ],
+            'top_projects' => $this->topProjects(),
+            'recent_activities' => $this->recentActivities(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * DIRECTOR DASHBOARD DATA
+     * ==============================================================
+     */
+    public function directorData(): array
+    {
+        return [
+            'kpis' => [
+                'total_employees'   => Employee::count(),
+                'active_projects'   => Project::where('status', 'in_progress')->count(),
+                'pending_approvals' => $this->pendingApprovals(),
+                'total_tasks'       => Task::count(),
+                'completed_tasks'   => Task::where('status', 'done')->count(),
+                'total_budget'      => Budget::sum('allocated_amount'),
+            ],
+            'charts' => [
+                'projects_by_status' => $this->projectsByStatus(),
+                'tasks_by_status' => $this->tasksByStatus(),
+                'employees_by_department' => $this->employeesByDepartment(),
+            ],
+            'recent_activities' => $this->recentActivities(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * HR DASHBOARD DATA
+     * ==============================================================
+     */
+    public function hrData(): array
+    {
+        return [
+            'kpis' => [
+                'total_employees'    => Employee::count(),
+                'active_employees'   => Employee::where('employment_status', 'active')->count(),
+                'total_departments'  => Department::count(),
+                'pending_leaves'     => LeaveRequest::where('status', 'pending')->count(),
+                'pending_approvals'  => LeaveRequest::where('status', 'pending')->count(),
+                'total_trainings'    => Training::count(),
+            ],
+            'charts' => [
+                'employees_by_department' => $this->employeesByDepartment(),
+                'employees_by_gender' => $this->employeesByGender(),
+                'leave_by_type' => $this->leaveByType(),
+                'trainings_by_category' => $this->trainingsByCategory(),
+            ],
+            'recent_leaves' => LeaveRequest::with('employee')->orderBy('created_at', 'desc')->take(5)->get(),
+            'pending_leaves_list' => LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * FINANCE DASHBOARD DATA
+     * ==============================================================
+     */
+    public function financeData(): array
+    {
+        return [
+            'kpis' => [
+                'total_budget'      => Budget::sum('allocated_amount'),
+                'total_spent'       => Budget::sum('spent_amount'),
+                'total_remaining'   => Budget::sum('allocated_amount') - Budget::sum('spent_amount'),
+                'utilization'       => $this->budgetUtilization(),
+                'pending_vouchers'  => PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count(),
+                'total_expenses'    => ExpenseClaim::sum('amount'),
+            ],
+            'charts' => [
+                'budget_vs_actual' => $this->budgetVsActual(),
+                'expenses_by_category' => $this->expensesByCategory(),
+                'vouchers_by_status' => $this->vouchersByStatus(),
+                'monthly_expenses' => $this->monthlyExpenses(),
+            ],
+            'recent_vouchers' => PaymentVoucher::with('creator')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_claims' => ExpenseClaim::with('employee')->orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * PROGRAM DASHBOARD DATA
+     * ==============================================================
+     */
+    public function programData(): array
+    {
+        return [
+            'kpis' => [
+                'total_projects'    => Project::count(),
+                'active_projects'   => Project::where('status', 'in_progress')->count(),
+                'completed_projects'=> Project::where('status', 'completed')->count(),
+                'total_tasks'       => Task::count(),
+                'pending_tasks'     => Task::where('status', '!=', 'done')->count(),
+                'total_budget'      => Project::sum('budget'),
+            ],
+            'charts' => [
+                'projects_by_status' => $this->projectsByStatus(),
+                'tasks_by_status' => $this->tasksByStatus(),
+                'project_progress' => $this->projectProgress(),
+                'budget_by_project' => $this->budgetByProject(),
+            ],
+            'recent_projects' => Project::with('projectManager')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_tasks' => Task::with(['project', 'assignedTo'])->orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * MEAL DASHBOARD DATA
+     * ==============================================================
+     */
+    public function mealData(): array
+    {
+        return [
+            'kpis' => [
+                'total_projects'    => Project::count(),
+                'active_projects'   => Project::where('status', 'in_progress')->count(),
+                'total_trainings'   => Training::count(),
+                'total_documents'   => Document::count(),
+                'total_reports'     => Document::where('category', 'report')->count(),
+                'total_indicators'  => 12, // Static placeholder
+            ],
+            'charts' => [
+                'projects_by_status' => $this->projectsByStatus(),
+                'documents_by_category' => $this->documentsByCategory(),
+                'trainings_by_category' => $this->trainingsByCategory(),
+                'monthly_reports' => $this->monthlyReports(),
+            ],
+            'recent_reports' => Document::where('category', 'report')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_trainings' => Training::orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * ICT DASHBOARD DATA
+     * ==============================================================
+     */
+    public function ictData(): array
+    {
+        return [
+            'kpis' => [
+                'total_users'       => User::count(),
+                'active_users'      => User::where('account_status', 'active')->count(),
+                'total_roles'       => \App\Models\Role::count(),
+                'total_permissions' => \App\Models\Permission::count(),
+                'total_documents'   => Document::count(),
+                'total_audit_logs'  => \App\Models\AuditLog::count(),
+            ],
+            'charts' => [
+                'users_by_role' => $this->usersByRole(),
+                'documents_by_category' => $this->documentsByCategory(),
+                'user_activity' => $this->userActivity(),
+                'system_health' => $this->systemHealth(),
+            ],
+            'recent_users' => User::with('roles')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_logs' => \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * MANAGER DASHBOARD DATA
+     * ==============================================================
+     */
+    public function managerData(): array
+    {
+        return [
+            'kpis' => [
+                'team_members'      => Employee::count(),
+                'total_tasks'       => Task::count(),
+                'completed_tasks'   => Task::where('status', 'done')->count(),
+                'pending_tasks'     => Task::where('status', '!=', 'done')->count(),
+                'pending_approvals' => LeaveRequest::where('status', 'pending')->count(),
+                'total_employees'   => Employee::count(),
+            ],
+            'charts' => [
+                'tasks_by_status' => $this->tasksByStatus(),
+                'employees_by_department' => $this->employeesByDepartment(),
+                'monthly_performance' => $this->monthlyPerformance(),
+            ],
+            'recent_tasks' => Task::with(['project', 'assignedTo'])->orderBy('created_at', 'desc')->take(5)->get(),
+            'pending_leaves' => LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * STAFF DASHBOARD DATA
+     * ==============================================================
+     */
+    public function staffData($userId): array
+    {
+        $employeeId = auth()->user()->employee_id;
+
+        return [
+            'kpis' => [
+                'my_tasks'        => Task::where('assigned_to', $employeeId)->count(),
+                'completed_tasks' => Task::where('assigned_to', $employeeId)->where('status', 'done')->count(),
+                'pending_leaves'  => LeaveRequest::where('employee_id', $employeeId)->where('status', 'pending')->count(),
+                'my_attendance'   => \App\Models\Attendance::where('employee_id', $employeeId)->whereMonth('created_at', now()->month)->count(),
+            ],
+            'charts' => [
+                'my_tasks_by_status' => $this->myTasksByStatus($employeeId),
+                'my_attendance_chart' => $this->myAttendanceChart($employeeId),
+            ],
+            'recent_tasks' => Task::where('assigned_to', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
+            'my_leaves' => LeaveRequest::where('employee_id', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * ADMIN DASHBOARD DATA
+     * ==============================================================
+     */
+    public function adminData(): array
+    {
+        return [
+            'kpis' => [
+                'total_users'        => User::count(),
+                'total_roles'        => \App\Models\Role::count(),
+                'total_permissions'  => \App\Models\Permission::count(),
+                'total_departments'  => Department::count(),
+                'total_positions'    => \App\Models\Position::count(),
+                'total_audit_logs'   => \App\Models\AuditLog::count(),
+            ],
+            'charts' => [
+                'users_by_role' => $this->usersByRole(),
+                'user_activity' => $this->userActivity(),
+                'documents_by_category' => $this->documentsByCategory(),
+                'system_health' => $this->systemHealth(),
+            ],
+            'recent_users' => User::with('roles')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_logs' => \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * ==============================================================
+     * HELPER METHODS
+     * ==============================================================
+     */
+    private function budgetUtilization(): float
+    {
+        $allocated = Budget::sum('allocated_amount');
+        $spent = Budget::sum('spent_amount');
+        return $allocated > 0 ? round(($spent / $allocated) * 100, 1) : 0;
+    }
+
+    private function pendingApprovals(): int
+    {
+        return PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count()
+            + LeaveRequest::where('status', 'pending')->count()
+            + ExpenseClaim::whereIn('status', ['pending_approval', 'submitted'])->count()
+            + ProcurementRequest::where('status', 'pending')->count();
+    }
+
+    private function budgetVsActual(): array
+    {
+        $budgets = Budget::select('category', DB::raw('SUM(allocated_amount) as allocated'), DB::raw('SUM(spent_amount) as spent'))
+            ->groupBy('category')
+            ->take(8)
+            ->get();
+
+        return [
+            'labels' => $budgets->pluck('category')->toArray(),
+            'datasets' => [
+                [
+                    'label' => 'Allocated',
+                    'data' => $budgets->pluck('allocated')->map(fn($v) => (float) $v)->toArray(),
+                    'backgroundColor' => '#2563eb',
+                    'borderRadius' => 6,
+                ],
+                [
+                    'label' => 'Spent',
+                    'data' => $budgets->pluck('spent')->map(fn($v) => (float) $v)->toArray(),
+                    'backgroundColor' => '#10b981',
+                    'borderRadius' => 6,
+                ],
+            ],
+        ];
+    }
+
+    private function projectsByStatus(): array
+    {
+        $projects = Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+
+        return [
+            'labels' => $projects->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
+            'datasets' => [[
+                'data' => $projects->pluck('count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#6b7280'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function employeesByDepartment(): array
+    {
+        $data = Department::withCount('employees')->get();
+
+        return [
+            'labels' => $data->pluck('name')->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('employees_count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#6b7280'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function employeesByGender(): array
+    {
+        $data = Employee::select('gender', DB::raw('count(*) as count'))->groupBy('gender')->get();
+
+        return [
+            'labels' => $data->pluck('gender')->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#ec4899', '#3b82f6', '#8b5cf6'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function monthlyRevenue(): array
+    {
+        $months = [];
+        $data = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M Y');
+            $data[] = (float) PaymentVoucher::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->where('status', 'paid')
+                ->sum('amount');
+        }
+
+        return [
+            'labels' => $months,
+            'datasets' => [[
+                'label' => 'Revenue (TZS)',
+                'data' => $data,
+                'borderColor' => '#2563eb',
+                'backgroundColor' => 'rgba(37, 99, 235, 0.1)',
+                'fill' => true,
+                'tension' => 0.4,
+            ]],
+        ];
+    }
+
+    private function monthlyExpenses(): array
+    {
+        $months = [];
+        $data = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M Y');
+            $data[] = (float) ExpenseClaim::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('amount');
+        }
+
+        return [
+            'labels' => $months,
+            'datasets' => [[
+                'label' => 'Expenses (TZS)',
+                'data' => $data,
+                'borderColor' => '#ef4444',
+                'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
+                'fill' => true,
+                'tension' => 0.4,
+            ]],
+        ];
+    }
+
+    private function tasksByStatus(): array
+    {
+        $data = Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+
+        return [
+            'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#6b7280', '#3b82f6', '#f59e0b', '#10b981'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function myTasksByStatus($employeeId): array
+    {
+        $data = Task::where('assigned_to', $employeeId)
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get();
+
+        return [
+            'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#6b7280', '#3b82f6', '#f59e0b', '#10b981'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function myAttendanceChart($employeeId): array
+    {
+        $months = [];
+        $present = [];
+        $absent = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M');
+
+            $present[] = \App\Models\Attendance::where('employee_id', $employeeId)
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->where('status', 'present')
+                ->count();
+
+            $absent[] = \App\Models\Attendance::where('employee_id', $employeeId)
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->where('status', 'absent')
+                ->count();
+        }
+
+        return [
+            'labels' => $months,
+            'datasets' => [
+                [
+                    'label' => 'Present',
+                    'data' => $present,
+                    'backgroundColor' => '#10b981',
+                    'borderRadius' => 6,
+                ],
+                [
+                    'label' => 'Absent',
+                    'data' => $absent,
+                    'backgroundColor' => '#ef4444',
+                    'borderRadius' => 6,
+                ],
+            ],
+        ];
+    }
+
+    private function expensesByCategory(): array
+    {
+        $data = ExpenseClaim::select('category', DB::raw('SUM(amount) as total'))
+            ->groupBy('category')
+            ->get();
+
+        return [
+            'labels' => $data->pluck('category')->map(fn($c) => ucfirst($c))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('total')->map(fn($v) => (float) $v)->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function vouchersByStatus(): array
+    {
+        $data = PaymentVoucher::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+
+        return [
+            'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#6b7280', '#3b82f6', '#10b981', '#ef4444', '#f59e0b'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function leaveByType(): array
+    {
+        $data = LeaveRequest::select('leave_type', DB::raw('count(*) as count'))->groupBy('leave_type')->get();
+
+        return [
+            'labels' => $data->pluck('leave_type')->map(fn($t) => ucfirst(str_replace('_', ' ', $t)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function trainingsByCategory(): array
+    {
+        $data = Training::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
+
+        return [
+            'labels' => $data->pluck('category')->map(fn($c) => ucfirst(str_replace('_', ' ', $c)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function documentsByCategory(): array
+    {
+        $data = Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
+
+        return [
+            'labels' => $data->pluck('category')->map(fn($c) => ucfirst(str_replace('_', ' ', $c)))->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function usersByRole(): array
+    {
+        $data = \App\Models\Role::withCount('users')->get();
+
+        return [
+            'labels' => $data->pluck('name')->toArray(),
+            'datasets' => [[
+                'data' => $data->pluck('users_count')->toArray(),
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#6b7280', '#ec4899', '#14b8a6', '#f97316'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function userActivity(): array
+    {
+        $days = [];
+        $data = [];
+
+        for ($i = 29; $i >= 0; $i--) {
+            $day = now()->subDays($i);
+            $days[] = $day->format('d M');
+            $data[] = \App\Models\AuditLog::whereDate('created_at', $day->toDateString())->count();
+        }
+
+        return [
+            'labels' => $days,
+            'datasets' => [[
+                'label' => 'Activity',
+                'data' => $data,
+                'borderColor' => '#2563eb',
+                'backgroundColor' => 'rgba(37, 99, 235, 0.1)',
+                'fill' => true,
+                'tension' => 0.4,
+            ]],
+        ];
+    }
+
+    private function systemHealth(): array
+    {
+        return [
+            'labels' => ['Database', 'Storage', 'Cache', 'Queue'],
+            'datasets' => [[
+                'data' => [95, 78, 100, 85],
+                'backgroundColor' => ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                'borderWidth' => 0,
+            ]],
+        ];
+    }
+
+    private function projectProgress(): array
+    {
+        $projects = Project::orderBy('progress', 'desc')->take(8)->get();
+
+        return [
+            'labels' => $projects->pluck('name')->map(fn($n) => \Str::limit($n, 25))->toArray(),
+            'datasets' => [[
+                'label' => 'Progress %',
+                'data' => $projects->pluck('progress')->toArray(),
+                'backgroundColor' => '#3b82f6',
+                'borderRadius' => 6,
+            ]],
+        ];
+    }
+
+    private function budgetByProject(): array
+    {
+        $projects = Project::orderBy('budget', 'desc')->take(8)->get();
+
+        return [
+            'labels' => $projects->pluck('name')->map(fn($n) => \Str::limit($n, 25))->toArray(),
+            'datasets' => [[
+                'label' => 'Budget (TZS)',
+                'data' => $projects->pluck('budget')->map(fn($v) => (float) $v)->toArray(),
+                'backgroundColor' => '#10b981',
+                'borderRadius' => 6,
+            ]],
+        ];
+    }
+
+    private function monthlyReports(): array
+    {
+        $months = [];
+        $data = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M Y');
+            $data[] = Document::where('category', 'report')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+        }
+
+        return [
+            'labels' => $months,
+            'datasets' => [[
+                'label' => 'Reports',
+                'data' => $data,
+                'backgroundColor' => '#3b82f6',
+                'borderRadius' => 6,
+            ]],
+        ];
+    }
+
+    private function monthlyPerformance(): array
+    {
+        $months = [];
+        $tasks = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M');
+            $tasks[] = Task::where('status', 'done')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+        }
+
+        return [
+            'labels' => $months,
+            'datasets' => [[
+                'label' => 'Tasks Completed',
+                'data' => $tasks,
+                'borderColor' => '#10b981',
+                'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
+                'fill' => true,
+                'tension' => 0.4,
+            ]],
+        ];
+    }
+
+    private function topProjects(): array
+    {
+        return Project::orderBy('budget', 'desc')->take(5)->get()->toArray();
+    }
+
+    private function recentActivities(): array
+    {
+        return \App\Models\AuditLog::with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->toArray();
+    }
+}

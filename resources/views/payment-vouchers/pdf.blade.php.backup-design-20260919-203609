@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payment Voucher</title>
+<style>
+@page { size: A4 portrait; margin: 5mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; font-size: 9pt; color: #000; }
+
+/* CONTAINER - 100% ya page (A4 - margins = 200mm) */
+.container { width: 100%; padding: 0; margin: 0 auto; }
+
+/* HEADER */
+.header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+.header .title { font-size: 18pt; font-weight: bold; letter-spacing: 3px; margin-bottom: 3px; }
+.header .org { font-size: 11pt; font-weight: bold; margin-bottom: 2px; }
+.header .address { font-size: 9pt; margin-bottom: 5px; }
+.header img { height: 65px; width: auto; display: block; margin: 0 auto; }
+
+/* INFO TABLE */
+.info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1.5px solid #000; table-layout: fixed; }
+.info-table td { padding: 4px 6px; vertical-align: top; font-size: 9pt; border: 1px solid #ccc; word-wrap: break-word; }
+.info-table td.label { font-weight: bold; white-space: nowrap; width: 15%; background: #f9f9f9; }
+.info-table td.value { width: 35%; }
+.info-table td.label2 { font-weight: bold; white-space: nowrap; width: 15%; background: #f9f9f9; }
+.info-table td.value2 { width: 35%; }
+
+/* ITEMS TABLE */
+.items-table { width: 100%; border-collapse: collapse; border: 1.5px solid #000; table-layout: fixed; }
+.items-table thead th { background: #f0f0f0; font-weight: bold; font-size: 9pt; text-align: left; padding: 6px 5px; border: 1px solid #000; word-wrap: break-word; }
+.items-table thead th.col-account { width: 25%; }
+.items-table thead th.col-details { width: 50%; }
+.items-table thead th.col-amount { width: 25%; text-align: right; }
+.items-table tbody td { padding: 6px 5px; border: 1px solid #000; font-size: 9pt; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+.items-table tbody td.col-account { width: 25%; }
+.items-table tbody td.col-details { width: 50%; }
+.items-table tbody td.col-amount { width: 25%; text-align: right; white-space: nowrap; }
+.items-table tfoot td { padding: 6px 5px; font-size: 9pt; vertical-align: top; border: 1px solid #000; word-wrap: break-word; }
+.items-table tfoot td.amount-cell { width: 25%; text-align: right; }
+
+.amount-words-label { font-weight: bold; font-size: 9pt; margin-bottom: 2px; }
+.amount-words-value { font-size: 9pt; }
+.total-label { font-weight: bold; font-size: 10pt; margin-bottom: 2px; }
+.total-value { font-weight: bold; font-size: 12pt; white-space: nowrap; }
+
+/* SIGNATURES TABLE */
+.signatures-table { width: 100%; border-collapse: collapse; border: 1.5px solid #000; border-top: none; table-layout: fixed; }
+.signatures-table thead th { background: #f0f0f0; font-weight: bold; font-size: 9pt; text-align: left; padding: 6px 5px; border: 1px solid #000; }
+.signatures-table thead th.col-name { width: 40%; }
+.signatures-table thead th.col-sig { width: 35%; }
+.signatures-table thead th.col-date { width: 25%; }
+.signatures-table tbody td { padding: 10px 5px; border: 1px solid #000; font-size: 9pt; vertical-align: top; height: 45px; word-wrap: break-word; }
+.sig-label { font-weight: bold; font-size: 8pt; }
+.sig-name { font-size: 9pt; margin-top: 2px; }
+
+/* RECEIVED BY */
+.received-table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 1.5px solid #000; table-layout: fixed; }
+.received-table td { padding: 6px 5px; vertical-align: middle; font-size: 9pt; border: 1px solid #ccc; word-wrap: break-word; }
+.received-table td.label { font-weight: bold; white-space: nowrap; width: 15%; background: #f9f9f9; }
+.received-table td.value { width: 35%; }
+</style>
+</head>
+<body>
+<div class="container">
+
+{{-- HEADER --}}
+<div class="header">
+    <div class="title">PAYMENT VOUCHER</div>
+    <div class="org">SOIL- ANIMALS' POWER TANZANIA</div>
+    <div class="address">P.O Box 149, Morogoro, Tanzania Kihonda- Kilimanjaro</div>
+    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/sapta-logo.png'))) }}">
+</div>
+
+{{-- INFO --}}
+<table class="info-table">
+<tr>
+    <td class="label">Date:</td>
+    <td class="value">{{ $voucher->payment_date ? \Carbon\Carbon::parse($voucher->payment_date)->format('d/m/Y') : '-' }}</td>
+    <td class="label2">Trans No:</td>
+    <td class="value2"><strong>{{ $voucher->trans_no ?? $voucher->voucher_number }}</strong></td>
+</tr>
+<tr>
+    <td class="label">Name of Payee:</td>
+    <td class="value">{{ $voucher->payee_name }}</td>
+    <td class="label2">P.O Box:</td>
+    <td class="value2">{{ $voucher->payee_pobox ?? '-' }}</td>
+</tr>
+<tr>
+    <td class="label">Batch:</td>
+    <td class="value">{{ $voucher->batch ?? '-' }}</td>
+    <td class="label2">Bank:</td>
+    <td class="value2">{{ $voucher->bank ?? '-' }}</td>
+</tr>
+<tr>
+    <td class="label">Currency:</td>
+    <td class="value">{{ $voucher->currency ?? 'TZS' }}</td>
+    <td class="label2">Mode:</td>
+    <td class="value2">{{ strtoupper($voucher->mode ?? '-') }}</td>
+</tr>
+<tr>
+    <td class="label">Cheque Number:</td>
+    <td class="value">{{ $voucher->cheque_number ?? '-' }}</td>
+    <td class="label2"></td>
+    <td class="value2"></td>
+</tr>
+</table>
+
+{{-- ITEMS --}}
+<table class="items-table">
+<thead>
+<tr>
+    <th class="col-account">Account/Invoice No</th>
+    <th class="col-details">Details</th>
+    <th class="col-amount">Amount {{ $voucher->currency ?? 'TZS' }}</th>
+</tr>
+</thead>
+<tbody>
+@forelse($voucher->items as $item)
+<tr>
+    <td class="col-account">{{ $item->account_invoice_no ?? '-' }}</td>
+    <td class="col-details">{{ $item->details }}</td>
+    <td class="col-amount">{{ number_format($item->amount, 2) }}</td>
+</tr>
+@empty
+<tr><td colspan="3" style="text-align: center; color: #999;">No items</td></tr>
+@endforelse
+</tbody>
+<tfoot>
+<tr>
+    <td colspan="2">
+        <div class="amount-words-label">Amount in Words:</div>
+        <div class="amount-words-value">{{ $voucher->amount_in_words ?? '-' }}</div>
+    </td>
+    <td class="amount-cell">
+        <div class="total-label">TOTAL</div>
+        <div class="total-value">{{ number_format($voucher->amount, 2) }}</div>
+    </td>
+</tr>
+</tfoot>
+</table>
+
+{{-- SIGNATURES --}}
+<table class="signatures-table">
+<thead>
+<tr>
+    <th class="col-name">Name</th>
+    <th class="col-sig">Signature</th>
+    <th class="col-date">Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><div class="sig-label">Prepared By:</div><div class="sig-name">{{ $voucher->preparedBy->username ?? '-' }}</div></td>
+    <td></td>
+    <td>{{ $voucher->prepared_at ? \Carbon\Carbon::parse($voucher->prepared_at)->format('d/m/Y') : '' }}</td>
+</tr>
+<tr>
+    <td><div class="sig-label">Checked By:</div><div class="sig-name">{{ $voucher->checkedBy->username ?? '-' }}</div></td>
+    <td></td>
+    <td>{{ $voucher->checked_at ? \Carbon\Carbon::parse($voucher->checked_at)->format('d/m/Y') : '' }}</td>
+</tr>
+<tr>
+    <td><div class="sig-label">Authorized By:</div><div class="sig-name">{{ $voucher->authorizedBy->username ?? '-' }}</div></td>
+    <td></td>
+    <td>{{ $voucher->authorized_at ? \Carbon\Carbon::parse($voucher->authorized_at)->format('d/m/Y') : '' }}</td>
+</tr>
+</tbody>
+</table>
+
+{{-- RECEIVED BY --}}
+<table class="received-table">
+<tr>
+    <td class="label">Received BY:</td>
+    <td class="value">{{ $voucher->received_by_name ?? '' }}</td>
+    <td class="label">Signature:</td>
+    <td class="value"></td>
+</tr>
+</table>
+
+</div>
+</body>
+</html>
