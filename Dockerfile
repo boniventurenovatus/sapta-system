@@ -22,5 +22,6 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 10000
 
 CMD php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
+    php artisan migrate --path=database/migrations/2026_09_20_18i36_create_user_activity_logs_table.php --force 2>&1 || echo "Specific migration skipped" ; \
     php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seed failed" ; \
     php artisan serve --host=0.0.0.0 --port=10000
