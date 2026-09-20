@@ -28,15 +28,15 @@ class DashboardService
         return [
             'kpis' => [
                 'total_employees'    => Employee::count(),
-                'total_projects'     => Project::count(),
-                'active_projects'    => Project::where('status', 'in_progress')->count(),
+                'total_projects'     => \Schema::hasTable('projects') ? Project::count(),
+                'active_projects'    => \Schema::hasTable('projects') ? Project::where('status', 'in_progress')->count(),
                 'total_budget'       => Budget::sum('allocated_amount'),
                 'total_spent'        => Budget::sum('spent_amount'),
                 'budget_utilization' => $this->budgetUtilization(),
                 'total_departments'  => Department::count(),
-                'total_tasks'        => Task::count(),
-                'completed_tasks'    => Task::where('status', 'done')->count(),
-                'pending_tasks'      => Task::where('status', '!=', 'done')->count(),
+                'total_tasks'        => \Schema::hasTable('tasks') ? Task::count(),
+                'completed_tasks'    => \Schema::hasTable('tasks') ? Task::where('status', 'done')->count(),
+                'pending_tasks'      => \Schema::hasTable('tasks') ? Task::where('status', '!=', 'done')->count(),
             ],
             'charts' => [
                 'budget_vs_actual' => $this->budgetVsActual(),
@@ -59,10 +59,10 @@ class DashboardService
         return [
             'kpis' => [
                 'total_employees'   => Employee::count(),
-                'active_projects'   => Project::where('status', 'in_progress')->count(),
+                'active_projects'   => \Schema::hasTable('projects') ? Project::where('status', 'in_progress')->count(),
                 'pending_approvals' => $this->pendingApprovals(),
-                'total_tasks'       => Task::count(),
-                'completed_tasks'   => Task::where('status', 'done')->count(),
+                'total_tasks'       => \Schema::hasTable('tasks') ? Task::count(),
+                'completed_tasks'   => \Schema::hasTable('tasks') ? Task::where('status', 'done')->count(),
                 'total_budget'      => Budget::sum('allocated_amount'),
             ],
             'charts' => [
@@ -86,8 +86,8 @@ class DashboardService
                 'total_employees'    => Employee::count(),
                 'active_employees'   => Employee::where('employment_status', 'active')->count(),
                 'total_departments'  => Department::count(),
-                'pending_leaves'     => LeaveRequest::where('status', 'pending')->count(),
-                'pending_approvals'  => LeaveRequest::where('status', 'pending')->count(),
+                'pending_leaves'     => \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->count(),
+                'pending_approvals'  => \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->count(),
                 'total_trainings'    => Training::count(),
             ],
             'charts' => [
@@ -96,8 +96,8 @@ class DashboardService
                 'leave_by_type' => $this->leaveByType(),
                 'trainings_by_category' => $this->trainingsByCategory(),
             ],
-            'recent_leaves' => LeaveRequest::with('employee')->orderBy('created_at', 'desc')->take(5)->get(),
-            'pending_leaves_list' => LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
+            'recent_leaves' => \Schema::hasTable('leave_requests') ? LeaveRequest::with('employee')->orderBy('created_at', 'desc')->take(5)->get(),
+            'pending_leaves_list' => \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
         ];
     }
 
@@ -114,7 +114,7 @@ class DashboardService
                 'total_spent'       => Budget::sum('spent_amount'),
                 'total_remaining'   => Budget::sum('allocated_amount') - Budget::sum('spent_amount'),
                 'utilization'       => $this->budgetUtilization(),
-                'pending_vouchers'  => PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count(),
+                'pending_vouchers'  => \Schema::hasTable('payment_vouchers') ? PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count(),
                 'total_expenses'    => ExpenseClaim::sum('amount'),
             ],
             'charts' => [
@@ -123,7 +123,7 @@ class DashboardService
                 'vouchers_by_status' => $this->vouchersByStatus(),
                 'monthly_expenses' => $this->monthlyExpenses(),
             ],
-            'recent_vouchers' => PaymentVoucher::with('creator')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_vouchers' => \Schema::hasTable('payment_vouchers') ? PaymentVoucher::with('creator')->orderBy('created_at', 'desc')->take(5)->get(),
             'recent_claims' => ExpenseClaim::with('employee')->orderBy('created_at', 'desc')->take(5)->get(),
         ];
     }
@@ -137,12 +137,12 @@ class DashboardService
     {
         return [
             'kpis' => [
-                'total_projects'    => Project::count(),
-                'active_projects'   => Project::where('status', 'in_progress')->count(),
-                'completed_projects'=> Project::where('status', 'completed')->count(),
-                'total_tasks'       => Task::count(),
-                'pending_tasks'     => Task::where('status', '!=', 'done')->count(),
-                'total_budget'      => Project::sum('budget'),
+                'total_projects'    => \Schema::hasTable('projects') ? Project::count(),
+                'active_projects'   => \Schema::hasTable('projects') ? Project::where('status', 'in_progress')->count(),
+                'completed_projects'=> \Schema::hasTable('projects') ? Project::where('status', 'completed')->count(),
+                'total_tasks'       => \Schema::hasTable('tasks') ? Task::count(),
+                'pending_tasks'     => \Schema::hasTable('tasks') ? Task::where('status', '!=', 'done')->count(),
+                'total_budget'      => \Schema::hasTable('projects') ? Project::sum('budget'),
             ],
             'charts' => [
                 'projects_by_status' => $this->projectsByStatus(),
@@ -150,8 +150,8 @@ class DashboardService
                 'project_progress' => $this->projectProgress(),
                 'budget_by_project' => $this->budgetByProject(),
             ],
-            'recent_projects' => Project::with('projectManager')->orderBy('created_at', 'desc')->take(5)->get(),
-            'recent_tasks' => Task::with(['project', 'assignee'])->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_projects' => \Schema::hasTable('projects') ? Project::with('projectManager')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_tasks' => \Schema::hasTable('tasks') ? Task::with(['project', 'assignee'])->orderBy('created_at', 'desc')->take(5)->get(),
         ];
     }
 
@@ -164,8 +164,8 @@ class DashboardService
     {
         return [
             'kpis' => [
-                'total_projects'    => Project::count(),
-                'active_projects'   => Project::where('status', 'in_progress')->count(),
+                'total_projects'    => \Schema::hasTable('projects') ? Project::count(),
+                'active_projects'   => \Schema::hasTable('projects') ? Project::where('status', 'in_progress')->count(),
                 'total_trainings'   => Training::count(),
                 'total_documents'   => Document::count(),
                 'total_reports'     => Document::where('category', 'report')->count(),
@@ -218,10 +218,10 @@ class DashboardService
         return [
             'kpis' => [
                 'team_members'      => Employee::count(),
-                'total_tasks'       => Task::count(),
-                'completed_tasks'   => Task::where('status', 'done')->count(),
-                'pending_tasks'     => Task::where('status', '!=', 'done')->count(),
-                'pending_approvals' => LeaveRequest::where('status', 'pending')->count(),
+                'total_tasks'       => \Schema::hasTable('tasks') ? Task::count(),
+                'completed_tasks'   => \Schema::hasTable('tasks') ? Task::where('status', 'done')->count(),
+                'pending_tasks'     => \Schema::hasTable('tasks') ? Task::where('status', '!=', 'done')->count(),
+                'pending_approvals' => \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->count(),
                 'total_employees'   => Employee::count(),
             ],
             'charts' => [
@@ -229,8 +229,8 @@ class DashboardService
                 'employees_by_department' => $this->employeesByDepartment(),
                 'monthly_performance' => $this->monthlyPerformance(),
             ],
-            'recent_tasks' => Task::with(['project', 'assignee'])->orderBy('created_at', 'desc')->take(5)->get(),
-            'pending_leaves' => LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
+            'recent_tasks' => \Schema::hasTable('tasks') ? Task::with(['project', 'assignee'])->orderBy('created_at', 'desc')->take(5)->get(),
+            'pending_leaves' => \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->with('employee')->take(5)->get(),
         ];
     }
 
@@ -245,17 +245,17 @@ class DashboardService
 
         return [
             'kpis' => [
-                'my_tasks'        => Task::where('assigned_to', $employeeId)->count(),
-                'completed_tasks' => Task::where('assigned_to', $employeeId)->where('status', 'done')->count(),
-                'pending_leaves'  => LeaveRequest::where('employee_id', $employeeId)->where('status', 'pending')->count(),
-                'my_attendance'   => \App\Models\Attendance::where('employee_id', $employeeId)->whereMonth('created_at', now()->month)->count(),
+                'my_tasks'        => \Schema::hasTable('tasks') ? Task::where('assigned_to', $employeeId)->count(),
+                'completed_tasks' => \Schema::hasTable('tasks') ? Task::where('assigned_to', $employeeId)->where('status', 'done')->count(),
+                'pending_leaves'  => \Schema::hasTable('leave_requests') ? LeaveRequest::where('employee_id', $employeeId)->where('status', 'pending')->count(),
+                'my_attendance'   => \App\Models\\Schema::hasTable('attendances') ? Attendance::where('employee_id', $employeeId)->whereMonth('created_at', now()->month)->count(),
             ],
             'charts' => [
                 'my_tasks_by_status' => $this->myTasksByStatus($employeeId),
                 'my_attendance_chart' => $this->myAttendanceChart($employeeId),
             ],
-            'recent_tasks' => Task::where('assigned_to', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
-            'my_leaves' => LeaveRequest::where('employee_id', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_tasks' => \Schema::hasTable('tasks') ? Task::where('assigned_to', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
+            'my_leaves' => \Schema::hasTable('leave_requests') ? LeaveRequest::where('employee_id', $employeeId)->orderBy('created_at', 'desc')->take(5)->get(),
         ];
     }
 
@@ -300,8 +300,8 @@ class DashboardService
 
     private function pendingApprovals(): int
     {
-        return PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count()
-            + LeaveRequest::where('status', 'pending')->count()
+        return \Schema::hasTable('payment_vouchers') ? PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count()
+            + \Schema::hasTable('leave_requests') ? LeaveRequest::where('status', 'pending')->count()
             + ExpenseClaim::whereIn('status', ['pending_approval', 'submitted'])->count()
             + ProcurementRequest::where('status', 'pending')->count();
     }
@@ -334,7 +334,7 @@ class DashboardService
 
     private function projectsByStatus(): array
     {
-        $projects = Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $projects = \Schema::hasTable('projects') ? \Schema::hasTable('projects') ? Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $projects->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -382,7 +382,7 @@ class DashboardService
         for ($i = 11; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $months[] = $month->format('M Y');
-            $data[] = (float) PaymentVoucher::whereYear('created_at', $month->year)
+            $data[] = (float) \Schema::hasTable('payment_vouchers') ? PaymentVoucher::whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->where('status', 'paid')
                 ->sum('amount');
@@ -429,7 +429,7 @@ class DashboardService
 
     private function tasksByStatus(): array
     {
-        $data = Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $data = \Schema::hasTable('tasks') ? \Schema::hasTable('tasks') ? Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -443,7 +443,7 @@ class DashboardService
 
     private function myTasksByStatus($employeeId): array
     {
-        $data = Task::where('assigned_to', $employeeId)
+        $data = \Schema::hasTable('tasks') ? Task::where('assigned_to', $employeeId)
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get();
@@ -468,13 +468,13 @@ class DashboardService
             $month = now()->subMonths($i);
             $months[] = $month->format('M');
 
-            $present[] = \App\Models\Attendance::where('employee_id', $employeeId)
+            $present[] = \App\Models\\Schema::hasTable('attendances') ? Attendance::where('employee_id', $employeeId)
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->where('status', 'present')
                 ->count();
 
-            $absent[] = \App\Models\Attendance::where('employee_id', $employeeId)
+            $absent[] = \App\Models\\Schema::hasTable('attendances') ? Attendance::where('employee_id', $employeeId)
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->where('status', 'absent')
@@ -518,7 +518,7 @@ class DashboardService
 
     private function vouchersByStatus(): array
     {
-        $data = PaymentVoucher::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $data = \Schema::hasTable('payment_vouchers') ? \Schema::hasTable('payment_vouchers') ? PaymentVoucher::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -532,7 +532,7 @@ class DashboardService
 
     private function leaveByType(): array
     {
-        $data = LeaveRequest::select('leave_type', DB::raw('count(*) as count'))->groupBy('leave_type')->get();
+        $data = \Schema::hasTable('leave_requests') ? \Schema::hasTable('leave_requests') ? LeaveRequest::select('leave_type', DB::raw('count(*) as count'))->groupBy('leave_type')->get();
 
         return [
             'labels' => $data->pluck('leave_type')->map(fn($t) => ucfirst(str_replace('_', ' ', $t)))->toArray(),
@@ -572,7 +572,7 @@ class DashboardService
         }
 
         if (!\Schema::hasTable('documents')) { return ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => [], 'borderWidth' => 0]]]; }
-        $data = Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
+        $data = \Schema::hasTable('documents') ? Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
 
         return [
             'labels' => $data->pluck('category')->map(fn($c) => ucfirst(str_replace('_', ' ', $c)))->toArray(),
@@ -636,7 +636,7 @@ class DashboardService
 
     private function projectProgress(): array
     {
-        $projects = Project::orderBy('progress', 'desc')->take(8)->get();
+        $projects = \Schema::hasTable('projects') ? Project::orderBy('progress', 'desc')->take(8)->get();
 
         return [
             'labels' => $projects->pluck('name')->map(fn($n) => \Str::limit($n, 25))->toArray(),
@@ -651,7 +651,7 @@ class DashboardService
 
     private function budgetByProject(): array
     {
-        $projects = Project::orderBy('budget', 'desc')->take(8)->get();
+        $projects = \Schema::hasTable('projects') ? Project::orderBy('budget', 'desc')->take(8)->get();
 
         return [
             'labels' => $projects->pluck('name')->map(fn($n) => \Str::limit($n, 25))->toArray(),
@@ -697,7 +697,7 @@ class DashboardService
         for ($i = 5; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $months[] = $month->format('M');
-            $tasks[] = Task::where('status', 'done')
+            $tasks[] = \Schema::hasTable('tasks') ? Task::where('status', 'done')
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->count();
@@ -718,7 +718,7 @@ class DashboardService
 
     private function topProjects(): array
     {
-        return Project::orderBy('budget', 'desc')->take(5)->get()->toArray();
+        return \Schema::hasTable('projects') ? Project::orderBy('budget', 'desc')->take(5)->get()->toArray();
     }
 
     private function recentActivities(): array
