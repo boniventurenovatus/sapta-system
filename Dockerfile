@@ -17,7 +17,6 @@ RUN apk add --no-cache \
     postgresql-dev \
     postgresql-client \
     supervisor \
-    nginx \
     nodejs \
     npm
 
@@ -69,11 +68,15 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
 # ============================================================
-# 9. Expose port (Render inahitaji 10000)
+# 9. Expose port
 # ============================================================
 EXPOSE 10000
 
 # ============================================================
-# 10. Start command
+# 10. Start command — AUTO MIGRATE
 # ============================================================
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate --force && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan serve --host=0.0.0.0 --port=10000
