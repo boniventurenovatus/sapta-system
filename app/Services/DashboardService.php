@@ -204,7 +204,7 @@ class DashboardService
                 'system_health' => $this->systemHealth(),
             ],
             'recent_users' => User::with('roles')->orderBy('created_at', 'desc')->take(5)->get(),
-            'recent_logs' => \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_logs' => \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
         ];
     }
 
@@ -282,7 +282,7 @@ class DashboardService
                 'system_health' => $this->systemHealth(),
             ],
             'recent_users' => User::with('roles')->orderBy('created_at', 'desc')->take(5)->get(),
-            'recent_logs' => \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get(),
+            'recent_logs' => \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::with('user')->orderBy('created_at', 'desc')->take(5)->get() : collect(),
         ];
     }
 
@@ -594,7 +594,7 @@ class DashboardService
         for ($i = 29; $i >= 0; $i--) {
             $day = now()->subDays($i);
             $days[] = $day->format('d M');
-            $data[] = \App\Models\AuditLog::whereDate('created_at', $day->toDateString())->count();
+            $data[] = \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::whereDate('created_at', $day->toDateString())->count() : 0;
         }
 
         return [
@@ -711,7 +711,7 @@ class DashboardService
 
     private function recentActivities(): array
     {
-        return \App\Models\AuditLog::with('user')
+        return \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::with('user')
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get()
