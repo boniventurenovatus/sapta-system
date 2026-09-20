@@ -196,7 +196,6 @@ class DashboardService
                 'total_roles'       => \App\Models\Role::count(),
                 'total_permissions' => \App\Models\Permission::count(),
                 'total_documents'   => Document::count(),
-                'total_audit_logs'  => \App\Models\AuditLog::count(),
             ],
             'charts' => [
                 'users_by_role' => $this->usersByRole(),
