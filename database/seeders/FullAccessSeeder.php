@@ -17,7 +17,7 @@ class FullAccessSeeder extends Seeder
         $this->command->info('=== FullAccessSeeder ===');
 
         // ============================================================
-        // 1. ROLES — BILA display_name
+        // 1. ROLES
         // ============================================================
         if (Schema::hasTable('roles')) {
             $roles = [
@@ -40,7 +40,7 @@ class FullAccessSeeder extends Seeder
         }
 
         // ============================================================
-        // 2. PERMISSIONS — BILA display_name
+        // 2. PERMISSIONS — NA code
         // ============================================================
         if (Schema::hasTable('permissions')) {
             $permissions = [
@@ -58,6 +58,7 @@ class FullAccessSeeder extends Seeder
                 DB::table('permissions')->updateOrInsert(
                     ['name' => $permission],
                     [
+                        'code' => $permission,
                         'description' => ucwords(str_replace('_', ' ', $permission)),
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -104,7 +105,6 @@ class FullAccessSeeder extends Seeder
                 ]);
                 $this->command->info('✅ Role super_admin imeongezwa');
                 
-                // Permissions zote
                 if (Schema::hasTable('role_permissions') && Schema::hasTable('permissions')) {
                     DB::table('role_permissions')->where('role_id', $superAdminRole->id)->delete();
                     
