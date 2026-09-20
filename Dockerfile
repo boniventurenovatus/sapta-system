@@ -13,7 +13,6 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
-
 RUN npm install && npm run build || true
 
 RUN chown -R www-data:www-data /var/www/html \
@@ -22,4 +21,9 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# Auto-migrate kwa usalama
+CMD php artisan migrate --force 2>&1 || echo "Migrate failed — continuing" ; \
+    php artisan config:cache 2>&1 ; \
+    php artisan route:cache 2>&1 ; \
+    php artisan view:cache 2>&1 ; \
+    php artisan serve --host=0.0.0.0 --port=10000
