@@ -334,7 +334,7 @@ class DashboardService
 
     private function projectsByStatus(): array
     {
-        $projects = \Schema::hasTable('projects') ? \Schema::hasTable('projects') ? Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $projects = \Schema::hasTable('projects') ? Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $projects->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -429,7 +429,7 @@ class DashboardService
 
     private function tasksByStatus(): array
     {
-        $data = \Schema::hasTable('tasks') ? \Schema::hasTable('tasks') ? Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $data = \Schema::hasTable('tasks') ? Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -518,7 +518,7 @@ class DashboardService
 
     private function vouchersByStatus(): array
     {
-        $data = \Schema::hasTable('payment_vouchers') ? \Schema::hasTable('payment_vouchers') ? PaymentVoucher::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $data = \Schema::hasTable('payment_vouchers') ? PaymentVoucher::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
 
         return [
             'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -532,7 +532,7 @@ class DashboardService
 
     private function leaveByType(): array
     {
-        $data = \Schema::hasTable('leave_requests') ? \Schema::hasTable('leave_requests') ? LeaveRequest::select('leave_type', DB::raw('count(*) as count'))->groupBy('leave_type')->get();
+        $data = \Schema::hasTable('leave_requests') ? LeaveRequest::select('leave_type', DB::raw('count(*) as count'))->groupBy('leave_type')->get();
 
         return [
             'labels' => $data->pluck('leave_type')->map(fn($t) => ucfirst(str_replace('_', ' ', $t)))->toArray(),
@@ -571,8 +571,7 @@ class DashboardService
             ];
         }
 
-        if (!\Schema::hasTable('documents')) { return ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => [], 'borderWidth' => 0]]]; }
-        $data = \Schema::hasTable('documents') ? Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
+        $data = Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
 
         return [
             'labels' => $data->pluck('category')->map(fn($c) => ucfirst(str_replace('_', ' ', $c)))->toArray(),
