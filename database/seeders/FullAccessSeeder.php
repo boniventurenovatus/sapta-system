@@ -17,33 +17,30 @@ class FullAccessSeeder extends Seeder
         $this->command->info('=== FullAccessSeeder ===');
 
         // ============================================================
-        // 1. ROLES
+        // 1. ROLES — BILA display_name
         // ============================================================
         if (Schema::hasTable('roles')) {
             $roles = [
-                'super_admin' => 'Super Admin',
-                'admin' => 'Admin',
-                'director' => 'Director',
-                'hr_manager' => 'HR Manager',
-                'hr_officer' => 'HR Officer',
-                'manager' => 'Manager',
-                'staff' => 'Staff',
-                'ceo' => 'CEO',
-                'bod' => 'Board of Directors',
-                'accountant' => 'Accountant',
+                'super_admin', 'admin', 'director', 'hr_manager', 'hr_officer',
+                'manager', 'staff', 'ceo', 'bod', 'accountant',
             ];
 
-            foreach ($roles as $code => $name) {
-                Role::firstOrCreate(
-                    ['name' => $code],
-                    ['code' => $code, 'display_name' => $name]
+            foreach ($roles as $role) {
+                DB::table('roles')->updateOrInsert(
+                    ['name' => $role],
+                    [
+                        'code' => $role,
+                        'description' => ucwords(str_replace('_', ' ', $role)),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
                 );
             }
             $this->command->info('✅ Roles zimeundwa');
         }
 
         // ============================================================
-        // 2. PERMISSIONS
+        // 2. PERMISSIONS — BILA display_name
         // ============================================================
         if (Schema::hasTable('permissions')) {
             $permissions = [
@@ -54,21 +51,24 @@ class FullAccessSeeder extends Seeder
                 'view_payment_vouchers', 'view_payroll', 'view_documents', 'view_projects',
                 'view_tasks', 'view_reports', 'view_activity_logs', 'view_settings',
                 'view_notifications', 'view_communication', 'view_trainings',
-                'view_recruitment', 'view_performance', 'view_procurement',
-                'view_drafts',
+                'view_recruitment', 'view_performance', 'view_procurement', 'view_drafts',
             ];
 
             foreach ($permissions as $permission) {
-                Permission::firstOrCreate(
+                DB::table('permissions')->updateOrInsert(
                     ['name' => $permission],
-                    ['display_name' => ucwords(str_replace('_', ' ', $permission))]
+                    [
+                        'description' => ucwords(str_replace('_', ' ', $permission)),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
                 );
             }
             $this->command->info('✅ Permissions zimeundwa');
         }
 
         // ============================================================
-        // 3. SUPERADMIN USER
+        // 3. SUPERADMIN
         // ============================================================
         $user = User::where('username', 'superadmin')->first();
 
@@ -89,32 +89,32 @@ class FullAccessSeeder extends Seeder
         }
 
         // ============================================================
-        // 4. ONGEZA ROLE super_admin KWA SUPERADMIN
+        // 4. ROLE super_admin KWA SUPERADMIN
         // ============================================================
         if (Schema::hasTable('roles') && Schema::hasTable('user_roles')) {
-            $superAdminRole = Role::where('name', 'super_admin')->first();
+            $superAdminRole = DB::table('roles')->where('name', 'super_admin')->first();
             
             if ($superAdminRole) {
-                // Ondoa roles zote
                 DB::table('user_roles')->where('user_id', $user->id)->delete();
-                
-                // Ongeza super_admin
                 DB::table('user_roles')->insert([
                     'user_id' => $user->id,
                     'role_id' => $superAdminRole->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
-                
                 $this->command->info('✅ Role super_admin imeongezwa');
                 
-                // Permissions zote kwa super_admin
+                // Permissions zote
                 if (Schema::hasTable('role_permissions') && Schema::hasTable('permissions')) {
                     DB::table('role_permissions')->where('role_id', $superAdminRole->id)->delete();
                     
-                    $allPermissions = Permission::all();
+                    $allPermissions = DB::table('permissions')->get();
                     foreach ($allPermissions as $perm) {
                         DB::table('role_permissions')->insert([
                             'role_id' => $superAdminRole->id,
                             'permission_id' => $perm->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]);
                     }
                     $this->command->info('✅ Permissions zote zimeongezwa');
