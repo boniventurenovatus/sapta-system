@@ -14,13 +14,9 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-# Build assets — LAZIMA
+# Build assets
 RUN npm install
 RUN npm run build
-
-# Hakikisha build ipo
-RUN ls -la public/build/ || echo "BUILD FAILED"
-RUN cat public/build/manifest.json || echo "MANIFEST FAILED"
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
@@ -30,7 +26,7 @@ EXPOSE 10000
 
 CMD php artisan config:clear 2>&1 ; \
     php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
-    php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seed failed" ; \
+    php artisan db:seed --class=FullAccessSeeder --force 2>&1 || echo "Seed failed" ; \
     php artisan config:cache 2>&1 ; \
     php artisan route:cache 2>&1 ; \
     php artisan view:cache 2>&1 ; \
