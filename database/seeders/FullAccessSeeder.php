@@ -16,7 +16,9 @@ class FullAccessSeeder extends Seeder
     {
         $this->command->info('=== FullAccessSeeder ===');
 
-        // ROLES
+        // ============================================================
+        // 1. ROLES
+        // ============================================================
         if (Schema::hasTable('roles')) {
             $roles = [
                 'super_admin', 'admin', 'director', 'hr_manager', 'hr_officer',
@@ -37,7 +39,9 @@ class FullAccessSeeder extends Seeder
             $this->command->info('✅ Roles zimeundwa');
         }
 
-        // PERMISSIONS — na code
+        // ============================================================
+        // 2. PERMISSIONS — na code
+        // ============================================================
         if (Schema::hasTable('permissions')) {
             $permissions = [
                 'view_employees', 'create_employees', 'edit_employees', 'delete_employees',
@@ -64,7 +68,9 @@ class FullAccessSeeder extends Seeder
             $this->command->info('✅ Permissions zimeundwa');
         }
 
-        // SUPERADMIN
+        // ============================================================
+        // 3. SUPERADMIN
+        // ============================================================
         $user = User::where('username', 'superadmin')->first();
 
         if (!$user) {
@@ -81,7 +87,9 @@ class FullAccessSeeder extends Seeder
             $user->save();
         }
 
-        // ROLE super_admin
+        // ============================================================
+        // 4. ROLE super_admin
+        // ============================================================
         if (Schema::hasTable('roles') && Schema::hasTable('user_roles')) {
             $superAdminRole = DB::table('roles')->where('name', 'super_admin')->first();
             

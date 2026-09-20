@@ -8,7 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // SALARIES
+        // ============================================================
+        // 1. SALARIES
+        // ============================================================
         if (!Schema::hasTable('salaries')) {
             Schema::create('salaries', function (Blueprint $table) {
                 $table->id();
@@ -24,7 +26,9 @@ return new class extends Migration
             });
         }
 
-        // NOTIFICATIONS
+        // ============================================================
+        // 2. NOTIFICATIONS
+        // ============================================================
         if (!Schema::hasTable('notifications')) {
             Schema::create('notifications', function (Blueprint $table) {
                 $table->uuid('id')->primary();
@@ -36,7 +40,9 @@ return new class extends Migration
             });
         }
 
-        // DOCUMENTS
+        // ============================================================
+        // 3. DOCUMENTS
+        // ============================================================
         if (!Schema::hasTable('documents')) {
             Schema::create('documents', function (Blueprint $table) {
                 $table->id();
@@ -51,7 +57,9 @@ return new class extends Migration
             });
         }
 
-        // BUDGETS
+        // ============================================================
+        // 4. BUDGETS
+        // ============================================================
         if (!Schema::hasTable('budgets')) {
             Schema::create('budgets', function (Blueprint $table) {
                 $table->id();
@@ -65,7 +73,9 @@ return new class extends Migration
             });
         }
 
-        // ATTENDANCES
+        // ============================================================
+        // 5. ATTENDANCES
+        // ============================================================
         if (!Schema::hasTable('attendances')) {
             Schema::create('attendances', function (Blueprint $table) {
                 $table->id();
@@ -79,7 +89,9 @@ return new class extends Migration
             });
         }
 
-        // LEAVE REQUESTS
+        // ============================================================
+        // 6. LEAVE REQUESTS
+        // ============================================================
         if (!Schema::hasTable('leave_requests')) {
             Schema::create('leave_requests', function (Blueprint $table) {
                 $table->id();
@@ -97,7 +109,9 @@ return new class extends Migration
             });
         }
 
-        // PAYMENT VOUCHERS
+        // ============================================================
+        // 7. PAYMENT VOUCHERS
+        // ============================================================
         if (!Schema::hasTable('payment_vouchers')) {
             Schema::create('payment_vouchers', function (Blueprint $table) {
                 $table->id();
@@ -112,7 +126,9 @@ return new class extends Migration
             });
         }
 
-        // EXPENSE CLAIMS
+        // ============================================================
+        // 8. EXPENSE CLAIMS
+        // ============================================================
         if (!Schema::hasTable('expense_claims')) {
             Schema::create('expense_claims', function (Blueprint $table) {
                 $table->id();
@@ -127,7 +143,9 @@ return new class extends Migration
             });
         }
 
-        // RECEIPTS
+        // ============================================================
+        // 9. RECEIPTS
+        // ============================================================
         if (!Schema::hasTable('receipts')) {
             Schema::create('receipts', function (Blueprint $table) {
                 $table->id();
@@ -142,7 +160,9 @@ return new class extends Migration
             });
         }
 
-        // TRAININGS
+        // ============================================================
+        // 10. TRAININGS
+        // ============================================================
         if (!Schema::hasTable('trainings')) {
             Schema::create('trainings', function (Blueprint $table) {
                 $table->id();
@@ -157,7 +177,9 @@ return new class extends Migration
             });
         }
 
-        // PROCUREMENT REQUESTS
+        // ============================================================
+        // 11. PROCUREMENT REQUESTS
+        // ============================================================
         if (!Schema::hasTable('procurement_requests')) {
             Schema::create('procurement_requests', function (Blueprint $table) {
                 $table->id();
@@ -172,7 +194,9 @@ return new class extends Migration
             });
         }
 
-        // ANNOUNCEMENTS
+        // ============================================================
+        // 12. ANNOUNCEMENTS
+        // ============================================================
         if (!Schema::hasTable('announcements')) {
             Schema::create('announcements', function (Blueprint $table) {
                 $table->id();
@@ -184,7 +208,9 @@ return new class extends Migration
             });
         }
 
-        // SHARED FILES
+        // ============================================================
+        // 13. SHARED FILES
+        // ============================================================
         if (!Schema::hasTable('shared_files')) {
             Schema::create('shared_files', function (Blueprint $table) {
                 $table->id();
@@ -195,7 +221,9 @@ return new class extends Migration
             });
         }
 
-        // CONVERSATIONS
+        // ============================================================
+        // 14. CONVERSATIONS
+        // ============================================================
         if (!Schema::hasTable('conversations')) {
             Schema::create('conversations', function (Blueprint $table) {
                 $table->id();
@@ -204,7 +232,9 @@ return new class extends Migration
             });
         }
 
-        // MESSAGES
+        // ============================================================
+        // 15. MESSAGES
+        // ============================================================
         if (!Schema::hasTable('messages')) {
             Schema::create('messages', function (Blueprint $table) {
                 $table->id();
@@ -216,7 +246,9 @@ return new class extends Migration
             });
         }
 
-        // GROUPS
+        // ============================================================
+        // 16. GROUPS
+        // ============================================================
         if (!Schema::hasTable('groups')) {
             Schema::create('groups', function (Blueprint $table) {
                 $table->id();
@@ -227,7 +259,9 @@ return new class extends Migration
             });
         }
 
-        // DRAFTS
+        // ============================================================
+        // 17. DRAFTS
+        // ============================================================
         if (!Schema::hasTable('drafts')) {
             Schema::create('drafts', function (Blueprint $table) {
                 $table->id();
@@ -238,7 +272,9 @@ return new class extends Migration
             });
         }
 
-        // SUBMISSIONS
+        // ============================================================
+        // 18. SUBMISSIONS
+        // ============================================================
         if (!Schema::hasTable('submissions')) {
             Schema::create('submissions', function (Blueprint $table) {
                 $table->id();
@@ -252,7 +288,9 @@ return new class extends Migration
             });
         }
 
-        // PERFORMANCE REVIEWS
+        // ============================================================
+        // 19. PERFORMANCE REVIEWS
+        // ============================================================
         if (!Schema::hasTable('performance_reviews')) {
             Schema::create('performance_reviews', function (Blueprint $table) {
                 $table->id();
@@ -266,7 +304,9 @@ return new class extends Migration
             });
         }
 
-        // PAYSLIPS — kama haipo
+        // ============================================================
+        // 20. PAYSLIPS
+        // ============================================================
         if (!Schema::hasTable('payslips')) {
             Schema::create('payslips', function (Blueprint $table) {
                 $table->id();
@@ -277,6 +317,78 @@ return new class extends Migration
                 $table->decimal('deductions', 15, 2)->default(0);
                 $table->decimal('net_salary', 15, 2)->default(0);
                 $table->string('status')->default('pending');
+                $table->timestamps();
+            });
+        }
+
+        // ============================================================
+        // 21. JOB POSTINGS
+        // ============================================================
+        if (!Schema::hasTable('job_postings')) {
+            Schema::create('job_postings', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->text('description')->nullable();
+                $table->string('status')->default('open');
+                $table->date('deadline')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        // ============================================================
+        // 22. JOB APPLICATIONS
+        // ============================================================
+        if (!Schema::hasTable('job_applications')) {
+            Schema::create('job_applications', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('job_posting_id')->nullable()->constrained('job_postings')->nullOnDelete();
+                $table->string('applicant_name');
+                $table->string('email')->nullable();
+                $table->string('status')->default('pending');
+                $table->timestamps();
+            });
+        }
+
+        // ============================================================
+        // 23. ORGANIZATIONAL UNITS — kama haipo
+        // ============================================================
+        if (!Schema::hasTable('organizational_units')) {
+            Schema::create('organizational_units', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('organization_id')->nullable()->constrained('organizations')->nullOnDelete();
+                $table->foreignId('parent_id')->nullable()->constrained('organizational_units')->nullOnDelete();
+                $table->string('name');
+                $table->string('code')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        // ============================================================
+        // 24. EMPLOYEE POSITIONS
+        // ============================================================
+        if (!Schema::hasTable('employee_positions')) {
+            Schema::create('employee_positions', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('employee_id')->nullable()->constrained('employees')->nullOnDelete();
+                $table->foreignId('position_id')->nullable()->constrained('positions')->nullOnDelete();
+                $table->date('start_date')->nullable();
+                $table->date('end_date')->nullable();
+                $table->boolean('is_primary')->default(false);
+                $table->string('status')->default('active');
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        // ============================================================
+        // 25. SETTINGS
+        // ============================================================
+        if (!Schema::hasTable('settings')) {
+            Schema::create('settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('key')->unique();
+                $table->text('value')->nullable();
                 $table->timestamps();
             });
         }

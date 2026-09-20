@@ -13,7 +13,6 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
-
 RUN npm install
 RUN npm run build
 
@@ -25,6 +24,7 @@ EXPOSE 10000
 
 CMD php artisan config:clear 2>&1 ; \
     php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
+    php artisan migrate --force 2>&1 || echo "Migrate retry" ; \
     php artisan db:seed --class=FullAccessSeeder --force 2>&1 || echo "Seed failed" ; \
     php artisan config:cache 2>&1 ; \
     php artisan route:cache 2>&1 ; \
