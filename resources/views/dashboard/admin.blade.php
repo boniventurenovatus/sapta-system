@@ -22,7 +22,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <x-kpi-card label="Positions" value="{{ number_format($kpis['total_positions']) }}" icon="fa-briefcase" color="indigo" />
         <x-kpi-card label="Audit Logs" value="{{ number_format($kpis['total_audit_logs']) }}" icon="fa-history" color="red" />
-        <x-kpi-card label="Documents" value="{{ \App\Models\Document::count() }}" icon="fa-file-lines" color="yellow" />
+        <x-kpi-card label="Documents" value="{{ \Schema::hasTable('documents') ? \App\Models\Document::count() : 0 }}" icon="fa-file-lines" color="yellow" />
         <x-kpi-card label="System Health" value="95%" icon="fa-heart-pulse" color="green" />
     </div>
 
