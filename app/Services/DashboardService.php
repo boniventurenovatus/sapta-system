@@ -711,10 +711,12 @@ class DashboardService
 
     private function recentActivities(): array
     {
-        return \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::with('user')
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get()
-            ->toArray();
+        return \Schema::hasTable('audit_logs')
+            ? \App\Models\AuditLog::with('user')
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get()
+                ->toArray()
+            : [];
     }
 }
