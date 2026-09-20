@@ -204,8 +204,8 @@
                 <span class="sapta-nav-icon"><i class="fas fa-bell"></i></span>
                 <span class="sapta-nav-text">Notifications</span>
                 @auth
-                    @if(auth()->check() && auth()->user()->unreadNotifications->count() > 0)
-                        <span class="sapta-nav-badge">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    @if(auth()->check() && \Schema::hasTable('notifications') && auth()->user()->unreadNotifications->count() > 0)
+                        <span class="sapta-nav-badge">{{ \Schema::hasTable('notifications') ? auth()->user()->unreadNotifications->count() : 0 }}</span>
                     @endif
                 @endauth
             </a>

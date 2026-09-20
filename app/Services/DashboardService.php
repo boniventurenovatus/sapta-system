@@ -30,8 +30,8 @@ class DashboardService
                 'total_employees'    => Employee::count(),
                 'total_projects'     => Project::count(),
                 'active_projects'    => Project::where('status', 'in_progress')->count(),
-                'total_budget'       => Budget::sum('allocated_amount'),
-                'total_spent'        => Budget::sum('spent_amount'),
+                'total_budget'       => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0,
+                'total_spent'        => \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0,
                 'budget_utilization' => $this->budgetUtilization(),
                 'total_departments'  => Department::count(),
                 'total_tasks'        => Task::count(),
@@ -63,7 +63,7 @@ class DashboardService
                 'pending_approvals' => $this->pendingApprovals(),
                 'total_tasks'       => Task::count(),
                 'completed_tasks'   => Task::where('status', 'done')->count(),
-                'total_budget'      => Budget::sum('allocated_amount'),
+                'total_budget'      => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0,
             ],
             'charts' => [
                 'projects_by_status' => $this->projectsByStatus(),
@@ -110,9 +110,9 @@ class DashboardService
     {
         return [
             'kpis' => [
-                'total_budget'      => Budget::sum('allocated_amount'),
-                'total_spent'       => Budget::sum('spent_amount'),
-                'total_remaining'   => Budget::sum('allocated_amount') - Budget::sum('spent_amount'),
+                'total_budget'      => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0,
+                'total_spent'       => \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0,
+                'total_remaining'   => \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0 - \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0,
                 'utilization'       => $this->budgetUtilization(),
                 'pending_vouchers'  => PaymentVoucher::whereIn('status', ['pending_approval', 'submitted'])->count(),
                 'total_expenses'    => ExpenseClaim::sum('amount'),
@@ -273,7 +273,7 @@ class DashboardService
                 'total_permissions'  => \App\Models\Permission::count(),
                 'total_departments'  => Department::count(),
                 'total_positions'    => \App\Models\Position::count(),
-                'total_audit_logs'   => \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::count() : 0,
+                'total_audit_logs'   => \Schema::hasTable('audit_logs') ? \App\Models\\Schema::hasTable('audit_logs') ? AuditLog::count() : 0 : 0,
             ],
             'charts' => [
                 'users_by_role' => $this->usersByRole(),
@@ -293,8 +293,8 @@ class DashboardService
      */
     private function budgetUtilization(): float
     {
-        $allocated = Budget::sum('allocated_amount');
-        $spent = Budget::sum('spent_amount');
+        $allocated = \Schema::hasTable('budgets') ? Budget::sum('allocated_amount') : 0;
+        $spent = \Schema::hasTable('budgets') ? Budget::sum('spent_amount') : 0;
         return $allocated > 0 ? round(($spent / $allocated) * 100, 1) : 0;
     }
 
@@ -334,7 +334,7 @@ class DashboardService
 
     private function projectsByStatus(): array
     {
-        $projects = Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $projects = \Schema::hasTable('projects') ? Project::select('status', DB::raw('count(*) as count'))->groupBy('status')->get() : collect();
 
         return [
             'labels' => $projects->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -429,7 +429,7 @@ class DashboardService
 
     private function tasksByStatus(): array
     {
-        $data = Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get();
+        $data = \Schema::hasTable('tasks') ? Task::select('status', DB::raw('count(*) as count'))->groupBy('status')->get() : collect();
 
         return [
             'labels' => $data->pluck('status')->map(fn($s) => ucfirst(str_replace('_', ' ', $s)))->toArray(),
@@ -572,7 +572,7 @@ class DashboardService
         }
 
         if (!\Schema::hasTable('documents')) { return ['labels' => [], 'datasets' => [['data' => [], 'backgroundColor' => [], 'borderWidth' => 0]]]; }
-        $data = Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get();
+        $data = \Schema::hasTable('documents') ? Document::select('category', DB::raw('count(*) as count'))->groupBy('category')->get() : collect();
 
         return [
             'labels' => $data->pluck('category')->map(fn($c) => ucfirst(str_replace('_', ' ', $c)))->toArray(),
