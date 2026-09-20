@@ -515,23 +515,6 @@ Route::middleware('auth')->prefix('communication/notifications')->name('communic
 // ================================================================
 // LEAVE REQUESTS — Full Workflow
 // ================================================================
-Route::middleware(['auth', 'role:super_admin,admin,director,manager,staff'])->prefix('leave-requests')->name('leave-requests.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\LeaveRequestController::class, 'index'])->name('index');
-    Route::get('/create', [\App\Http\Controllers\LeaveRequestController::class, 'create'])->name('create');
-    Route::post('/', [\App\Http\Controllers\LeaveRequestController::class, 'store'])->name('store');
-    Route::get('/{leaveRequest}', [\App\Http\Controllers\LeaveRequestController::class, 'show'])->name('show');
-    Route::get('/{leaveRequest}/edit', [\App\Http\Controllers\LeaveRequestController::class, 'edit'])->name('edit');
-    Route::put('/{leaveRequest}', [\App\Http\Controllers\LeaveRequestController::class, 'update'])->name('update');
-    Route::delete('/{leaveRequest}', [\App\Http\Controllers\LeaveRequestController::class, 'destroy'])->name('destroy');
-    
-    // Workflow Actions
-    Route::post('/{leaveRequest}/approve', [\App\Http\Controllers\LeaveRequestController::class, 'approve'])->name('approve');
-    Route::post('/{leaveRequest}/return', [\App\Http\Controllers\LeaveRequestController::class, 'returnRequest'])->name('return');
-    
-    // PDF + Print
-    Route::get('/{leaveRequest}/pdf', [\App\Http\Controllers\LeaveRequestController::class, 'downloadPdf'])->name('pdf');
-    Route::get('/{leaveRequest}/print', [\App\Http\Controllers\LeaveRequestController::class, 'print'])->name('print');
-});
 // ================================================================
 // EXPENSE CLAIMS — Full Workflow
 // ================================================================
