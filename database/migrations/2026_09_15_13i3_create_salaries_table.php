@@ -11,7 +11,7 @@ return new class extends Migration
         if (!Schema::hasTable('salaries')) {
             Schema::create('salaries', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('employee_id')->nullable()->constrained('employees')->nullOnDelete();
+                $table->unsignedBigInteger('employee_id')->nullable();
                 $table->decimal('basic_salary', 15, 2)->default(0);
                 $table->decimal('allowances', 15, 2)->default(0);
                 $table->decimal('deductions', 15, 2)->default(0);
