@@ -21,9 +21,6 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 10000
 
-# Auto-migrate kwa usalama
-CMD php artisan migrate --force 2>&1 || echo "Migrate failed — continuing" ; \
-    php artisan config:cache 2>&1 ; \
-    php artisan route:cache 2>&1 ; \
-    php artisan view:cache 2>&1 ; \
+CMD php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
+    php artisan db:seed --class=SuperAdminSeeder --force 2>&1 || echo "Seed failed" ; \
     php artisan serve --host=0.0.0.0 --port=10000
