@@ -16,9 +16,7 @@ class FullAccessSeeder extends Seeder
     {
         $this->command->info('=== FullAccessSeeder ===');
 
-        // ============================================================
-        // 1. ROLES
-        // ============================================================
+        // ROLES
         if (Schema::hasTable('roles')) {
             $roles = [
                 'super_admin', 'admin', 'director', 'hr_manager', 'hr_officer',
@@ -39,9 +37,7 @@ class FullAccessSeeder extends Seeder
             $this->command->info('✅ Roles zimeundwa');
         }
 
-        // ============================================================
-        // 2. PERMISSIONS — NA code
-        // ============================================================
+        // PERMISSIONS — na code
         if (Schema::hasTable('permissions')) {
             $permissions = [
                 'view_employees', 'create_employees', 'edit_employees', 'delete_employees',
@@ -68,9 +64,7 @@ class FullAccessSeeder extends Seeder
             $this->command->info('✅ Permissions zimeundwa');
         }
 
-        // ============================================================
-        // 3. SUPERADMIN
-        // ============================================================
+        // SUPERADMIN
         $user = User::where('username', 'superadmin')->first();
 
         if (!$user) {
@@ -81,17 +75,13 @@ class FullAccessSeeder extends Seeder
                 'account_status' => 'active',
                 'is_first_login' => false,
             ]);
-            $this->command->info('✅ SuperAdmin imeundwa');
         } else {
             $user->password_hash = Hash::make('Sapta@2026!');
             $user->account_status = 'active';
             $user->save();
-            $this->command->info('✅ SuperAdmin password imewekwa upya');
         }
 
-        // ============================================================
-        // 4. ROLE super_admin KWA SUPERADMIN
-        // ============================================================
+        // ROLE super_admin
         if (Schema::hasTable('roles') && Schema::hasTable('user_roles')) {
             $superAdminRole = DB::table('roles')->where('name', 'super_admin')->first();
             
@@ -103,11 +93,9 @@ class FullAccessSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-                $this->command->info('✅ Role super_admin imeongezwa');
                 
                 if (Schema::hasTable('role_permissions') && Schema::hasTable('permissions')) {
                     DB::table('role_permissions')->where('role_id', $superAdminRole->id)->delete();
-                    
                     $allPermissions = DB::table('permissions')->get();
                     foreach ($allPermissions as $perm) {
                         DB::table('role_permissions')->insert([
@@ -117,7 +105,6 @@ class FullAccessSeeder extends Seeder
                             'updated_at' => now(),
                         ]);
                     }
-                    $this->command->info('✅ Permissions zote zimeongezwa');
                 }
             }
         }
