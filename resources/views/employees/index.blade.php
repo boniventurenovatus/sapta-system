@@ -100,7 +100,7 @@
                             <option value="">All Departments</option>
                             @if(isset($departments))
                                 @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
-                                    <option value="{{ $department->id }}" @selected(request('department_id') == $department->id)>{{ $department->name }}</option>
+                                    <option value="{{ $d->id }}" @selected(request('department_id') == $d->id)>{{ $d->name }}</option>
                                 @endforeach
                             @endif
                         </select>

@@ -369,7 +369,7 @@
                 <select name="department_id">
                     <option value="">All Departments</option>
                     @foreach($departments ?? [] as $d)
-                        <option value="{{ $department->id }}" @selected(request('department_id') == $department->id)>{{ $department->name }}</option>
+                        <option value="{{ $d->id }}" @selected(request('department_id') == $d->id)>{{ $d->name }}</option>
                     @endforeach
                 </select>
             </div>

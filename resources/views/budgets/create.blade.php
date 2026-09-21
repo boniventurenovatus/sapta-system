@@ -106,7 +106,7 @@
                         <select name="department_id" class="bgc-input">
                             <option value="">? None ?</option>
                             @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
-                                <option value="{{ $department->id }}" @selected(old('department_id') == $department->id)>{{ $department->name }}</option>
+                                <option value="{{ $d->id }}" @selected(old('department_id') == $d->id)>{{ $d->name }}</option>
                             @endforeach
                         </select>
                     </div>

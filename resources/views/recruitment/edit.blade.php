@@ -75,7 +75,7 @@
                         <select name="department_id" class="jpe-input">
                             <option value="">-- Select Department --</option>
                             @foreach($departments ?? [] as $d)
-                                <option value="{{ $department->id }}" @selected(old('department_id', $job->department_id) == $department->id)>{{ $department->name }}</option>
+                                <option value="{{ $d->id }}" @selected(old('department_id', $job->department_id) == $d->id)>{{ $d->name }}</option>
                             @endforeach
                         </select>
                     </div>
