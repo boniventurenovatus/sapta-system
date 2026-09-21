@@ -702,3 +702,24 @@ Route::get('/debug/employee-test', function() {
         ], 500);
     }
 })->name('debug.employee-test');
+// DEBUG ROUTE — Angalia IDs zote
+Route::get('/debug/ids', function() {
+    return response()->json([
+        'regions' => \App\Models\Region::take(5)->get(['id', 'name']),
+        'districts' => \App\Models\District::take(5)->get(['id', 'name', 'region_id']),
+        'wards' => \App\Models\Ward::take(5)->get(['id', 'name', 'district_id']),
+        'organizations' => \App\Models\Organization::take(5)->get(['id', 'name']),
+        'departments' => \App\Models\Department::take(10)->get(['id', 'name', 'organization_id']),
+        'organizational_units' => \App\Models\OrganizationalUnit::take(10)->get(['id', 'name', 'organization_id']),
+        'positions' => \App\Models\Position::take(20)->get(['id', 'title']),
+        'counts' => [
+            'regions' => \App\Models\Region::count(),
+            'districts' => \App\Models\District::count(),
+            'wards' => \App\Models\Ward::count(),
+            'organizations' => \App\Models\Organization::count(),
+            'departments' => \App\Models\Department::count(),
+            'organizational_units' => \App\Models\OrganizationalUnit::count(),
+            'positions' => \App\Models\Position::count(),
+        ],
+    ]);
+})->name('debug.ids');
