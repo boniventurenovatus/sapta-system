@@ -6,8 +6,6 @@
 @section('content')
 <div style="max-width: 1000px; margin: 0 auto; padding: 2rem;">
 
-    <div><strong>User:</strong> {{ auth()->user()?->email ?? 'HAJALOGIN' }}</div>
-    <div><strong>Errors:</strong> {{ json_encode($errors->all()) }}</div>
 </div>
 
 
