@@ -81,26 +81,35 @@ class EmployeeController extends Controller
      * Show create form.
      */
     public function create(): View
-    {
-        $departments = Department::where('is_active', true)
+    {        $organizations = Organization::query()
             ->orderBy('name')
             ->get();
 
-        $organizations = \App\Models\Organization::orderBy('name')->get();
-
-        $roles = \App\Models\Role::where('status', 'active')
+        $departments = Department::query()
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $positions = \App\Models\Position::orderBy('title')->get();
+        $regions = \App\Models\Region::orderBy('name')->get();
 
-        return view('employees.create', compact(
-            'departments',
-            'organizations',
-            'roles',
-            'positions'
-        ));
-    }public function store(StoreEmployeeRequest $request): RedirectResponse
+        return view(
+            'employees.create',
+            compact(
+                'organizations',
+                'departments',
+                'regions'
+            )
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STORE
+    |--------------------------------------------------------------------------
+    */
+
+    public function store(StoreEmployeeRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -136,43 +145,18 @@ class EmployeeController extends Controller
                     ->store('employees', 'public');
         }
 
-        // ============================================================
-        // 1. UNDA EMPLOYEE
-        // ============================================================
-        $employee = Employee::create($validated);
-
-        // ============================================================
-        // 2. UNDA USER ACCOUNT (KAMA IMECHAGULIWA)
-        // ============================================================
-        if ($request->boolean('create_user_account')) {
-            $request->validate([
-                'username' => ['required', 'string', 'max:100', 'unique:users,username'],
-                'user_password' => ['required', 'string', 'min:8', 'confirmed'],
-                'role_id' => ['required', 'exists:roles,id'],
-            ]);
-
-            $user = \App\Models\User::create([
-                'employee_id' => $employee->id,
-                'username' => $request->username,
-                'email' => $employee->email,
-                'password_hash' => \Hash::make($request->user_password),
-                'account_status' => 'active',
-                'is_first_login' => true,
-            ]);
-
-            // Assign role
-            $user->roles()->attach($request->role_id);
-        }
+        Employee::create($validated);
 
         return redirect()
             ->route('employees.index')
             ->with(
                 'success',
-                $request->boolean('create_user_account')
-                    ? 'Employee na User Account wameundwa kikamilifu.'
-                    : 'Employee ameundwa kikamilifu.'
+                'Employee created successfully.'
             );
-    }/*
+    }
+
+
+    /*
     |--------------------------------------------------------------------------
     | SHOW
     |--------------------------------------------------------------------------

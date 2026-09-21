@@ -28,25 +28,61 @@ class Employee extends Model
     */
 
     protected $fillable = [
+        // ===== LOCATION =====
+        'region_id',
+        'district_id',
+        'ward_id',
+        'city',
+        'address',
+
+        // ===== ORGANIZATION =====
         'organization_id',
         'department_id',
         'organizational_unit_id',
+        'position_id',
+
+        // ===== BASIC INFO =====
         'employee_number',
         'first_name',
         'middle_name',
         'last_name',
         'gender',
         'date_of_birth',
+        'nationality',
+        'marital_status',
+
+        // ===== CONTACT =====
         'phone',
+        'alternative_phone',
         'email',
         'profile_image',
+
+        // ===== EMPLOYMENT =====
         'hire_date',
         'job_title',
         'employment_status',
+        'employment_type',
+        'contract_type',
+
+        // ===== FINANCIAL =====
+        'salary',
+        'bank_account',
+        'bank_name',
+        'tin_number',
+        'nssf_number',
+        'nhif_number',
+
+        // ===== EMERGENCY =====
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'emergency_relationship',
+
+        // ===== SUSPENSION =====
         'suspension_reason',
         'suspended_at',
         'suspended_by',
-        'address',
+
+        // ===== OTHER =====
         'notes',
     ];
 

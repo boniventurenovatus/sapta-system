@@ -116,7 +116,7 @@
                         <select name="department_id" class="rce-input">
                             <option value="">? None ?</option>
                             @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
-                                <option value="{{ $d->id }}" @selected(old('department_id', $receipt->department_id) == $d->id)>{{ $d->name }}</option>
+                                <option value="{{ $department->id }}" @selected(old('department_id', $receipt->department_id) == $department->id)>{{ $department->name }}</option>
                             @endforeach
                         </select>
                     </div>
