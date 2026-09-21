@@ -43,35 +43,38 @@ class OrganizationalUnitsAndPositionsSeeder extends Seeder
         }
 
         // ============================================================
-        // 2. POSITIONS
+        // 2. POSITIONS — NA organizational_unit_id & department_id
         // ============================================================
         if (Schema::hasTable('positions')) {
             $positions = [
-                ['id' => 3, 'title' => 'Board of Directors', 'code' => 'bod'],
-                ['id' => 4, 'title' => 'Chief Executive Officer (CEO)', 'code' => 'ceo'],
-                ['id' => 5, 'title' => 'Administrative Director', 'code' => 'admin_director'],
-                ['id' => 6, 'title' => 'Human Resource Management & Administration Manager', 'code' => 'hr_manager'],
-                ['id' => 7, 'title' => 'Procurement & Logistics Manager', 'code' => 'procurement_manager'],
-                ['id' => 8, 'title' => 'Finance Manager', 'code' => 'finance_manager'],
-                ['id' => 9, 'title' => 'Accountant', 'code' => 'accountant'],
-                ['id' => 10, 'title' => 'Program & Technical Director', 'code' => 'program_director'],
-                ['id' => 11, 'title' => 'Project Manager', 'code' => 'project_manager'],
-                ['id' => 12, 'title' => 'Project Officers', 'code' => 'project_officer'],
-                ['id' => 13, 'title' => 'Field Trainer', 'code' => 'field_trainer'],
-                ['id' => 14, 'title' => 'Partnerships and Resource Mobilization Manager', 'code' => 'partnerships_manager'],
-                ['id' => 15, 'title' => 'MEAL Manager', 'code' => 'meal_manager'],
-                ['id' => 16, 'title' => 'MEAL Officer', 'code' => 'meal_officer'],
-                ['id' => 17, 'title' => 'Research and Innovation Officer', 'code' => 'research_officer'],
-                ['id' => 18, 'title' => 'Community Knowledge Manager', 'code' => 'community_manager'],
-                ['id' => 19, 'title' => 'ICT & Digital Innovation Manager', 'code' => 'ict_manager'],
+                ['id' => 3,  'organizational_unit_id' => 1, 'department_id' => 2, 'title' => 'Board of Directors', 'code' => 'bod'],
+                ['id' => 4,  'organizational_unit_id' => 2, 'department_id' => 3, 'title' => 'Chief Executive Officer (CEO)', 'code' => 'ceo'],
+                ['id' => 5,  'organizational_unit_id' => 3, 'department_id' => 4, 'title' => 'Administrative Director', 'code' => 'admin_director'],
+                ['id' => 6,  'organizational_unit_id' => 7, 'department_id' => 1, 'title' => 'Human Resource Management & Administration Manager', 'code' => 'hr_manager'],
+                ['id' => 7,  'organizational_unit_id' => 3, 'department_id' => 4, 'title' => 'Procurement & Logistics Manager', 'code' => 'procurement_manager'],
+                ['id' => 8,  'organizational_unit_id' => 3, 'department_id' => 4, 'title' => 'Finance Manager', 'code' => 'finance_manager'],
+                ['id' => 9,  'organizational_unit_id' => 3, 'department_id' => 4, 'title' => 'Accountant', 'code' => 'accountant'],
+                ['id' => 10, 'organizational_unit_id' => 4, 'department_id' => 5, 'title' => 'Program & Technical Director', 'code' => 'program_director'],
+                ['id' => 11, 'organizational_unit_id' => 4, 'department_id' => 5, 'title' => 'Project Manager', 'code' => 'project_manager'],
+                ['id' => 12, 'organizational_unit_id' => 4, 'department_id' => 5, 'title' => 'Project Officers', 'code' => 'project_officer'],
+                ['id' => 13, 'organizational_unit_id' => 4, 'department_id' => 5, 'title' => 'Field Trainer', 'code' => 'field_trainer'],
+                ['id' => 14, 'organizational_unit_id' => 4, 'department_id' => 5, 'title' => 'Partnerships and Resource Mobilization Manager', 'code' => 'partnerships_manager'],
+                ['id' => 15, 'organizational_unit_id' => 5, 'department_id' => 6, 'title' => 'MEAL Manager', 'code' => 'meal_manager'],
+                ['id' => 16, 'organizational_unit_id' => 5, 'department_id' => 6, 'title' => 'MEAL Officer', 'code' => 'meal_officer'],
+                ['id' => 17, 'organizational_unit_id' => 5, 'department_id' => 6, 'title' => 'Research and Innovation Officer', 'code' => 'research_officer'],
+                ['id' => 18, 'organizational_unit_id' => 5, 'department_id' => 6, 'title' => 'Community Knowledge Manager', 'code' => 'community_manager'],
+                ['id' => 19, 'organizational_unit_id' => 6, 'department_id' => 7, 'title' => 'ICT & Digital Innovation Manager', 'code' => 'ict_manager'],
             ];
 
             foreach ($positions as $position) {
                 DB::table('positions')->updateOrInsert(
                     ['id' => $position['id']],
                     [
+                        'organizational_unit_id' => $position['organizational_unit_id'],
+                        'department_id' => $position['department_id'],
                         'title' => $position['title'],
                         'code' => $position['code'],
+                        'status' => 'active',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]
