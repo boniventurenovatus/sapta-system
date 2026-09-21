@@ -178,7 +178,32 @@
             <div><label>Notes</label><textarea name="notes" rows="4" style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;">{{ old('notes') }}</textarea></div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:1rem; padding-top:1.5rem; border-top:1px solid #e5e7eb;">
+        
+                    {{-- LOGIN ACCESS --}}
+
+                    <div class="employee-field full" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">
+                            <i class="fas fa-user-shield"></i> Login Access
+                        </h3>
+                        <p style="color: #64748b; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <strong>System ita-generate credentials automatically.</strong><br>
+                            Username: <code>[jina]@sapta2024[X]</code><br>
+                            Password: <code>[Lastname]@Sapta.org</code>
+                        </p>
+                        <div>
+                            <label for="role_id">Role <span style="color: red;">*</span></label>
+                            <select id="role_id" name="role_id" class="employee-input" style="width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                                <option value="">-- Chagua Role --</option>
+                                @foreach(($roles ?? collect()) as $role)
+                                    <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                        {{ $role->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('role_id') <div style="color: red; font-size: 0.8rem; margin-top: 0.25rem;">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+<div style="display:flex; justify-content:flex-end; gap:1rem; padding-top:1.5rem; border-top:1px solid #e5e7eb;">
             <a href="{{ route('employees.index') }}" style="padding:0.75rem 1.5rem; border:1px solid #d1d5db; border-radius:6px; text-decoration:none; color:#374151;">Cancel</a>
             <button type="submit" style="padding:0.75rem 1.5rem; background:#1a5276; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer;">
                 Save Employee

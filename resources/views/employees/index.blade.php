@@ -5,6 +5,26 @@
 
 @section('content')
 <style>
+    @if (session('generated_credentials'))
+        <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #166534; font-weight: 700; margin-bottom: 1rem;">
+                🎉 Employee Amefanikiwa Kuundwa — Credentials Zake:
+            </h3>
+            <div style="background: #ffffff; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 1rem;">
+                <div><strong>Username:</strong> {{ session('generated_credentials')['username'] }}</div>
+                <div><strong>Email:</strong> {{ session('generated_credentials')['email'] }}</div>
+                <div><strong>Password:</strong> {{ session('generated_credentials')['password'] }}</div>
+                <div><strong>Role:</strong> {{ session('generated_credentials')['role'] }}</div>
+                <div><strong>Expires:</strong> {{ session('generated_credentials')['expires_at'] }}</div>
+                <div><strong>Internal Message:</strong> {{ session('generated_credentials')['internal_sent'] ? 'SENT ✅' : 'FAILED ❌' }}</div>
+                <div><strong>Email:</strong> {{ session('generated_credentials')['email_sent'] ? 'SENT ✅' : 'FAILED ❌' }}</div>
+            </div>
+            <div style="margin-top: 1rem; color: #166534; font-size: 0.9rem;">
+                ⚠️ Mpe Employee credentials hizi. Anaweza kubadilisha password kwa <strong>forgot-password</strong>.
+            </div>
+        </div>
+    @endif
+
     .em-page { padding: 1.5rem; max-width: 1500px; margin: 0 auto; }
     .em-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .em-head h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem; }
