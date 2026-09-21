@@ -48,6 +48,7 @@ class TrainingController extends Controller
 
     public function create()
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
         $employees = Employee::orderBy('first_name')->get();

@@ -52,6 +52,7 @@ class BudgetController extends Controller
 
     public function create()
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $projects = Project::orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
@@ -95,6 +96,7 @@ class BudgetController extends Controller
 
     public function edit(Budget $budget)
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $projects = Project::orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();

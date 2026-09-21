@@ -51,6 +51,7 @@ class ReceiptController extends Controller
 
     public function create()
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $projects = Project::orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
@@ -96,6 +97,7 @@ class ReceiptController extends Controller
 
     public function edit(Receipt $receipt)
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $projects = Project::orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();

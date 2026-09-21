@@ -47,6 +47,7 @@ class RecruitmentController extends Controller
 
     public function create()
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
         $positions = Position::orderBy('title')->get();
@@ -95,6 +96,7 @@ class RecruitmentController extends Controller
 
     public function edit(JobPosting $job)
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
         $positions = Position::orderBy('title')->get();

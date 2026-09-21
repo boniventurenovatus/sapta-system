@@ -46,6 +46,7 @@ class ReportController extends Controller
     // ========== EMPLOYEES ==========
     public function employees(Request $request)
     {
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $query = Employee::with(['department', 'organization', 'region', 'district', 'ward']);
         if ($request->filled('department_id')) $query->where('department_id', $request->department_id);
         if ($request->filled('status')) $query->where('employment_status', $request->status);
