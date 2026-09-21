@@ -10,38 +10,33 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // ============================================================
-        // 1. Kama user hajalogin — redirect login
-        // ============================================================
-        if (!auth()->check()) {
+        $user = auth()->user();
+
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $user = auth()->user();
-
         // ============================================================
-        // 2. Super Admin — anaruhusiwa kila kitu
+        // SUPER ADMIN — KILA KITU
         // ============================================================
-        if ($user->hasRole('super_admin') || $user->hasRole('admin')) {
+        if ($user->hasRole('super_admin')) {
             return $next($request);
         }
 
         // ============================================================
-        // 3. Angalia kama user ana role yoyote iliyotajwa
+        // ADMIN — KILA KITU ISIPOKUWA super_admin PEKEE
         // ============================================================
-        if (empty($roles)) {
+        if ($user->hasRole('admin')) {
             return $next($request);
         }
 
-        foreach ($roles as $role) {
-            if ($user->hasRole($role)) {
-                return $next($request);
-            }
+        // ============================================================
+        // ANGALIA ROLES ZILIZOTAJWA
+        // ============================================================
+        if ($user->hasAnyRole($roles)) {
+            return $next($request);
         }
 
-        // ============================================================
-        // 4. Hana ruhusa — 403
-        // ============================================================
         abort(403, 'Unauthorized. You do not have permission to access this page.');
     }
 }
