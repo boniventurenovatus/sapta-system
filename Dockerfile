@@ -28,6 +28,7 @@ CMD php artisan config:clear 2>&1 ; \
     php artisan cache:clear 2>&1 ; \
     php artisan migrate --force 2>&1 || echo "Migrate failed" ; \
     php artisan db:seed --class=FullAccessSeeder --force 2>&1 || echo "FullAccessSeeder failed" ; \
-    php artisan db:seed --class=DatabaseImportSeeder --force 2>&1 || echo "DatabaseImportSeeder failed" ; \
+    php artisan db:seed --class=DatabaseImportSeeder --force 2>&1 || echo "DatabaseImportSeeder failed" ; 
+    php artisan db:seed --class=OrganizationalUnitsAndPositionsSeeder --force 2>&1 || echo "OrganizationalUnitsAndPositionsSeeder failed" ; \
     php artisan config:cache 2>&1 ; \
     php artisan serve --host=0.0.0.0 --port=10000
