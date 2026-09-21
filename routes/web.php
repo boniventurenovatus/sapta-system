@@ -632,3 +632,11 @@ Route::get('/debug/db-check', function() {
         ], 500);
     }
 })->name('debug.db-check');
+// DEBUG ROUTE — Angalia organizations
+Route::get('/debug/organizations', function() {
+    return response()->json([
+        'organizations' => DB::table('organizations')->get(['id', 'name', 'code']),
+        'departments' => DB::table('departments')->get(['id', 'organization_id', 'name', 'code']),
+        'departments_count' => DB::table('departments')->count(),
+    ]);
+})->name('debug.organizations');
