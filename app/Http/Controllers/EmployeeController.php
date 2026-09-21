@@ -123,11 +123,73 @@ class EmployeeController extends Controller
             $validated['profile_image'] = $request->file('profile_image')->store('employees', 'public');
         }
 
+        // ============================================================
+        // 1. UNDA EMPLOYEE
+        // ============================================================
         $employee = Employee::create($validated);
+
+        // ============================================================
+        // 2. AUTO-GENERATE USER ACCOUNT (KAMA ROLE IMECHAGULIWA)
+        // ============================================================
+        if ($request->filled('role_id')) {
+            // ============================================================
+            // USERNAME: [jina]@sapta2024[X]
+            // Mfano: victory@sapta2024T
+            // ============================================================
+            $firstName = strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->first_name));
+            $lastName = strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name));
+            
+            // Chagua jina la kwanza au la mwisho — random
+            $nameBase = rand(0, 1) ? $firstName : $lastName;
+            
+            // Herufi kutoka SAPTA — kubwa na ndogo
+            $saptaChars = ['S', 's', 'A', 'a', 'P', 'p', 'T', 't'];
+            $randomChar = $saptaChars[array_rand($saptaChars)];
+            
+            $username = $nameBase . '@sapta2024' . $randomChar;
+            
+            // Hakikisha ni unique
+            $counter = 1;
+            while (\App\Models\User::where('username', $username)->exists()) {
+                $randomChar = $saptaChars[array_rand($saptaChars)];
+                $username = $nameBase . '@sapta2024' . $randomChar . $counter;
+                $counter++;
+            }
+
+            // ============================================================
+            // PASSWORD: [Lastname]@Sapta.org
+            // Mfano: Jeremia@Sapta.org
+            // ============================================================
+            $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
+            $password = $lastNameCapitalized . '@Sapta.org';
+
+            // ============================================================
+            // UNDA USER
+            // ============================================================
+            $user = \App\Models\User::create([
+                'employee_id' => $employee->id,
+                'username' => $username,
+                'email' => $employee->email,
+                'password_hash' => \Hash::make($password),
+                'account_status' => 'active',
+                'is_first_login' => true,
+            ]);
+
+            // Assign role
+            $user->roles()->attach($request->role_id);
+
+            // Kumbuka credentials kwa ajili ya kuonyesha
+            session()->flash('generated_credentials', [
+                'username' => $username,
+                'email' => $employee->email,
+                'password' => $password,
+                'role' => \App\Models\Role::find($request->role_id)?->name,
+            ]);
+        }
 
         return redirect()
             ->route('employees.index')
-            ->with('success', 'Employee created successfully.');
+            ->with('success', 'Employee ameundwa kikamilifu.');
     }public function show(Employee $employee): View
     {
         $employee->load([
