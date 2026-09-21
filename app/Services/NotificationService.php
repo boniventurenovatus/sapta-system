@@ -144,7 +144,7 @@ class NotificationService
             'account_status' => 'active',
             'is_first_login' => true,
             'credentials_sent_at' => now(),
-            'credentials_expires_at' => now()->addDays($expiryDays),
+            'credentials_expires_at' => now()->addDays((int) $expiryDays),
             'credentials_channel' => 'internal_email',
         ]);
 
