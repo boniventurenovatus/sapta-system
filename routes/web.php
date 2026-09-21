@@ -586,3 +586,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
     Route::get('roles/{role}', [RoleController::class, 'show'])->name('roles.show');
 });
+
+// DEBUG ROUTE — Angalia data
+Route::get('/debug/locations', function() {
+    return response()->json([
+        'regions_count' => \App\Models\Region::count(),
+        'districts_count' => \App\Models\District::count(),
+        'wards_count' => \App\Models\Ward::count(),
+        'organizations_count' => \App\Models\Organization::count(),
+        'departments_count' => \App\Models\Department::count(),
+        'regions_sample' => \App\Models\Region::take(5)->get(['id', 'name']),
+        'districts_sample' => \App\Models\District::take(5)->get(['id', 'name', 'region_id']),
+        'wards_sample' => \App\Models\Ward::take(5)->get(['id', 'name', 'district_id']),
+    ]);
+})->name('debug.locations');
