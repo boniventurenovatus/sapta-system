@@ -102,3 +102,77 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Data kutoka Controller
+    const districtsData = @json($districts ?? []);
+    const wardsData = @json($wards ?? []);
+
+    const regionSelect = document.getElementById('region_id');
+    const districtSelect = document.getElementById('district_id');
+    const wardSelect = document.getElementById('ward_id');
+
+    if (!regionSelect || !districtSelect || !wardSelect) {
+        console.warn('Location dropdowns hazipo');
+        return;
+    }
+
+    // Thamani za awali
+    const oldDistrictId = '{{ old('district_id') }}';
+    const oldWardId = '{{ old('ward_id') }}';
+
+    function populateDistricts(regionId, selectedDistrictId = null) {
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        wardSelect.innerHTML = '<option value="">Select Ward</option>';
+
+        if (!regionId) return;
+
+        const filtered = districtsData.filter(d => d.region_id == regionId);
+        filtered.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = d.name;
+            if (selectedDistrictId && d.id == selectedDistrictId) {
+                opt.selected = true;
+            }
+            districtSelect.appendChild(opt);
+        });
+    }
+
+    function populateWards(districtId, selectedWardId = null) {
+        wardSelect.innerHTML = '<option value="">Select Ward</option>';
+
+        if (!districtId) return;
+
+        const filtered = wardsData.filter(w => w.district_id == districtId);
+        filtered.forEach(w => {
+            const opt = document.createElement('option');
+            opt.value = w.id;
+            opt.textContent = w.name;
+            if (selectedWardId && w.id == selectedWardId) {
+                opt.selected = true;
+            }
+            wardSelect.appendChild(opt);
+        });
+    }
+
+    // Region change
+    regionSelect.addEventListener('change', function () {
+        populateDistricts(this.value);
+    });
+
+    // District change
+    districtSelect.addEventListener('change', function () {
+        populateWards(this.value);
+    });
+
+    // On load
+    if (regionSelect.value) {
+        populateDistricts(regionSelect.value, oldDistrictId);
+    }
+    if (districtSelect.value) {
+        populateWards(districtSelect.value, oldWardId);
+    }
+});
+</script>
