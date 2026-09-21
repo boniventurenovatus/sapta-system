@@ -20,7 +20,7 @@ class NotificationService
             // Angalia kama table ya messages ipo
             if (DB::getSchemaBuilder()->hasTable('messages')) {
                 DB::table('messages')->insert([
-                    'sender_id' => null, // System
+                    'sender_id' => 1, // Admin
                     'recipient_id' => $user->id,
                     'subject' => $subject,
                     'body' => $message,
