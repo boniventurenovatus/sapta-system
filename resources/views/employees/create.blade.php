@@ -5,11 +5,7 @@
 
 @section('content')
 <div style="max-width: 1000px; margin: 0 auto; padding: 2rem;">
-{{-- DEBUG INFO --}}
-<div style="background:#fef3c7; border:1px solid #f59e0b; border-radius:8px; padding:1rem; margin-bottom:1.5rem; font-family:monospace; font-size:0.85rem;">
-    <h4 style="color:#92400e; font-weight:700; margin-bottom:0.5rem;">🔍 DEBUG INFO</h4>
-    <div><strong>URL:</strong> {{ url()->current() }}</div>
-    <div><strong>Method:</strong> {{ request()->method() }}</div>
+
     <div><strong>User:</strong> {{ auth()->user()?->email ?? 'HAJALOGIN' }}</div>
     <div><strong>Session ID:</strong> {{ session()->getId() }}</div>
     <div><strong>Old Input:</strong> {{ json_encode(old()) }}</div>
