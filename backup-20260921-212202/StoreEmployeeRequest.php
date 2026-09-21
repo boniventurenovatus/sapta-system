@@ -65,55 +65,57 @@ class StoreEmployeeRequest extends FormRequest
             // ===== OTHER =====
             'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
             'notes' => ['required', 'string', 'max:5000'],
-
-            // ===== USER ACCOUNT (optional) =====
-            'create_user_account' => ['nullable', 'boolean'],
-            'username' => ['nullable', 'string', 'max:100', 'unique:users,username'],
-            'user_password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role_id' => ['nullable', 'exists:roles,id'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'region_id.required' => 'Region is required.',
-            'district_id.required' => 'District is required.',
-            'ward_id.required' => 'Ward is required.',
-            'organization_id.required' => 'Organization is required.',
-            'department_id.required' => 'Department is required.',
-            'organizational_unit_id.required' => 'Organizational unit is required.',
-            'position_id.required' => 'Position is required.',
+            // Location
+            'region_id.exists' => 'The selected region does not exist.',
+            'district_id.exists' => 'The selected district does not exist.',
+            'ward_id.exists' => 'The selected ward does not exist.',
+
+            // Organization
+            'organization_id.exists' => 'The selected organization does not exist.',
+            'department_id.exists' => 'The selected department does not exist.',
+            'organizational_unit_id.exists' => 'The selected organizational unit does not exist.',
+            'position_id.exists' => 'The selected position does not exist.',
+
+            // Basic
             'employee_number.required' => 'Employee number is required.',
-            'employee_number.unique' => 'Employee number already exists.',
+            'employee_number.unique' => 'This employee number already exists.',
             'first_name.required' => 'First name is required.',
-            'middle_name.required' => 'Middle name is required.',
             'last_name.required' => 'Last name is required.',
-            'gender.required' => 'Gender is required.',
-            'date_of_birth.required' => 'Date of birth is required.',
-            'nationality.required' => 'Nationality is required.',
-            'marital_status.required' => 'Marital status is required.',
-            'email.required' => 'Email is required.',
-            'email.unique' => 'Email already exists.',
-            'phone.required' => 'Phone is required.',
-            'alternative_phone.required' => 'Alternative phone is required.',
-            'address.required' => 'Address is required.',
-            'city.required' => 'City is required.',
-            'hire_date.required' => 'Hire date is required.',
-            'job_title.required' => 'Job title is required.',
+            'date_of_birth.before' => 'Date of birth must be in the past.',
+            'gender.in' => 'Gender must be Male, Female, or Other.',
+            'marital_status.in' => 'Marital status must be Single, Married, Divorced, or Widowed.',
+
+            // Contact
+            'email.email' => 'Enter a valid email address.',
+            'email.unique' => 'This email already exists.',
+
+            // Employment
             'employment_status.required' => 'Employment status is required.',
-            'employment_type.required' => 'Employment type is required.',
-            'contract_type.required' => 'Contract type is required.',
-            'salary.required' => 'Salary is required.',
-            'bank_account.required' => 'Bank account is required.',
-            'bank_name.required' => 'Bank name is required.',
-            'tin_number.required' => 'TIN number is required.',
-            'nssf_number.required' => 'NSSF number is required.',
-            'nhif_number.required' => 'NHIF number is required.',
-            'emergency_contact_name.required' => 'Emergency contact name is required.',
-            'emergency_contact_phone.required' => 'Emergency contact phone is required.',
-            'emergency_relationship.required' => 'Emergency relationship is required.',
-            'notes.required' => 'Notes is required.',
+            'employment_status.in' => 'Employment status must be Active, Inactive, On Leave, Suspended, or Terminated.',
+            'employment_type.in' => 'Employment type must be Full Time, Part Time, Contract, or Intern.',
+
+            // Financial
+            'salary.numeric' => 'Salary must be a number.',
+            'salary.min' => 'Salary cannot be negative.',
+
+            // Other
+            'profile_image.image' => 'Profile image must be an image file.',
+            'profile_image.mimes' => 'Profile image must be JPG, JPEG, PNG, or GIF.',
+            'profile_image.max' => 'Profile image cannot exceed 2MB.',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'employee_number' => strtoupper(trim($this->employee_number ?? '')),
+            'email' => trim(strtolower($this->email ?? '')),
+        ]);
     }
 }

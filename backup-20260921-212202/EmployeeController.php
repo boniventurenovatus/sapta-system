@@ -115,49 +115,33 @@ class EmployeeController extends Controller
         ));
     }public function store(StoreEmployeeRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
 
-        // ============================================================
-        // 1. EMPLOYEE NUMBER — uppercase
-        // ============================================================
-        $validated['employee_number'] = strtoupper(trim($validated['employee_number']));
+            $validated['employee_number'] = strtoupper(
+                trim($validated['employee_number'])
+            );
 
-        // ============================================================
-        // 2. PROFILE IMAGE
-        // ============================================================
-        if ($request->hasFile('profile_image')) {
-            $validated['profile_image'] = $request->file('profile_image')->store('employees', 'public');
-        }
-
-        // ============================================================
-        // 3. UNDA EMPLOYEE
-        // ============================================================
-        $employee = Employee::create($validated);
-
-        // ============================================================
-        // 4. UNDA USER ACCOUNT (kama imechaguliwa)
-        // ============================================================
-        if ($request->boolean('create_user_account') && $request->filled('username') && $request->filled('user_password')) {
-            $user = \App\Models\User::create([
-                'employee_id' => $employee->id,
-                'username' => $request->username,
-                'email' => $employee->email,
-                'password_hash' => \Hash::make($request->user_password),
-                'account_status' => 'active',
-                'is_first_login' => true,
-            ]);
-
-            if ($request->filled('role_id')) {
-                $user->roles()->attach($request->role_id);
+            if ($request->hasFile('profile_image')) {
+                $validated['profile_image'] =
+                    $request->file('profile_image')
+                        ->store('employees', 'public');
             }
-        }
 
-        // ============================================================
-        // 5. REDIRECT
-        // ============================================================
-        return redirect()
-            ->route('employees.index')
-            ->with('success', 'Employee created successfully.');
+            $employee = Employee::create($validated);
+
+            return redirect()
+                ->route('employees.index')
+                ->with('success', 'Employee created successfully.');
+                
+        } catch (\Exception $e) {
+            \Log::error('Employee store error: ' . $e->getMessage());
+            \Log::error('Employee store data: ' . json_encode($request->all()));
+            
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+        }
     }public function show(Employee $employee): View
     {
         $employee->load([
