@@ -28,7 +28,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Employee::with(['department', 'position', 'organization']);
+        $query = Employee::with(['organization', 'department', 'position']);
 
         // Search
         if ($request->filled('search')) {
@@ -36,9 +36,8 @@ class EmployeeController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('employee_number', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                  ->orWhere('employee_number', 'like', "%{$search}%");
             });
         }
 
@@ -52,35 +51,22 @@ class EmployeeController extends Controller
             $query->where('employment_status', $request->status);
         }
 
-        $employees = $query->orderBy('first_name')->paginate(15)->withQueryString();
+        $employees = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        // KPI cards
-        $totalEmployees    = Employee::count();
-        $activeEmployees   = Employee::where('employment_status', 'active')->count();
-        $inactiveEmployees = Employee::where('employment_status', 'inactive')->count();
-        $onLeaveEmployees  = Employee::where('employment_status', 'on_leave')->count();
-        $suspendedEmployees  = Employee::where('employment_status', 'suspended')->count();
-        $terminatedEmployees = Employee::where('employment_status', 'terminated')->count();
+        // Stats
+        $stats = [
+            'total' => Employee::count(),
+            'active' => Employee::where('employment_status', 'active')->count(),
+            'inactive' => Employee::where('employment_status', 'inactive')->count(),
+            'on_leave' => Employee::where('employment_status', 'on_leave')->count(),
+            'suspended' => Employee::where('employment_status', 'suspended')->count(),
+            'terminated' => Employee::where('employment_status', 'terminated')->count(),
+        ];
 
-        // Dropdown data
-        $departments = Department::orderBy('name')->get(['id', 'name']);
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
 
-        return view('employees.index', compact(
-            'employees',
-            'totalEmployees',
-            'activeEmployees',
-            'inactiveEmployees',
-            'onLeaveEmployees',
-            'suspendedEmployees',
-            'terminatedEmployees',
-            'departments'
-        ));
-    }
-
-    /**
-     * Show create form.
-     */
-    public function create(): View
+        return view('employees.index', compact('employees', 'stats', 'departments'));
+    }public function create(): View
     {
         // ===== LOCATIONS =====
         $regions = \App\Models\Region::orderBy('name')->get();

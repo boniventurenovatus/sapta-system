@@ -4,7 +4,9 @@
 @section('page-title', 'Employees')
 
 @section('content')
-<style>
+<div style="max-width: 1500px; margin: 0 auto; padding: 1.5rem;">
+
+    {{-- CREDENTIALS DISPLAY --}}
     @if (session('generated_credentials'))
         <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
             <h3 style="color: #166534; font-weight: 700; margin-bottom: 1rem;">
@@ -25,224 +27,207 @@
         </div>
     @endif
 
-    .em-page { padding: 1.5rem; max-width: 1500px; margin: 0 auto; }
-    .em-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .em-head h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem; }
-    .em-head p { color: #64748b; margin: 0; font-size: 0.9rem; }
-    .em-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .em-stat { background: #fff; border-radius: 0.875rem; padding: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.2s; }
-    .em-stat:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-    .em-stat-label { font-size: 0.72rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 0; display: flex; align-items: center; gap: 0.4rem; }
-    .em-stat-value { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0.35rem 0 0; }
-    .em-card { background: #fff; border-radius: 0.875rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 1.5rem; }
-    .em-card-head { padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; background: #fafbfc; }
-    .em-card-head h2 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
-    .em-card-head h2 i { color: #2563eb; }
-    .em-card-body { padding: 1.25rem; }
-    .em-filter { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end; }
-    @media (max-width: 900px) { .em-filter { grid-template-columns: 1fr; } }
-    .em-form-group label { display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem; }
-    .em-input-wrap { position: relative; }
-    .em-input-wrap i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
-    .em-input { width: 100%; padding: 0.6rem 0.75rem 0.6rem 2.25rem; border: 1.5px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.88rem; transition: all 0.2s; }
-    .em-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    .em-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .em-btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-    .em-btn-primary:hover { transform: translateY(-1px); color: #fff; }
-    .em-btn-secondary { background: #fff; color: #475569; border: 1.5px solid #e2e8f0; }
-    .em-alert { padding: 0.75rem 1rem; background: #dcfce7; color: #15803d; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; font-weight: 600; }
-    .em-name { display: flex; align-items: center; gap: 0.6rem; }
-    .em-avatar { width: 2.25rem; height: 2.25rem; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; flex-shrink: 0; }
-    .em-info { display: flex; flex-direction: column; }
-    .em-info strong { font-size: 0.88rem; color: #1e293b; }
-    .em-info small { font-size: 0.72rem; color: #94a3b8; }
-</style>
-
-<div class="em-page">
-
-    <div class="em-head">
-        <div>
-            <h1>Employees</h1>
-            <p>Manage employee records, departments and employment status.</p>
+    {{-- SUCCESS MESSAGE --}}
+    @if (session('success'))
+        <div style="background: #dcfce7; border: 1px solid #22c55e; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #166534;">
+            {{ session('success') }}
         </div>
-        <a href="{{ url('/employees/create') }}" class="em-btn em-btn-primary">
-            <i class="fas fa-plus"></i> Add Employee
+    @endif
+
+    {{-- HEADER --}}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0;">
+                Employees
+            </h1>
+            <p style="color: #64748b; margin: 0.25rem 0 0;">
+                Manage employee records, departments and employment status.
+            </p>
+        </div>
+        <a href="{{ route('employees.create') }}" style="padding: 0.75rem 1.5rem; background: #1a5276; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600;">
+            + Add Employee
         </a>
     </div>
 
-    
-
-    <div class="em-stats">
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-users" style="color:#2563eb;"></i> Total Employees</p>
-            <p class="em-stat-value">{{ $totalEmployees ?? 0 }}</p>
+    {{-- STATS CARDS --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #64748b; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Total Employees</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #0f172a;">{{ $stats['total'] ?? 0 }}</div>
         </div>
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-circle-check" style="color:#10b981;"></i> Active</p>
-            <p class="em-stat-value">{{ $activeEmployees ?? 0 }}</p>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #16a34a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Active</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #16a34a;">{{ $stats['active'] ?? 0 }}</div>
         </div>
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-circle-xmark" style="color:#dc2626;"></i> Inactive</p>
-            <p class="em-stat-value">{{ $inactiveEmployees ?? 0 }}</p>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #dc2626; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Inactive</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #dc2626;">{{ $stats['inactive'] ?? 0 }}</div>
         </div>
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-plane" style="color:#f59e0b;"></i> On Leave</p>
-            <p class="em-stat-value">{{ $onLeaveEmployees ?? 0 }}</p>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #f59e0b; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">On Leave</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #f59e0b;">{{ $stats['on_leave'] ?? 0 }}</div>
         </div>
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-user-slash" style="color:#8b5cf6;"></i> Suspended</p>
-            <p class="em-stat-value">{{ $suspendedEmployees ?? 0 }}</p>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #8b5cf6; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Suspended</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #8b5cf6;">{{ $stats['suspended'] ?? 0 }}</div>
         </div>
-        <div class="em-stat">
-            <p class="em-stat-label"><i class="fas fa-user-times" style="color:#dc2626;"></i> Terminated</p>
-            <p class="em-stat-value">{{ $terminatedEmployees ?? 0 }}</p>
-        </div>
-    </div>
-
-    <div class="em-card">
-        <div class="em-card-head">
-            <h2><i class="fas fa-filter"></i> Search & Filter</h2>
-        </div>
-        <div class="em-card-body">
-            <form method="GET" action="{{ url('/employees') }}" class="em-filter">
-                <div class="em-form-group">
-                    <label>Search</label>
-                    <div class="em-input-wrap">
-                        <i class="fas fa-magnifying-glass"></i>
-                        <input type="text" name="search" class="em-input" value="{{ request('search') }}" placeholder="Search employees...">
-                    </div>
-                </div>
-                <div class="em-form-group">
-                    <label>Department</label>
-                    <div class="em-input-wrap">
-                        <i class="fas fa-sitemap"></i>
-                        <select name="department_id" class="em-input">
-                            <option value="">All Departments</option>
-                            @if(isset($departments))
-                                @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
-                                    <option value="{{ $d->id }}" @selected(request('department_id') == $d->id)>{{ $d->name }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-                </div>
-                <div class="em-form-group">
-                    <label>Status</label>
-                    <div class="em-input-wrap">
-                        <i class="fas fa-toggle-on"></i>
-                        <select name="status" class="em-input">
-                            <option value="">All Status</option>
-                            <option value="active" @selected(request('status') === 'active')>Active</option>
-                            <option value="inactive" @selected(request('status') === 'inactive')>Inactive</option>
-                            <option value="on_leave" @selected(request('status') === 'on_leave')>On Leave</option>
-                            <option value="suspended" @selected(request('status') === 'suspended')>Suspended</option>
-                            <option value="terminated" @selected(request('status') === 'terminated')>Terminated</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button type="submit" class="em-btn em-btn-primary"><i class="fas fa-magnifying-glass"></i> Search</button>
-                    <a href="{{ url('/employees') }}" class="em-btn em-btn-secondary"><i class="fas fa-rotate-left"></i> Clear</a>
-                </div>
-            </form>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="color: #64748b; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Terminated</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #64748b;">{{ $stats['terminated'] ?? 0 }}</div>
         </div>
     </div>
 
-    <div class="em-card">
-        <div class="em-card-head">
-            <h2><i class="fas fa-list"></i> Employee List <span style="color:#64748b; font-weight:500; margin-left:0.5rem;">({{ $totalEmployees ?? 0 }})</span></h2>
-        </div>
-
-        @if(isset($employees) && $employees->count() > 0)
-            <div class="sapta-table-wrap">
-                <table class="sapta-table">
-                    <thead>
-                        <tr>
-                            <th class="col-code">ID</th>
-                            <th class="col-title">Name</th>
-                            <th class="col-org">Organization</th>
-                            <th class="col-unit">Department</th>
-                            <th style="min-width:150px;">Job Title</th>
-                            <th style="min-width:180px;">Contact</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-actions">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($employees as $emp)
-                            <tr>
-                                <td class="col-code"><code>{{ $emp->employee_id ?? 'EMP' . str_pad($emp->id, 3, '0', STR_PAD_LEFT) }}</code></td>
-                                <td class="col-title">
-                                    <div class="em-name">
-                                        <div class="em-avatar">{{ strtoupper(substr($emp->first_name ?? 'E', 0, 1)) }}{{ strtoupper(substr($emp->last_name ?? '', 0, 1)) }}</div>
-                                        <div class="em-info">
-                                            <strong>{{ $emp->first_name }} {{ $emp->last_name }}</strong>
-                                            <small>{{ $emp->email ?? '' }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="col-org">{{ $emp->organization?->name ?? '—' }}</td>
-                                <td class="col-unit">{{ $emp->department?->name ?? '—' }}</td>
-                                <td>{{ $emp->job_title ?? '—' }}</td>
-                                <td>
-                                    <div style="font-size:0.8rem;">{{ $emp->email ?? '—' }}</div>
-                                    <div style="font-size:0.75rem; color:#94a3b8;">{{ $emp->phone ?? '' }}</div>
-                                </td>
-                                <td class="col-status">
-                                    <span class="badge badge-{{ $emp->employment_status === 'active' ? 'success' : ($emp->employment_status === 'on_leave' ? 'warning' : ($emp->employment_status === 'terminated' ? 'danger' : ($emp->employment_status === 'suspended' ? 'purple' : 'secondary'))) }}">
-                                        {{ ucfirst(str_replace('_', ' ', $emp->employment_status ?? 'active')) }}
-                                    </span>
-                                </td>
-                                <td class="col-actions">
-                                    <div class="actions">
-                                        <a href="{{ url('/employees/' . $emp->id) }}" class="action-btn view" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="{{ url('/employees/' . $emp->id . '/edit') }}" class="action-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                                        <a href="{{ route('employees.credentials', $emp->id) }}" class="action-btn credentials" title="Credentials" style="color:#1a5276;">
-    <i class="fas fa-key"></i>
-</a>
-
-                                        @if($emp->employment_status === 'active')
-                                            <form action="{{ route('employees.deactivate', $emp->id) }}" method="POST" class="sapta-action-form" data-action="deactivate" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn deactivate" title="Deactivate"><i class="fas fa-user-slash"></i></button>
-                                            </form>
-                                            <form action="{{ route('employees.suspend', $emp->id) }}" method="POST" class="sapta-action-form" data-action="suspend_employee" novalidate style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn suspend" title="Suspend"><i class="fas fa-user-clock"></i></button>
-                                            </form>
-                                            <form action="{{ route('employees.terminate', $emp->id) }}" method="POST" class="sapta-action-form" data-action="terminate" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn terminate" title="Terminate"><i class="fas fa-user-times"></i></button>
-                                            </form>
-                                        @else
-                                            <form action="{{ route('employees.activate', $emp->id) }}" method="POST" class="sapta-action-form" data-action="activate_employee" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn activate" title="Activate"><i class="fas fa-user-check"></i></button>
-                                            </form>
-                                        @endif
-
-                                        <form action="{{ url('/employees/' . $emp->id) }}" method="POST" class="sapta-delete-form" style="display:inline;">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="action-btn delete" title="Delete"><i class="fas fa-trash"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+    {{-- SEARCH & FILTER --}}
+    <div style="background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+        <form method="GET" action="{{ route('employees.index') }}">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem;">Search</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email, employee number..." style="width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem;">Department</label>
+                    <select name="department_id" style="width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <option value="">All Departments</option>
+                        @foreach($departments ?? [] as $dept)
+                            <option value="{{ $dept->id }}" @selected(request('department_id') == $dept->id)>{{ $dept->name }}</option>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @if($employees->hasPages())
-                <div style="padding:1rem 1.25rem; border-top:1px solid #f1f5f9;">{{ $employees->links() }}</div>
-            @endif
-        @else
-            <div style="text-align:center; padding:3rem 1rem;">
-                <div style="width:4rem; height:4rem; margin:0 auto 1rem; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#94a3b8;">
-                    <i class="fas fa-users"></i>
+                    </select>
                 </div>
-                <h3 style="font-size:1.1rem; color:#1e293b; margin:0 0 0.5rem;">No employees found</h3>
-                <p style="color:#64748b; margin:0 0 1.25rem;">Add your first employee to get started.</p>
-                <a href="{{ url('/employees/create') }}" class="em-btn em-btn-primary"><i class="fas fa-plus"></i> Add Employee</a>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem;">Status</label>
+                    <select name="status" style="width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <option value="">All Status</option>
+                        <option value="active" @selected(request('status') == 'active')>Active</option>
+                        <option value="inactive" @selected(request('status') == 'inactive')>Inactive</option>
+                        <option value="on_leave" @selected(request('status') == 'on_leave')>On Leave</option>
+                        <option value="suspended" @selected(request('status') == 'suspended')>Suspended</option>
+                        <option value="terminated" @selected(request('status') == 'terminated')>Terminated</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" style="padding: 0.6rem 1.5rem; background: #1a5276; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                        Search
+                    </button>
+                    <a href="{{ route('employees.index') }}" style="padding: 0.6rem 1rem; background: #f1f5f9; color: #374151; border-radius: 6px; text-decoration: none; font-weight: 600;">
+                        Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- EMPLOYEE TABLE --}}
+    <div style="background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">
+                Employee List ({{ $employees->total() ?? 0 }})
+            </h3>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">#</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Employee</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Employee Number</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Email</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Phone</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Organization</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Department</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Job Title</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Status</th>
+                        <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($employees ?? [] as $emp)
+                        <tr style="border-top: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem 1rem;">{{ $loop->iteration }}</td>
+                            <td style="padding: 0.75rem 1rem;">
+                                <div style="font-weight: 600; color: #0f172a;">
+                                    {{ $emp->first_name }} {{ $emp->last_name }}
+                                </div>
+                            </td>
+                            <td style="padding: 0.75rem 1rem; font-family: monospace;">
+                                {{ $emp->employee_number }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem;">{{ $emp->email }}</td>
+                            <td style="padding: 0.75rem 1rem;">{{ $emp->phone }}</td>
+                            <td style="padding: 0.75rem 1rem;">
+                                {{ $emp->organization?->name ?? '-' }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem;">
+                                {{ $emp->department?->name ?? '-' }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem;">
+                                {{ $emp->job_title }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem;">
+                                @php
+                                    $statusColors = [
+                                        'active' => 'background:#dcfce7; color:#166534;',
+                                        'inactive' => 'background:#f1f5f9; color:#64748b;',
+                                        'on_leave' => 'background:#fef3c7; color:#92400e;',
+                                        'suspended' => 'background:#ede9fe; color:#6d28d9;',
+                                        'terminated' => 'background:#fee2e2; color:#991b1b;',
+                                    ];
+                                @endphp
+                                <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; {{ $statusColors[$emp->employment_status] ?? 'background:#f1f5f9;' }}">
+                                    {{ ucfirst(str_replace('_', ' ', $emp->employment_status)) }}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem 1rem;">
+                                <div style="display: flex; gap: 0.5rem;">
+                                    {{-- View --}}
+                                    <a href="{{ route('employees.show', $emp->id) }}" title="View" style="color:#1a5276; font-size: 1.1rem;">
+                                        👁️
+                                    </a>
+                                    {{-- Edit --}}
+                                    <a href="{{ route('employees.edit', $emp->id) }}" title="Edit" style="color:#1a5276; font-size: 1.1rem;">
+                                        ✏️
+                                    </a>
+                                    {{-- Credentials --}}
+                                    <a href="{{ route('employees.credentials', $emp->id) }}" title="Credentials" style="color:#f59e0b; font-size: 1.1rem;">
+                                        🔑
+                                    </a>
+                                    {{-- Suspend --}}
+                                    @if($emp->employment_status === 'active')
+                                        <form method="POST" action="{{ route('employees.suspend', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Suspend employee?')">
+                                            @csrf
+                                            <button type="submit" title="Suspend" style="background:none; border:none; color:#8b5cf6; font-size: 1.1rem; cursor: pointer;">
+                                                ⏸️
+                                            </button>
+                                        </form>
+                                    @endif
+                                    {{-- Deactivate --}}
+                                    @if($emp->employment_status === 'active')
+                                        <form method="POST" action="{{ route('employees.deactivate', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Deactivate employee?')">
+                                            @csrf
+                                            <button type="submit" title="Deactivate" style="background:none; border:none; color:#dc2626; font-size: 1.1rem; cursor: pointer;">
+                                                🚫
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" style="padding: 2rem; text-align: center; color: #64748b;">
+                                Hakuna Employee. <a href="{{ route('employees.create') }}" style="color: #1a5276; font-weight: 600;">Add Employee</a>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- PAGINATION --}}
+        @if(method_exists($employees, 'links'))
+            <div style="padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb;">
+                {{ $employees->withQueryString()->links() }}
             </div>
         @endif
     </div>
