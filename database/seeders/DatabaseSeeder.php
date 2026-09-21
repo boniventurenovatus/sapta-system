@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FullAccessSeeder::class,
-            LocationSeeder::class,
+            DatabaseImportSeeder::class,
         ]);
     }
 }
