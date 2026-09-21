@@ -115,83 +115,34 @@ class EmployeeController extends Controller
         ));
     }public function store(StoreEmployeeRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
 
-        $validated['employee_number'] = strtoupper(
-            trim($validated['employee_number'])
-        );
-
-        if (
-            !empty($validated['organization_id']) &&
-            !empty($validated['department_id'])
-        ) {
-            $belongsToOrganization = Department::query()
-                ->where('id', $validated['department_id'])
-                ->where(
-                    'organization_id',
-                    $validated['organization_id']
-                )
-                ->exists();
-
-            if (!$belongsToOrganization) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'department_id' =>
-                            'The selected department does not belong to the selected organization.',
-                    ]);
-            }
-        }
-
-        if ($request->hasFile('profile_image')) {
-            $validated['profile_image'] =
-                $request->file('profile_image')
-                    ->store('employees', 'public');
-        }
-
-        // ============================================================
-        // 1. UNDA EMPLOYEE
-        // ============================================================
-        $employee = Employee::create($validated);
-
-        // ============================================================
-        // 2. UNDA USER ACCOUNT (KAMA IMECHAGULIWA)
-        // ============================================================
-        if ($request->boolean('create_user_account')) {
-            $request->validate([
-                'username' => ['required', 'string', 'max:100', 'unique:users,username'],
-                'user_password' => ['required', 'string', 'min:8', 'confirmed'],
-                'role_id' => ['required', 'exists:roles,id'],
-            ]);
-
-            $user = \App\Models\User::create([
-                'employee_id' => $employee->id,
-                'username' => $request->username,
-                'email' => $employee->email,
-                'password_hash' => \Hash::make($request->user_password),
-                'account_status' => 'active',
-                'is_first_login' => true,
-            ]);
-
-            // Assign role
-            $user->roles()->attach($request->role_id);
-        }
-
-        return redirect()
-            ->route('employees.index')
-            ->with(
-                'success',
-                $request->boolean('create_user_account')
-                    ? 'Employee na User Account wameundwa kikamilifu.'
-                    : 'Employee ameundwa kikamilifu.'
+            $validated['employee_number'] = strtoupper(
+                trim($validated['employee_number'])
             );
-    }/*
-    |--------------------------------------------------------------------------
-    | SHOW
-    |--------------------------------------------------------------------------
-    */
 
-    public function show(Employee $employee): View
+            if ($request->hasFile('profile_image')) {
+                $validated['profile_image'] =
+                    $request->file('profile_image')
+                        ->store('employees', 'public');
+            }
+
+            $employee = Employee::create($validated);
+
+            return redirect()
+                ->route('employees.index')
+                ->with('success', 'Employee created successfully.');
+                
+        } catch (\Exception $e) {
+            \Log::error('Employee store error: ' . $e->getMessage());
+            \Log::error('Employee store data: ' . json_encode($request->all()));
+            
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+        }
+    }public function show(Employee $employee): View
     {
         $employee->load([
             'organization',
