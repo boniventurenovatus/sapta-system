@@ -93,7 +93,7 @@ class DatabaseImportSeeder extends Seeder
             $this->command->info('✅ Organizations (' . count($data['organizations']) . ')');
         }
 
-        // 5. DEPARTMENTS
+        // 5. DEPARTMENTS — BILA is_active
         if (Schema::hasTable('departments') && isset($data['departments'])) {
             foreach ($data['departments'] as $dept) {
                 DB::table('departments')->updateOrInsert(
@@ -101,7 +101,6 @@ class DatabaseImportSeeder extends Seeder
                     [
                         'name' => $dept['name'],
                         'code' => $dept['code'],
-                        'is_active' => true,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]
