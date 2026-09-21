@@ -126,12 +126,11 @@ class EmployeeController extends Controller
         // Unda Employee
         $employee = Employee::create($validated);
 
-        // Auto-generate credentials
+        // Auto-generate credentials + Tuma Internal Message + Email
         if ($request->filled('role_id')) {
-            $result = \App\Services\CredentialsService::createForEmployee(
+            $result = \App\Services\NotificationService::createForEmployee(
                 $employee,
-                $request->role_id,
-                'both'
+                $request->role_id
             );
 
             session()->flash('generated_credentials', [
@@ -140,13 +139,14 @@ class EmployeeController extends Controller
                 'password' => $result['password'],
                 'role' => \App\Models\Role::find($request->role_id)?->name,
                 'expires_at' => now()->addDays(7)->format('d M Y'),
-                'sent_via' => 'SMS & Email',
+                'internal_sent' => $result['internal_sent'],
+                'email_sent' => $result['email_sent'],
             ]);
         }
 
         return redirect()
             ->route('employees.index')
-            ->with('success', 'Employee ameundwa, credentials zimetumwa kwa SMS & Email.');
+            ->with('success', 'Employee ameundwa. Credentials zimetumwa kwa Internal Message & Email.');
     }public function show(Employee $employee): View
     {
         $employee->load([
