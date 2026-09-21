@@ -589,8 +589,67 @@ class EmployeeController extends Controller
             }
         }
     }
+
+    /**
+     * Onyesha credentials za Employee — kwa Admin
+     */
+    public function credentials(Employee $employee): View
+    {
+        $user = $employee->user;
+        
+        if (!$user) {
+            return view('employees.credentials', [
+                'employee' => $employee,
+                'user' => null,
+            ]);
+        }
+        
+        // Chukua credentials kutoka kwenye messages
+        $credentialMessage = \DB::table('messages')
+            ->where('recipient_id', $user->id)
+            ->where('subject', 'SAPTA System - Credentials Zako')
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        // Extract password kutoka message body
+        $password = null;
+        if ($credentialMessage && preg_match('/Password:\s*([^\n]+)/', $credentialMessage->body, $matches)) {
+            $password = trim($matches[1]);
+        }
+        
+        return view('employees.credentials', [
+            'employee' => $employee,
+            'user' => $user,
+            'password' => $password,
+            'message' => $credentialMessage,
+        ]);
+    }
+
+    /**
+     * Reset password ya Employee — kwa Admin
+     */
+    public function resetPassword(Employee $employee): RedirectResponse
+    {
+        $user = $employee->user;
+        
+        if (!$user) {
+            return back()->with('error', 'Employee hana User Account.');
+        }
+        
+        // Generate password mpya
+        $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
+        $newPassword = $lastNameCapitalized . '@Sapta.org';
+        
+        $user->update([
+            'password_hash' => \Hash::make($newPassword),
+            'is_first_login' => true,
+            'credentials_sent_at' => now(),
+            'credentials_expires_at' => now()->addDays((int) config('sapta.credentials_expiry_days', 7)),
+        ]);
+        
+        // Tuma credentials mpya
+        \App\Services\NotificationService::sendCredentials($user, $newPassword);
+        
+        return back()->with('success', "Password imereset. Password mpya: {$newPassword}");
+    }
 }
-
-
-
-

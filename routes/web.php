@@ -586,3 +586,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
     Route::get('roles/{role}', [RoleController::class, 'show'])->name('roles.show');
 });
+
+// EMPLOYEE CREDENTIALS — Admin anaona
+Route::get('employees/{employee}/credentials', [App\Http\Controllers\EmployeeController::class, 'credentials'])
+    ->name('employees.credentials')
+    ->middleware('role:super_admin,admin,director,admin_director,hr_manager,hr_officer');
+// RESET PASSWORD — Admin
+Route::post('employees/{employee}/reset-password', [App\Http\Controllers\EmployeeController::class, 'resetPassword'])
+    ->name('employees.reset-password')
+    ->middleware('role:super_admin,admin,hr_manager,hr_officer');
