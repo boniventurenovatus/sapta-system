@@ -723,3 +723,20 @@ Route::get('/debug/ids', function() {
         ],
     ]);
 })->name('debug.ids');
+// DEBUG ROUTE — Angalia positions schema
+Route::get('/debug/positions-schema', function() {
+    try {
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('positions');
+        $positions = \App\Models\Position::all();
+        
+        return response()->json([
+            'columns' => $columns,
+            'positions_count' => $positions->count(),
+            'positions' => $positions,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.positions-schema');
