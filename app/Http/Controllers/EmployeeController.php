@@ -82,23 +82,36 @@ class EmployeeController extends Controller
      */
     public function create(): View
     {
+        // ===== LOCATIONS =====
+        $regions = \App\Models\Region::orderBy('name')->get();
+        $districts = \App\Models\District::orderBy('name')->get();
+        $wards = \App\Models\Ward::orderBy('name')->get();
+
+        // ===== ORGANIZATION =====
         $departments = Department::where('is_active', true)
             ->orderBy('name')
             ->get();
 
         $organizations = \App\Models\Organization::orderBy('name')->get();
 
+        $organizationalUnits = \App\Models\OrganizationalUnit::orderBy('name')->get();
+
+        $positions = \App\Models\Position::orderBy('title')->get();
+
+        // ===== ROLES =====
         $roles = \App\Models\Role::where('status', 'active')
             ->orderBy('name')
             ->get();
 
-        $positions = \App\Models\Position::orderBy('title')->get();
-
         return view('employees.create', compact(
+            'regions',
+            'districts',
+            'wards',
             'departments',
             'organizations',
-            'roles',
-            'positions'
+            'organizationalUnits',
+            'positions',
+            'roles'
         ));
     }public function store(StoreEmployeeRequest $request): RedirectResponse
     {
