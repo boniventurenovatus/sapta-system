@@ -24,7 +24,7 @@
             Credentials za Employee
         </h1>
         <p style="color:#64748b; margin-bottom:2rem;">
-            {{ $employee->first_name }} {{ $employee->last_name }}
+            {{ $employee->first_name }} {{ $employee->last_name }} ({{ $employee->employee_number }})
         </p>
 
         @if (!$user)
@@ -38,7 +38,10 @@
                 </h3>
                 <div style="background:#ffffff; padding:1rem; border-radius:8px; font-family:monospace; font-size:1rem;">
                     <div style="margin-bottom:0.5rem;">
-                        <strong>Username:</strong> {{ $user->username }}
+                        <strong>Username:</strong> 
+                        <span style="background:#fef3c7; padding:0.2rem 0.5rem; border-radius:4px;">
+                            {{ $user->username }}
+                        </span>
                     </div>
                     <div style="margin-bottom:0.5rem;">
                         <strong>Email:</strong> {{ $user->email }}
@@ -54,7 +57,7 @@
                         @endif
                     </div>
                     <div style="margin-bottom:0.5rem;">
-                        <strong>Role:</strong> {{ $user->roles->first()?->name ?? 'Haina Role' }}
+                        <strong>Role:</strong> {{ $roleName ?? 'No Role' }}
                     </div>
                     <div style="margin-bottom:0.5rem;">
                         <strong>Account Status:</strong> 
@@ -68,9 +71,11 @@
                             {{ $user->credentials_expires_at->format('d M Y H:i') }}
                             @if($user->credentials_expires_at->isPast())
                                 <span style="color:#dc2626;">(IMEEXPIRA)</span>
+                            @else
+                                <span style="color:#16a34a;">(Active)</span>
                             @endif
                         @else
-                            (haipo)
+                            <span style="color:#64748b;">(haipo — reset)</span>
                         @endif
                     </div>
                     <div>
@@ -85,7 +90,7 @@
                 <form method="POST" action="{{ route('employees.reset-password', $employee->id) }}" style="display:inline;">
                     @csrf
                     <button type="submit" 
-                            onclick="return confirm('Reset password? Password mpya: {{ ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name))) }}@Sapta.org')"
+                            onclick="return confirm('Reset password? Password mpya itatumwa kwa internal message + email.')"
                             style="padding:0.75rem 1.5rem; background:#f59e0b; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer;">
                         🔄 Reset Password
                     </button>

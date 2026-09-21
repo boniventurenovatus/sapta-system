@@ -582,39 +582,48 @@ class EmployeeController extends Controller
     public function credentials(Employee $employee): View
     {
         $user = $employee->user;
-        
+
         if (!$user) {
             return view('employees.credentials', [
                 'employee' => $employee,
                 'user' => null,
+                'password' => null,
+                'message' => null,
             ]);
         }
-        
+
         // Chukua credentials kutoka kwenye messages
         $credentialMessage = \DB::table('messages')
             ->where('recipient_id', $user->id)
-            ->where('subject', 'SAPTA System - Credentials Zako')
+            ->where('subject', 'LIKE', '%Credentials%')
             ->orderBy('id', 'desc')
             ->first();
-        
+
         // Extract password kutoka message body
         $password = null;
-        if ($credentialMessage && preg_match('/Password:\s*([^\n]+)/', $credentialMessage->body, $matches)) {
-            $password = trim($matches[1]);
+        if ($credentialMessage) {
+            if (preg_match('/Password:\s*([^\n\r]+)/i', $credentialMessage->body, $matches)) {
+                $password = trim($matches[1]);
+            }
         }
-        
+
+        // Kama password haipatikani — generate mpya
+        if (!$password) {
+            $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
+            $password = $lastNameCapitalized . '@Sapta.org';
+        }
+
+        // Role name
+        $roleName = $user->roles()->first()?->name ?? 'No Role';
+
         return view('employees.credentials', [
             'employee' => $employee,
             'user' => $user,
             'password' => $password,
+            'roleName' => $roleName,
             'message' => $credentialMessage,
         ]);
-    }
-
-    /**
-     * Reset password ya Employee — kwa Admin
-     */
-    public function resetPassword(Employee $employee): RedirectResponse
+    }public function resetPassword(Employee $employee): RedirectResponse
     {
         $user = $employee->user;
         
