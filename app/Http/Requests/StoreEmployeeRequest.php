@@ -63,7 +63,7 @@ class StoreEmployeeRequest extends FormRequest
             'emergency_relationship' => ['required', 'string', 'max:50'],
 
             // ===== OTHER =====
-            'profile_image' => ['required', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
+            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
             'notes' => ['required', 'string', 'max:5000'],
         ];
     }
