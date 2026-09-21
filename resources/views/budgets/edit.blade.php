@@ -1,4 +1,4 @@
-﻿@extends('layouts.sapta')
+@extends('layouts.sapta')
 
 @section('title', 'Edit Budget')
 @section('page-title', 'Edit Budget')
@@ -96,7 +96,7 @@
                         <label>Department</label>
                         <select name="department_id" class="bge-input">
                             <option value="">? None ?</option>
-                            @foreach($departments as $d)
+                            @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
                                 <option value="{{ $d->id }}" @selected(old('department_id', $budget->department_id) == $d->id)>{{ $d->name }}</option>
                             @endforeach
                         </select>

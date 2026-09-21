@@ -542,7 +542,7 @@
                                     Select Department
                                 </option>
 
-                                @foreach($departments as $department)
+                                @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $department)
 
                                     <option
                                         value="{{ $department->id }}"

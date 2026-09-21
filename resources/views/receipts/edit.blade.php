@@ -1,4 +1,4 @@
-﻿@extends('layouts.sapta')
+@extends('layouts.sapta')
 
 @section('title', 'Edit Receipt')
 @section('page-title', 'Edit Receipt')
@@ -115,7 +115,7 @@
                         <label>Department</label>
                         <select name="department_id" class="rce-input">
                             <option value="">? None ?</option>
-                            @foreach($departments as $d)
+                            @foreach(($departments ?? \App\Models\Department::where("is_active", true)->orderBy("name")->get()) as $d)
                                 <option value="{{ $d->id }}" @selected(old('department_id', $receipt->department_id) == $d->id)>{{ $d->name }}</option>
                             @endforeach
                         </select>
