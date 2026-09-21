@@ -54,7 +54,10 @@ class DocumentController extends Controller
     {
         $employees = Employee::take(100)->get();
         $projects = Project::take(100)->get();
-        return view('documents.create', compact('employees', 'projects'));
+        $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
+        $districts = \App\Models\District::orderBy('name')->get(['id', 'name', 'region_id']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'district_id']);
+        return view('documents.create', compact('employees', 'projects', 'regions', 'districts', 'wards'));
     }
 
     /**

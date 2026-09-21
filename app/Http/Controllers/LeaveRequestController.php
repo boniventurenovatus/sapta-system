@@ -55,7 +55,10 @@ class LeaveRequestController extends Controller
     public function create()
     {
         $employees = Employee::take(50)->get();
-        return view('leave-requests.create', compact('employees'));
+        $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
+        $districts = \App\Models\District::orderBy('name')->get(['id', 'name', 'region_id']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'district_id']);
+        return view('leave-requests.create', compact('employees', 'regions', 'districts', 'wards'));
     }
 
     public function store(StoreLeaveRequestRequest $request)

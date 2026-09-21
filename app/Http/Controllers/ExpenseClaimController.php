@@ -51,7 +51,10 @@ class ExpenseClaimController extends Controller
         $employees = Employee::take(50)->get();
         $projects = DB::table('projects')->take(50)->get(['id', 'name']);
         $departments = DB::table('departments')->get(['id', 'name']);
-        return view('expense-claims.create', compact('employees', 'projects', 'departments'));
+        $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
+        $districts = \App\Models\District::orderBy('name')->get(['id', 'name', 'region_id']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'district_id']);
+        return view('expense-claims.create', compact('employees', 'projects', 'departments', 'regions', 'districts', 'wards'));
     }
 
     public function store(Request $request)
