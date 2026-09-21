@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Document;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,7 @@ class DocumentController extends Controller
      */
     public function create()
     {
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
         $employees = Employee::take(100)->get();
         $projects = Project::take(100)->get();
         $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
@@ -134,6 +136,7 @@ class DocumentController extends Controller
      */
     public function edit(Document $document)
     {
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
         $employees = Employee::take(100)->get();
         $projects = Project::take(100)->get();
         return view('documents.edit', compact('document', 'employees', 'projects'));
