@@ -640,3 +640,65 @@ Route::get('/debug/organizations', function() {
         'departments_count' => DB::table('departments')->count(),
     ]);
 })->name('debug.organizations');
+// DEBUG ROUTE — Test Employee Store
+Route::get('/debug/employee-test', function() {
+    try {
+        // Test 1: Angalia kama Employee model inafanya kazi
+        $count = \App\Models\Employee::count();
+        
+        // Test 2: Angalia kama validation inapita
+        $data = [
+            'region_id' => 2,
+            'district_id' => 1,
+            'ward_id' => 8,
+            'organization_id' => 2,
+            'department_id' => 1,
+            'organizational_unit_id' => 1,
+            'position_id' => 9,
+            'employee_number' => 'EMP-TEST-' . rand(10000, 99999),
+            'first_name' => 'Test',
+            'middle_name' => 'Middle',
+            'last_name' => 'Employee',
+            'gender' => 'male',
+            'date_of_birth' => '1990-01-01',
+            'nationality' => 'Tanzanian',
+            'marital_status' => 'single',
+            'email' => 'test' . rand(10000, 99999) . '@sapta.co.tz',
+            'phone' => '0712345678',
+            'alternative_phone' => '0765432109',
+            'address' => 'Test Address',
+            'city' => 'Dar es Salaam',
+            'hire_date' => '2026-01-01',
+            'job_title' => 'Test Officer',
+            'employment_status' => 'active',
+            'employment_type' => 'full_time',
+            'contract_type' => 'permanent',
+            'salary' => 500000,
+            'bank_account' => '1234567890',
+            'bank_name' => 'CRDB',
+            'tin_number' => '123-456-789',
+            'nssf_number' => 'NSSF12345',
+            'nhif_number' => 'NHIF12345',
+            'emergency_contact_name' => 'Jane Doe',
+            'emergency_contact_phone' => '0712345679',
+            'emergency_relationship' => 'Sister',
+            'notes' => 'Test notes',
+        ];
+        
+        $validator = \Validator::make($data, (new \App\Http\Requests\StoreEmployeeRequest())->rules());
+        
+        return response()->json([
+            'employee_count' => $count,
+            'validation_passes' => !$validator->fails(),
+            'validation_errors' => $validator->errors()->all(),
+            'data_keys' => array_keys($data),
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
+    }
+})->name('debug.employee-test');
