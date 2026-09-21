@@ -600,3 +600,35 @@ Route::get('/debug/locations', function() {
         'wards_sample' => \App\Models\Ward::take(5)->get(['id', 'name', 'district_id']),
     ]);
 })->name('debug.locations');
+// DEBUG ROUTE — Angalia database connection
+Route::get('/debug/db-check', function() {
+    try {
+        $dbName = DB::connection()->getDatabaseName();
+        $driver = DB::connection()->getDriverName();
+        
+        $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", [$dbName]);
+        $tableNames = array_map(function($t) { return $t->table_name ?? $t->TABLE_NAME; }, $tables);
+        
+        $hasRegions = in_array('regions', $tableNames);
+        $hasDistricts = in_array('districts', $tableNames);
+        $hasWards = in_array('wards', $tableNames);
+        
+        return response()->json([
+            'database' => $dbName,
+            'driver' => $driver,
+            'total_tables' => count($tableNames),
+            'has_regions_table' => $hasRegions,
+            'has_districts_table' => $hasDistricts,
+            'has_wards_table' => $hasWards,
+            'regions_count' => $hasRegions ? DB::table('regions')->count() : 'N/A',
+            'districts_count' => $hasDistricts ? DB::table('districts')->count() : 'N/A',
+            'wards_count' => $hasWards ? DB::table('wards')->count() : 'N/A',
+            'all_tables' => $tableNames,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+})->name('debug.db-check');
