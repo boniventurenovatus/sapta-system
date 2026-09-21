@@ -626,25 +626,25 @@ class EmployeeController extends Controller
     }public function resetPassword(Employee $employee): RedirectResponse
     {
         $user = $employee->user;
-        
+
         if (!$user) {
-            return back()->with('error', 'Employee hana User Account.');
+            return back()->with('error', 'Employee does not have a User Account.');
         }
-        
-        // Generate password mpya
+
         $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
         $newPassword = $lastNameCapitalized . '@Sapta.org';
-        
+
+        $expiryDays = (int) config('sapta.credentials_expiry_days', 7);
+
         $user->update([
             'password_hash' => \Hash::make($newPassword),
             'is_first_login' => true,
             'credentials_sent_at' => now(),
-            'credentials_expires_at' => now()->addDays((int) config('sapta.credentials_expiry_days', 7)),
+            'credentials_expires_at' => now()->addDays($expiryDays),
+            'credentials_channel' => 'internal_email',
         ]);
-        
-        // Tuma credentials mpya
+
         \App\Services\NotificationService::sendCredentials($user, $newPassword);
-        
-        return back()->with('success', "Password imereset. Password mpya: {$newPassword}");
-    }
-}
+
+        return back()->with('success', "Password reset successfully. New password: {$newPassword}");
+    }}
