@@ -273,7 +273,7 @@ class DashboardService
                 'total_permissions'  => \App\Models\Permission::count(),
                 'total_departments'  => Department::count(),
                 'total_positions'    => \App\Models\Position::count(),
-                'total_audit_logs'   => \Schema::hasTable('audit_logs') ? AuditLog::count() : 0,
+                'total_audit_logs'   => \Schema::hasTable('audit_logs') ? \App\Models\AuditLog::count() : 0,
             ],
             'charts' => [
                 'users_by_role' => $this->usersByRole(),
