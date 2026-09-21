@@ -244,7 +244,151 @@
         font-size: 11px;
     }
 
-    .employee-form-footer {
+    .
+                    {{-- ADDITIONAL FIELDS --}}
+
+                    <div class="employee-field full">
+
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin: 1.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                            <i class="fas fa-info-circle"></i>
+                            Additional Information
+                        </h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+                            <div>
+                                <label for="nationality">Nationality <span style="color: red;">*</span></label>
+                                <input type="text" id="nationality" name="nationality" value="{{ old('nationality') }}" class="employee-input">
+                                @error('nationality') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="marital_status">Marital Status <span style="color: red;">*</span></label>
+                                <select id="marital_status" name="marital_status" class="employee-input">
+                                    <option value="">-- Select --</option>
+                                    <option value="single" @selected(old('marital_status') == 'single')>Single</option>
+                                    <option value="married" @selected(old('marital_status') == 'married')>Married</option>
+                                    <option value="divorced" @selected(old('marital_status') == 'divorced')>Divorced</option>
+                                    <option value="widowed" @selected(old('marital_status') == 'widowed')>Widowed</option>
+                                </select>
+                                @error('marital_status') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="alternative_phone">Alternative Phone <span style="color: red;">*</span></label>
+                                <input type="text" id="alternative_phone" name="alternative_phone" value="{{ old('alternative_phone') }}" class="employee-input">
+                                @error('alternative_phone') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="city">City <span style="color: red;">*</span></label>
+                                <input type="text" id="city" name="city" value="{{ old('city') }}" class="employee-input">
+                                @error('city') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="organizational_unit_id">Organizational Unit <span style="color: red;">*</span></label>
+                                <select id="organizational_unit_id" name="organizational_unit_id" class="employee-input">
+                                    <option value="">-- Select --</option>
+                                    @foreach(($organizationalUnits ?? collect()) as $unit)
+                                        <option value="{{ $unit->id }}" @selected(old('organizational_unit_id') == $unit->id)>{{ $unit->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('organizational_unit_id') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="position_id">Position <span style="color: red;">*</span></label>
+                                <select id="position_id" name="position_id" class="employee-input">
+                                    <option value="">-- Select --</option>
+                                    @foreach(($positions ?? collect()) as $position)
+                                        <option value="{{ $position->id }}" @selected(old('position_id') == $position->id)>{{ $position->title ?? $position->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('position_id') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="employment_type">Employment Type <span style="color: red;">*</span></label>
+                                <select id="employment_type" name="employment_type" class="employee-input">
+                                    <option value="">-- Select --</option>
+                                    <option value="full_time" @selected(old('employment_type') == 'full_time')>Full Time</option>
+                                    <option value="part_time" @selected(old('employment_type') == 'part_time')>Part Time</option>
+                                    <option value="contract" @selected(old('employment_type') == 'contract')>Contract</option>
+                                    <option value="intern" @selected(old('employment_type') == 'intern')>Intern</option>
+                                </select>
+                                @error('employment_type') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="contract_type">Contract Type <span style="color: red;">*</span></label>
+                                <select id="contract_type" name="contract_type" class="employee-input">
+                                    <option value="">-- Select --</option>
+                                    <option value="permanent" @selected(old('contract_type') == 'permanent')>Permanent</option>
+                                    <option value="temporary" @selected(old('contract_type') == 'temporary')>Temporary</option>
+                                    <option value="probation" @selected(old('contract_type') == 'probation')>Probation</option>
+                                </select>
+                                @error('contract_type') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="salary">Salary (TZS) <span style="color: red;">*</span></label>
+                                <input type="number" step="0.01" id="salary" name="salary" value="{{ old('salary') }}" class="employee-input">
+                                @error('salary') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="bank_account">Bank Account <span style="color: red;">*</span></label>
+                                <input type="text" id="bank_account" name="bank_account" value="{{ old('bank_account') }}" class="employee-input">
+                                @error('bank_account') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="bank_name">Bank Name <span style="color: red;">*</span></label>
+                                <input type="text" id="bank_name" name="bank_name" value="{{ old('bank_name') }}" class="employee-input">
+                                @error('bank_name') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="tin_number">TIN Number <span style="color: red;">*</span></label>
+                                <input type="text" id="tin_number" name="tin_number" value="{{ old('tin_number') }}" class="employee-input">
+                                @error('tin_number') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="nssf_number">NSSF Number <span style="color: red;">*</span></label>
+                                <input type="text" id="nssf_number" name="nssf_number" value="{{ old('nssf_number') }}" class="employee-input">
+                                @error('nssf_number') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="nhif_number">NHIF Number <span style="color: red;">*</span></label>
+                                <input type="text" id="nhif_number" name="nhif_number" value="{{ old('nhif_number') }}" class="employee-input">
+                                @error('nhif_number') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="emergency_contact_name">Emergency Contact Name <span style="color: red;">*</span></label>
+                                <input type="text" id="emergency_contact_name" name="emergency_contact_name" value="{{ old('emergency_contact_name') }}" class="employee-input">
+                                @error('emergency_contact_name') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="emergency_contact_phone">Emergency Contact Phone <span style="color: red;">*</span></label>
+                                <input type="text" id="emergency_contact_phone" name="emergency_contact_phone" value="{{ old('emergency_contact_phone') }}" class="employee-input">
+                                @error('emergency_contact_phone') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div>
+                                <label for="emergency_relationship">Emergency Relationship <span style="color: red;">*</span></label>
+                                <input type="text" id="emergency_relationship" name="emergency_relationship" value="{{ old('emergency_relationship') }}" class="employee-input">
+                                @error('emergency_relationship') <div class="employee-error">{{ $message }}</div> @enderror
+                            </div>
+
+                        </div>
+
+                    </div>
+employee-form-footer {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
