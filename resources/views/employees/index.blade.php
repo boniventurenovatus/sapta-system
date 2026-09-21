@@ -197,6 +197,9 @@
                                     <div class="actions">
                                         <a href="{{ url('/employees/' . $emp->id) }}" class="action-btn view" title="View"><i class="fas fa-eye"></i></a>
                                         <a href="{{ url('/employees/' . $emp->id . '/edit') }}" class="action-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
+                                        <a href="{{ route('employees.credentials', $emp->id) }}" class="action-btn credentials" title="Credentials" style="color:#1a5276;">
+    <i class="fas fa-key"></i>
+</a>
 
                                         @if($emp->employment_status === 'active')
                                             <form action="{{ route('employees.deactivate', $emp->id) }}" method="POST" class="sapta-action-form" data-action="deactivate" style="display:inline;">
