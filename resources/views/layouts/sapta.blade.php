@@ -658,5 +658,99 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 </style>
 
+
+<script>
+/* ============================================================
+   SAPTA CONFIRM — SweetAlert2 based
+   Badilisha confirm() zote kuwa SweetAlert2
+   ============================================================ */
+window.saptaConfirm = function(event, message, options) {
+    if (event) event.preventDefault();
+    
+    const link = event ? event.currentTarget : null;
+    const href = link ? link.href : null;
+    const method = (link && link.dataset.method) ? link.dataset.method : 'GET';
+    const isDanger = message.toLowerCase().includes('delete') 
+        || message.toLowerCase().includes('deactivate')
+        || message.toLowerCase().includes('suspend')
+        || message.toLowerCase().includes('terminate');
+    
+    Swal.fire({
+        title: options && options.title ? options.title : (isDanger ? 'Are you sure?' : 'Confirm'),
+        text: message,
+        icon: isDanger ? 'warning' : 'question',
+        showCancelButton: true,
+        confirmButtonColor: isDanger ? '#dc2626' : '#3b82f6',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: options && options.confirmText ? options.confirmText : (isDanger ? 'Yes, continue' : 'OK'),
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+            popup: 'sapta-swal-popup',
+            title: 'sapta-swal-title',
+            confirmButton: 'sapta-swal-confirm',
+            cancelButton: 'sapta-swal-cancel',
+        }
+    }).then((result) => {
+        if (result.isConfirmed && href) {
+            if (method === 'DELETE') {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = href;
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                form.appendChild(csrf);
+                form.appendChild(methodInput);
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                window.location.href = href;
+            }
+        }
+    });
+    
+    return false;
+};
+
+/* Badilisha native confirm() — onyo */
+window._originalConfirm = window.confirm;
+window.confirm = function(message) {
+    console.warn('Native confirm() imeitwa. Tumia saptaConfirm() badala yake.');
+    return _originalConfirm(message);
+};
+</script>
+
+<style>
+/* SweetAlert2 custom styling */
+.sapta-swal-popup {
+    border-radius: 16px !important;
+    padding: 28px !important;
+    font-family: inherit !important;
+}
+.sapta-swal-title {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #1a1a2e !important;
+}
+.swal2-html-container {
+    font-size: 14px !important;
+    color: #64748b !important;
+}
+.sapta-swal-confirm,
+.sapta-swal-cancel {
+    padding: 10px 24px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    border: none !important;
+}
+</style>
 </body>
 </html>
