@@ -38,7 +38,7 @@
             <a href="{{ route('reports.payroll.export') }}" class="rpp-btn rpp-btn-secondary" style="color:#0284c7;"><i class="fas fa-file-csv"></i> Export CSV</a>
             <a href="{{ route('reports.index') }}" class="rpp-btn rpp-btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
         <a href="{{ route('reports.export.payroll') }}" style="padding:0.6rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; text-decoration:none; font-weight:700;"><i class="fas fa-file-csv"></i> CSV</a>
-            <button onclick="window.print()" class="rpp-btn rpp-btn-primary"><i class="fas fa-print"></i> Print</button>
+        <button onclick="window.print()" style="padding:0.6rem 1rem; background:#3b82f6; color:#fff; border:none; border-radius:0.5rem; font-weight:700; cursor:pointer;"><i class="fas fa-print"></i> Print</button>
         </div>
     </div>
 
