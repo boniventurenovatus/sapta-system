@@ -615,3 +615,26 @@ Route::get('/debug/run-seeder', function() {
         ], 500);
     }
 })->name('debug.run-seeder');
+// DEBUG ROUTE — Angalia data zote
+Route::get('/debug/data-check', function() {
+    return response()->json([
+        'users' => \App\Models\User::count(),
+        'employees' => \App\Models\Employee::count(),
+        'roles' => \App\Models\Role::count(),
+        'permissions' => \App\Models\Permission::count(),
+        'regions' => \App\Models\Region::count(),
+        'districts' => \App\Models\District::count(),
+        'wards' => \App\Models\Ward::count(),
+        'organizations' => \App\Models\Organization::count(),
+        'departments' => \App\Models\Department::count(),
+        'positions' => \App\Models\Position::count(),
+        'trainings' => \App\Models\Training::count(),
+        'documents' => \App\Models\Document::count(),
+        'users_list' => \App\Models\User::select('id', 'username', 'email', 'account_status')->take(30)->get(),
+        'user_roles' => \DB::table('user_roles')
+            ->join('users', 'users.id', '=', 'user_roles.user_id')
+            ->join('roles', 'roles.id', '=', 'user_roles.role_id')
+            ->select('users.username', 'users.email', 'roles.code as role')
+            ->get(),
+    ]);
+})->name('debug.data-check');
