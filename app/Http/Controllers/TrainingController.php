@@ -87,6 +87,11 @@ class TrainingController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        // ============================================================
+        // AUTO-GENERATE training_number
+        // Format: TRN-YYYYMMDD-XXXX
+        // ============================================================
+        $validated['training_number'] = 'TRN-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
         $validated['created_by'] = auth()->id();
         $validated['status'] = 'draft';
 

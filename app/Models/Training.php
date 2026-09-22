@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Training extends Model
 {
     protected $fillable = [
+        'training_number',
         'title', 'type', 'description',
         'start_date', 'end_date', 'duration_hours', 'cost',
         'region_id', 'district_id', 'ward_id',
