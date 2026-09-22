@@ -10,9 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $roles = $user->roles()->pluck('code')->toArray();
-
+        $roles = auth()->user()->roles()->pluck('code')->toArray();
         if (in_array('super_admin', $roles) || in_array('admin', $roles)) return redirect()->route('dashboard.admin');
         if (in_array('ceo', $roles) || in_array('bod', $roles) || in_array('director', $roles)) return redirect()->route('dashboard.director');
         if (in_array('hr_manager', $roles) || in_array('hr_officer', $roles) || in_array('admin_director', $roles)) return redirect()->route('dashboard.hr');
@@ -20,232 +18,232 @@ class DashboardController extends Controller
         if (in_array('ict_manager', $roles)) return redirect()->route('dashboard.ict');
         if (in_array('meal_manager', $roles) || in_array('meal_officer', $roles)) return redirect()->route('dashboard.meal');
         if (in_array('manager', $roles) || in_array('project_manager', $roles) || in_array('project_officer', $roles) || in_array('program_director', $roles)) return redirect()->route('dashboard.manager');
-
         return redirect()->route('dashboard.staff');
     }
 
     public function admin()
     {
-        $kpis = [
-            'total_users' => DB::table('users')->count(),
-            'total_roles' => DB::table('roles')->count(),
-            'total_permissions' => Schema::hasTable('permissions') ? DB::table('permissions')->count() : 0,
-            'total_departments' => Schema::hasTable('departments') ? DB::table('departments')->count() : 0,
-            'total_positions' => Schema::hasTable('positions') ? DB::table('positions')->count() : 0,
-            'total_audit_logs' => Schema::hasTable('audit_logs') ? DB::table('audit_logs')->count() : 0,
-        ];
-
-        $charts = [
-            'users_by_role' => $this->chartUsersByRole(),
-            'user_activity' => $this->chartEmptyActivity(),
-            'documents_by_category' => $this->chartDocumentsByCategory(),
-        ];
-
-        $recent_users = \App\Models\User::orderByDesc('created_at')->limit(5)->get();
-        $recent_logs = Schema::hasTable('audit_logs') ? DB::table('audit_logs')->orderByDesc('created_at')->limit(10)->get() : collect();
-
-        return view('dashboard.admin', compact('kpis','charts','recent_users','recent_logs'));
+        return view('dashboard.admin', [
+            'kpis' => $this->kpisAdmin(),
+            'charts' => $this->allCharts(),
+            'recent_users' => \App\Models\User::orderByDesc('created_at')->limit(5)->get(),
+            'recent_logs' => $this->has('audit_logs') ? DB::table('audit_logs')->orderByDesc('created_at')->limit(10)->get() : collect(),
+        ]);
     }
 
     public function director()
     {
-        $kpis = [
-            'total_employees' => DB::table('employees')->count(),
-            'active_projects' => Schema::hasTable('projects') ? DB::table('projects')->where('status','active')->count() : 0,
-            'pending_approvals' => Schema::hasTable('leave_requests') ? DB::table('leave_requests')->where('status','pending')->count() : 0,
-            'total_budget' => $this->getBudgetSum(),
-            'total_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->count() : 0,
-            'completed_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->where('status','completed')->count() : 0,
-        ];
-
-        $charts = [
-            'projects_by_status' => $this->chartProjectsByStatus(),
-            'tasks_by_status' => $this->chartTasksByStatus(),
-            'budget_overview' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_activities = collect();
-
-        return view('dashboard.director', compact('kpis','charts','recent_activities'));
+        return view('dashboard.director', [
+            'kpis' => $this->kpisDirector(),
+            'charts' => $this->allCharts(),
+            'recent_activities' => collect(),
+        ]);
     }
 
     public function executive()
     {
-        $kpis = [
-            'total_employees' => DB::table('employees')->count(),
-            'total_projects' => Schema::hasTable('projects') ? DB::table('projects')->count() : 0,
-            'total_revenue' => 0,
-            'total_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->count() : 0,
-            'active_projects' => Schema::hasTable('projects') ? DB::table('projects')->where('status','active')->count() : 0,
-            'total_budget' => $this->getBudgetSum(),
-        ];
-
-        $charts = [
-            'revenue_trend' => $this->chartEmptyActivity(),
-            'projects_by_status' => $this->chartProjectsByStatus(),
-            'department_performance' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_activities = collect();
-        $top_projects = Schema::hasTable('projects') ? DB::table('projects')->limit(5)->get() : collect();
-
-        return view('dashboard.executive', compact('kpis','charts','recent_activities','top_projects'));
+        return view('dashboard.executive', [
+            'kpis' => $this->kpisExecutive(),
+            'charts' => $this->allCharts(),
+            'recent_activities' => collect(),
+            'top_projects' => $this->has('projects') ? DB::table('projects')->limit(5)->get() : collect(),
+        ]);
     }
 
     public function hr()
     {
-        $kpis = [
-            'total_employees' => DB::table('employees')->count(),
-            'active_employees' => Schema::hasTable('employees') ? DB::table('employees')->where('employment_status','active')->count() : 0,
-            'pending_leaves' => Schema::hasTable('leave_requests') ? DB::table('leave_requests')->where('status','pending')->count() : 0,
-            'total_departments' => Schema::hasTable('departments') ? DB::table('departments')->count() : 0,
-        ];
-
-        $charts = [
-            'employees_by_department' => $this->chartEmptyActivity(),
-            'leaves_by_status' => $this->chartEmptyActivity(),
-            'attendance_overview' => $this->chartEmptyActivity(),
-        ];
-
-        $pending_leaves_list = collect();
-
-        return view('dashboard.hr', compact('kpis','charts','pending_leaves_list'));
+        return view('dashboard.hr', [
+            'kpis' => $this->kpisHr(),
+            'charts' => $this->allCharts(),
+            'pending_leaves_list' => collect(),
+        ]);
     }
 
     public function finance()
     {
-        $kpis = [
-            'total_income' => 0,
-            'total_expenses' => 0,
-            'pending_payments' => Schema::hasTable('payment_vouchers') ? DB::table('payment_vouchers')->where('status','pending')->count() : 0,
-            'total_budget' => $this->getBudgetSum(),
-        ];
-
-        $charts = [
-            'income_expense' => $this->chartEmptyActivity(),
-            'budget_utilization' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_vouchers = Schema::hasTable('payment_vouchers') ? DB::table('payment_vouchers')->orderByDesc('created_at')->limit(5)->get() : collect();
-
-        return view('dashboard.finance', compact('kpis','charts','recent_vouchers'));
+        return view('dashboard.finance', [
+            'kpis' => $this->kpisFinance(),
+            'charts' => $this->allCharts(),
+            'recent_vouchers' => $this->has('payment_vouchers') ? DB::table('payment_vouchers')->orderByDesc('created_at')->limit(5)->get() : collect(),
+        ]);
     }
 
     public function manager()
     {
-        $kpis = [
-            'total_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->count() : 0,
-            'completed_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->where('status','completed')->count() : 0,
-            'pending_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->where('status','pending')->count() : 0,
-            'team_members' => DB::table('users')->count(),
-        ];
-
-        $charts = [
-            'tasks_by_status' => $this->chartTasksByStatus(),
-            'team_performance' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_tasks = Schema::hasTable('tasks') ? DB::table('tasks')->orderByDesc('created_at')->limit(5)->get() : collect();
-
-        return view('dashboard.manager', compact('kpis','charts','recent_tasks'));
+        return view('dashboard.manager', [
+            'kpis' => $this->kpisManager(),
+            'charts' => $this->allCharts(),
+            'recent_tasks' => $this->has('tasks') ? DB::table('tasks')->orderByDesc('created_at')->limit(5)->get() : collect(),
+        ]);
     }
 
     public function staff()
     {
-        $kpis = [
-            'my_tasks' => 0,
-            'pending_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->where('status','pending')->count() : 0,
-            'completed_tasks' => Schema::hasTable('tasks') ? DB::table('tasks')->where('status','completed')->count() : 0,
-            'attendance_rate' => 100,
-        ];
-
-        $charts = [
-            'my_activity' => $this->chartEmptyActivity(),
-            'tasks_by_status' => $this->chartTasksByStatus(),
-        ];
-
-        $recent_tasks = Schema::hasTable('tasks') ? DB::table('tasks')->orderByDesc('created_at')->limit(5)->get() : collect();
-
-        return view('dashboard.staff', compact('kpis','charts','recent_tasks'));
+        return view('dashboard.staff', [
+            'kpis' => $this->kpisStaff(),
+            'charts' => $this->allCharts(),
+            'recent_tasks' => $this->has('tasks') ? DB::table('tasks')->orderByDesc('created_at')->limit(5)->get() : collect(),
+        ]);
     }
 
     public function ict()
     {
-        $kpis = [
-            'total_users' => DB::table('users')->count(),
-            'active_sessions' => 0,
-            'system_health' => 95,
-            'total_logs' => Schema::hasTable('audit_logs') ? DB::table('audit_logs')->count() : 0,
-        ];
-
-        $charts = [
-            'system_usage' => $this->chartEmptyActivity(),
-            'user_activity' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_users = \App\Models\User::orderByDesc('created_at')->limit(5)->get();
-
-        return view('dashboard.ict', compact('kpis','charts','recent_users'));
+        return view('dashboard.ict', [
+            'kpis' => $this->kpisIct(),
+            'charts' => $this->allCharts(),
+            'recent_users' => \App\Models\User::orderByDesc('created_at')->limit(5)->get(),
+        ]);
     }
 
     public function meal()
     {
-        $kpis = [
-            'total_reports' => 0,
-            'pending_reports' => 0,
-            'completed_reports' => 0,
-            'total_projects' => Schema::hasTable('projects') ? DB::table('projects')->count() : 0,
-        ];
-
-        $charts = [
-            'reports_overview' => $this->chartEmptyActivity(),
-            'projects_by_status' => $this->chartProjectsByStatus(),
-        ];
-
-        $recent_reports = collect();
-
-        return view('dashboard.meal', compact('kpis','charts','recent_reports'));
+        return view('dashboard.meal', [
+            'kpis' => $this->kpisMeal(),
+            'charts' => $this->allCharts(),
+            'recent_reports' => collect(),
+        ]);
     }
 
     public function program()
     {
-        $kpis = [
-            'total_projects' => Schema::hasTable('projects') ? DB::table('projects')->count() : 0,
-            'active_projects' => Schema::hasTable('projects') ? DB::table('projects')->where('status','active')->count() : 0,
-            'completed_projects' => Schema::hasTable('projects') ? DB::table('projects')->where('status','completed')->count() : 0,
-            'total_budget' => $this->getBudgetSum(),
+        return view('dashboard.program', [
+            'kpis' => $this->kpisProgram(),
+            'charts' => $this->allCharts(),
+            'recent_projects' => $this->has('projects') ? DB::table('projects')->orderByDesc('created_at')->limit(5)->get() : collect(),
+        ]);
+    }
+
+    // ============================================================
+    // KPIs
+    // ============================================================
+    private function kpisAdmin(): array { return [
+        'total_users' => DB::table('users')->count(),
+        'total_roles' => DB::table('roles')->count(),
+        'total_permissions' => $this->count('permissions'),
+        'total_departments' => $this->count('departments'),
+        'total_positions' => $this->count('positions'),
+        'total_audit_logs' => $this->count('audit_logs'),
+    ];}
+
+    private function kpisDirector(): array { return [
+        'total_employees' => $this->count('employees'),
+        'active_projects' => $this->countWhere('projects', 'status', 'active'),
+        'pending_approvals' => $this->countWhere('leave_requests', 'status', 'pending'),
+        'total_budget' => $this->budgetSum(),
+        'total_tasks' => $this->count('tasks'),
+        'completed_tasks' => $this->countWhere('tasks', 'status', 'completed'),
+    ];}
+
+    private function kpisExecutive(): array { return [
+        'total_employees' => $this->count('employees'),
+        'total_projects' => $this->count('projects'),
+        'total_revenue' => 0,
+        'total_tasks' => $this->count('tasks'),
+        'active_projects' => $this->countWhere('projects', 'status', 'active'),
+        'total_budget' => $this->budgetSum(),
+    ];}
+
+    private function kpisHr(): array { return [
+        'total_employees' => $this->count('employees'),
+        'active_employees' => $this->countWhere('employees', 'employment_status', 'active'),
+        'pending_leaves' => $this->countWhere('leave_requests', 'status', 'pending'),
+        'total_departments' => $this->count('departments'),
+    ];}
+
+    private function kpisFinance(): array { return [
+        'total_income' => 0,
+        'total_expenses' => 0,
+        'pending_payments' => $this->countWhere('payment_vouchers', 'status', 'pending'),
+        'total_budget' => $this->budgetSum(),
+    ];}
+
+    private function kpisManager(): array { return [
+        'total_tasks' => $this->count('tasks'),
+        'completed_tasks' => $this->countWhere('tasks', 'status', 'completed'),
+        'pending_tasks' => $this->countWhere('tasks', 'status', 'pending'),
+        'team_members' => DB::table('users')->count(),
+    ];}
+
+    private function kpisStaff(): array { return [
+        'my_tasks' => 0,
+        'pending_tasks' => $this->countWhere('tasks', 'status', 'pending'),
+        'completed_tasks' => $this->countWhere('tasks', 'status', 'completed'),
+        'attendance_rate' => 100,
+    ];}
+
+    private function kpisIct(): array { return [
+        'total_users' => DB::table('users')->count(),
+        'active_sessions' => 0,
+        'system_health' => 95,
+        'total_logs' => $this->count('audit_logs'),
+    ];}
+
+    private function kpisMeal(): array { return [
+        'total_reports' => 0,
+        'pending_reports' => 0,
+        'completed_reports' => 0,
+        'total_projects' => $this->count('projects'),
+    ];}
+
+    private function kpisProgram(): array { return [
+        'total_projects' => $this->count('projects'),
+        'active_projects' => $this->countWhere('projects', 'status', 'active'),
+        'completed_projects' => $this->countWhere('projects', 'status', 'completed'),
+        'total_budget' => $this->budgetSum(),
+    ];}
+
+    // ============================================================
+    // CHARTS — ZOTE ZINAZOWEZEKANA
+    // ============================================================
+    private function allCharts(): array
+    {
+        return [
+            'users_by_role' => $this->chartUsersByRole(),
+            'user_activity' => $this->chartEmpty('Activity'),
+            'documents_by_category' => $this->chartGroupBy('documents', ['category','document_category','type'], 'Documents'),
+            'projects_by_status' => $this->chartGroupBy('projects', ['status'], 'Projects'),
+            'tasks_by_status' => $this->chartGroupBy('tasks', ['status'], 'Tasks'),
+            'employees_by_department' => $this->chartEmployeesByDept(),
+            'leaves_by_status' => $this->chartGroupBy('leave_requests', ['status'], 'Leaves'),
+            'attendance_overview' => $this->chartEmpty('Attendance'),
+            'budget_overview' => $this->chartEmpty('Budget'),
+            'budget_utilization' => $this->chartEmpty('Utilization'),
+            'income_expense' => $this->chartEmpty('Income vs Expense'),
+            'revenue_trend' => $this->chartEmpty('Revenue'),
+            'department_performance' => $this->chartEmpty('Performance'),
+            'team_performance' => $this->chartEmpty('Team'),
+            'system_usage' => $this->chartEmpty('System'),
+            'reports_overview' => $this->chartEmpty('Reports'),
+            'my_activity' => $this->chartEmpty('Activity'),
+            'projects_by_department' => $this->chartEmpty('Projects'),
+            'recent_activities' => $this->chartEmpty('Activities'),
         ];
-
-        $charts = [
-            'projects_by_status' => $this->chartProjectsByStatus(),
-            'budget_overview' => $this->chartEmptyActivity(),
-        ];
-
-        $recent_projects = Schema::hasTable('projects') ? DB::table('projects')->orderByDesc('created_at')->limit(5)->get() : collect();
-
-        return view('dashboard.program', compact('kpis','charts','recent_projects'));
     }
 
     // ============================================================
     // HELPERS
     // ============================================================
-    private function getBudgetSum(): int
-    {
-        if (!Schema::hasTable('budgets')) return 0;
-        foreach (['amount','budget_amount','total_amount','total','allocated_amount','allocated','budget'] as $col) {
-            if (Schema::hasColumn('budgets', $col)) {
-                return (int) DB::table('budgets')->sum($col);
-            }
+    private function has(string $t): bool { return Schema::hasTable($t); }
+
+    private function count(string $t): int { return $this->has($t) ? DB::table($t)->count() : 0; }
+
+    private function countWhere(string $t, string $col, $val): int {
+        return ($this->has($t) && Schema::hasColumn($t, $col)) ? DB::table($t)->where($col, $val)->count() : 0;
+    }
+
+    private function budgetSum(): int {
+        if (!$this->has('budgets')) return 0;
+        foreach (['amount','budget_amount','total_amount','total','allocated_amount','allocated','budget'] as $c) {
+            if (Schema::hasColumn('budgets', $c)) return (int) DB::table('budgets')->sum($c);
         }
         return 0;
     }
 
-    private function chartEmptyActivity(): array
-    {
+    private function chartEmpty(string $label): array {
         return [
             'labels' => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
             'datasets' => [[
-                'label' => 'Activity',
+                'label' => $label,
                 'data' => array_fill(0, 12, 0),
                 'borderColor' => '#3b82f6',
                 'backgroundColor' => 'rgba(59,130,246,0.1)',
@@ -253,83 +251,50 @@ class DashboardController extends Controller
         ];
     }
 
-    private function chartUsersByRole(): array
-    {
+    private function chartUsersByRole(): array {
         $rows = DB::table('roles')
             ->leftJoin('user_roles', 'roles.id', '=', 'user_roles.role_id')
             ->select('roles.name', DB::raw('COUNT(user_roles.user_id) as total'))
-            ->groupBy('roles.id', 'roles.name')
-            ->get();
-
+            ->groupBy('roles.id', 'roles.name')->get();
         return [
-            'labels' => $rows->pluck('name')->toArray(),
+            'labels' => $rows->pluck('name')->toArray() ?: ['Hakuna'],
             'datasets' => [[
                 'label' => 'Users',
-                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray(),
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
                 'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
             ]],
         ];
     }
 
-    private function chartDocumentsByCategory(): array
-    {
-        if (!Schema::hasTable('documents')) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Documents', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
+    private function chartGroupBy(string $table, array $candidates, string $label): array {
+        if (!$this->has($table)) return $this->chartEmpty($label);
         $col = null;
-        foreach (['category','document_category','type'] as $c) {
-            if (Schema::hasColumn('documents', $c)) { $col = $c; break; }
-        }
-        if (!$col) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Documents', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
-        $rows = DB::table('documents')->select($col.' as cat', DB::raw('COUNT(*) as total'))->groupBy($col)->get();
+        foreach ($candidates as $c) if (Schema::hasColumn($table, $c)) { $col = $c; break; }
+        if (!$col) return $this->chartEmpty($label);
+        $rows = DB::table($table)->select($col.' as k', DB::raw('COUNT(*) as total'))->groupBy($col)->get();
         return [
-            'labels' => $rows->pluck('cat')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
+            'labels' => $rows->pluck('k')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
             'datasets' => [[
-                'label' => 'Documents',
+                'label' => $label,
                 'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
-                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444'],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
             ]],
         ];
     }
 
-    private function chartProjectsByStatus(): array
-    {
-        if (!Schema::hasTable('projects')) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Projects', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
-        $col = Schema::hasColumn('projects','status') ? 'status' : null;
-        if (!$col) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Projects', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
-        $rows = DB::table('projects')->select($col.' as st', DB::raw('COUNT(*) as total'))->groupBy($col)->get();
+    private function chartEmployeesByDept(): array {
+        if (!$this->has('employees')) return $this->chartEmpty('Employees');
+        if (!Schema::hasColumn('employees', 'department_id')) return $this->chartEmpty('Employees');
+        $rows = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('departments.name as dept', DB::raw('COUNT(*) as total'))
+            ->groupBy('departments.name')->get();
         return [
-            'labels' => $rows->pluck('st')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
+            'labels' => $rows->pluck('dept')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
             'datasets' => [[
-                'label' => 'Projects',
+                'label' => 'Employees',
                 'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
-                'backgroundColor' => ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6'],
-            ]],
-        ];
-    }
-
-    private function chartTasksByStatus(): array
-    {
-        if (!Schema::hasTable('tasks')) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Tasks', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
-        $col = Schema::hasColumn('tasks','status') ? 'status' : null;
-        if (!$col) {
-            return ['labels' => ['Hakuna'], 'datasets' => [['label' => 'Tasks', 'data' => [0], 'backgroundColor' => ['#3b82f6']]]];
-        }
-        $rows = DB::table('tasks')->select($col.' as st', DB::raw('COUNT(*) as total'))->groupBy($col)->get();
-        return [
-            'labels' => $rows->pluck('st')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
-            'datasets' => [[
-                'label' => 'Tasks',
-                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
-                'backgroundColor' => ['#10b981','#f59e0b','#3b82f6','#ef4444','#8b5cf6'],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
             ]],
         ];
     }
