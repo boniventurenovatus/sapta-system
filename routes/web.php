@@ -930,3 +930,11 @@ Route::get('/debug/seed-locations', function() {
         'results' => $results,
     ]);
 })->name('debug.seed-locations');
+// ============================================================
+// LOCATION API — kwa dropdowns (Mkoa/Wilaya/Kata)
+// ============================================================
+Route::middleware(['auth'])->prefix('location')->name('location.')->group(function () {
+    Route::get('/regions', [\App\Http\Controllers\LocationController::class, 'regions'])->name('regions');
+    Route::get('/districts', [\App\Http\Controllers\LocationController::class, 'districts'])->name('districts');
+    Route::get('/wards', [\App\Http\Controllers\LocationController::class, 'wards'])->name('wards');
+});

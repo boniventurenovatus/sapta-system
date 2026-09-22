@@ -28,22 +28,29 @@ class ReportController extends Controller
 
     public function employees(Request $request)
     {
-        $query = \App\Models\Employee::query();
-        if ($request->filled('department')) $query->where('department_id', $request->department);
-        if ($request->filled('status')) $query->where('employment_status', $request->status);
-        $employees = $query->paginate(50);
+        $query = $this->has('employees') ? DB::table('employees')->whereNull('deleted_at') : null;
+
+        if ($query && $request->filled('department_id')) $query->where('department_id', $request->department_id);
+        if ($query && $request->filled('region_id')) $query->where('region_id', $request->region_id);
+        if ($query && $request->filled('district_id')) $query->where('district_id', $request->district_id);
+        if ($query && $request->filled('ward_id')) $query->where('ward_id', $request->ward_id);
+        if ($query && $request->filled('status')) $query->where('employment_status', $request->status);
+
+        $employees = $query ? $query->orderByDesc('id')->paginate(50) : collect();
+
         $stats = [
-            'total' => $employees->total(),
+            'total' => $this->countWhereNull('employees', 'deleted_at'),
             'active' => $this->countWhere('employees', 'employment_status', 'active'),
             'inactive' => $this->countWhere('employees', 'employment_status', 'inactive'),
             'on_leave' => $this->countWhere('employees', 'employment_status', 'on_leave'),
         ];
+
         return view('reports.employees', compact('employees', 'stats'));
     }
 
     public function attendance(Request $request)
     {
-        $records = $this->has('attendances') ? DB::table('attendances')->orderByDesc('created_at')->paginate(50) : collect();
+        $records = $this->has('attendances') ? DB::table('attendances')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('attendances'),
             'present' => $this->countWhere('attendances', 'status', 'present'),
@@ -55,7 +62,7 @@ class ReportController extends Controller
 
     public function leaves(Request $request)
     {
-        $records = $this->has('leave_requests') ? DB::table('leave_requests')->orderByDesc('created_at')->paginate(50) : collect();
+        $records = $this->has('leave_requests') ? DB::table('leave_requests')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('leave_requests'),
             'pending' => $this->countWhere('leave_requests', 'status', 'pending'),
@@ -67,7 +74,7 @@ class ReportController extends Controller
 
     public function payroll(Request $request)
     {
-        $payslips = $this->has('payslips') ? DB::table('payslips')->orderByDesc('created_at')->paginate(50) : collect();
+        $payslips = $this->has('payslips') ? DB::table('payslips')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('payslips'),
             'gross' => $this->sum('payslips', 'gross_salary'),
@@ -79,7 +86,7 @@ class ReportController extends Controller
 
     public function paymentVouchers(Request $request)
     {
-        $vouchers = $this->has('payment_vouchers') ? DB::table('payment_vouchers')->orderByDesc('created_at')->paginate(50) : collect();
+        $vouchers = $this->has('payment_vouchers') ? DB::table('payment_vouchers')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('payment_vouchers'),
             'pending' => $this->countWhere('payment_vouchers', 'status', 'pending'),
@@ -92,7 +99,7 @@ class ReportController extends Controller
 
     public function receipts(Request $request)
     {
-        $receipts = $this->has('receipts') ? DB::table('receipts')->orderByDesc('created_at')->paginate(50) : collect();
+        $receipts = $this->has('receipts') ? DB::table('receipts')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('receipts'),
             'confirmed' => $this->countWhere('receipts', 'status', 'confirmed'),
@@ -103,7 +110,7 @@ class ReportController extends Controller
 
     public function budgets(Request $request)
     {
-        $budgets = $this->has('budgets') ? DB::table('budgets')->orderByDesc('created_at')->paginate(50) : collect();
+        $budgets = $this->has('budgets') ? DB::table('budgets')->orderByDesc('id')->paginate(50) : collect();
         $allocated = $this->sum('budgets', 'allocated_amount');
         $spent = $this->sum('budgets', 'spent_amount');
         $stats = [
@@ -117,7 +124,7 @@ class ReportController extends Controller
 
     public function projects(Request $request)
     {
-        $records = $this->has('projects') ? DB::table('projects')->orderByDesc('created_at')->paginate(50) : collect();
+        $records = $this->has('projects') ? DB::table('projects')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('projects'),
             'active' => $this->countWhere('projects', 'status', 'active'),
@@ -129,7 +136,7 @@ class ReportController extends Controller
 
     public function tasks(Request $request)
     {
-        $records = $this->has('tasks') ? DB::table('tasks')->orderByDesc('created_at')->paginate(50) : collect();
+        $records = $this->has('tasks') ? DB::table('tasks')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('tasks'),
             'pending' => $this->countWhere('tasks', 'status', 'pending'),
@@ -141,10 +148,10 @@ class ReportController extends Controller
 
     public function recruitment(Request $request)
     {
-        $jobs = $this->has('recruitments') ? DB::table('recruitments')->orderByDesc('created_at')->paginate(50) : collect();
+        $jobs = collect();
         $stats = [
-            'total_jobs' => $this->count('recruitments'),
-            'open_jobs' => $this->countWhere('recruitments', 'status', 'open'),
+            'total_jobs' => 0,
+            'open_jobs' => 0,
             'applications' => 0,
             'hired' => 0,
         ];
@@ -153,7 +160,7 @@ class ReportController extends Controller
 
     public function trainings(Request $request)
     {
-        $trainings = $this->has('trainings') ? DB::table('trainings')->orderByDesc('created_at')->paginate(50) : collect();
+        $trainings = $this->has('trainings') ? DB::table('trainings')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('trainings'),
             'planned' => $this->countWhere('trainings', 'status', 'planned'),
@@ -166,7 +173,7 @@ class ReportController extends Controller
 
     public function performance(Request $request)
     {
-        $reviews = $this->has('performance_reviews') ? DB::table('performance_reviews')->orderByDesc('created_at')->paginate(50) : collect();
+        $reviews = $this->has('performance_reviews') ? DB::table('performance_reviews')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
             'total' => $this->count('performance_reviews'),
             'avg_rating' => $this->avg('performance_reviews', 'overall_rating'),
@@ -178,9 +185,9 @@ class ReportController extends Controller
 
     public function documents(Request $request)
     {
-        $documents = $this->has('documents') ? DB::table('documents')->orderByDesc('created_at')->paginate(50) : collect();
+        $documents = $this->has('documents') ? DB::table('documents')->whereNull('deleted_at')->orderByDesc('id')->paginate(50) : collect();
         $stats = [
-            'total' => $this->count('documents'),
+            'total' => $this->countWhereNull('documents', 'deleted_at'),
             'active' => $this->countWhere('documents', 'status', 'active'),
             'draft' => $this->countWhere('documents', 'status', 'draft'),
             'expiring' => 0,
@@ -196,6 +203,9 @@ class ReportController extends Controller
     private function countWhere(string $t, string $col, $val): int {
         return ($this->has($t) && Schema::hasColumn($t, $col)) ? DB::table($t)->where($col, $val)->count() : 0;
     }
+    private function countWhereNull(string $t, string $col): int {
+        return ($this->has($t) && Schema::hasColumn($t, $col)) ? DB::table($t)->whereNull($col)->count() : 0;
+    }
     private function sum(string $t, string $col): int {
         return ($this->has($t) && Schema::hasColumn($t, $col)) ? (int) DB::table($t)->sum($col) : 0;
     }
@@ -205,10 +215,10 @@ class ReportController extends Controller
 
     private function allStats(): array {
         return [
-            'employees' => $this->count('employees'),
+            'employees' => $this->countWhereNull('employees', 'deleted_at'),
             'departments' => $this->count('departments'),
             'positions' => $this->count('positions'),
-            'documents' => $this->count('documents'),
+            'documents' => $this->countWhereNull('documents', 'deleted_at'),
             'projects' => $this->count('projects'),
             'tasks' => $this->count('tasks'),
             'budgets' => $this->count('budgets'),
@@ -217,7 +227,7 @@ class ReportController extends Controller
             'vouchers' => $this->count('payment_vouchers'),
             'attendance' => $this->count('attendances'),
             'leaves' => $this->count('leave_requests'),
-            'recruitment' => $this->count('recruitments'),
+            'recruitment' => 0,
             'trainings' => $this->count('trainings'),
             'performance' => $this->count('performance_reviews'),
             'users' => $this->count('users'),
