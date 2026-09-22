@@ -23,25 +23,67 @@ class DocumentController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Document::with(['uploader', 'employee', 'project', 'approvedBy'])
-            ->orderBy('created_at', 'desc');
+        $query = Document::with(['uploader', 'employee', 'project', 'approvedBy']);
 
+        // ============================================================
+        // SEARCH
+        // ============================================================
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
                 $q->where('title', 'like', "%{$s}%")
                   ->orWhere('document_number', 'like', "%{$s}%")
-                  ->orWhere('description', 'like', "%{$s}%");
+                  ->orWhere('description', 'like', "%{$s}%")
+                  ->orWhere('file_name', 'like', "%{$s}%");
             });
         }
 
-        $documents = $query->paginate(20);
+        // ============================================================
+        // CATEGORY FILTER
+        // ============================================================
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
 
+        // ============================================================
+        // STATUS FILTER
+        // ============================================================
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // ============================================================
+        // EMPLOYEE FILTER
+        // ============================================================
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        // ============================================================
+        // PROJECT FILTER
+        // ============================================================
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        // ============================================================
+        // VISIBILITY FILTER
+        // ============================================================
+        if ($request->filled('visibility')) {
+            $query->where('visibility', $request->visibility);
+        }
+
+        $documents = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+
+        // ============================================================
+        // STATS
+        // ============================================================
         $stats = [
-            'total' => Document::count(),
-            'active' => Document::where('status', 'active')->count(),
-            'draft' => Document::where('status', 'draft')->count(),
-            'expired' => Document::where('status', 'expired')->count(),
+            'total'    => Document::count(),
+            'active'   => Document::where('status', 'active')->count(),
+            'draft'    => Document::where('status', 'draft')->count(),
+            'expired'  => Document::where('status', 'expired')->count(),
+            'archived' => Document::where('status', 'archived')->count(),
         ];
 
         return view('documents.index', compact('documents', 'stats'));
