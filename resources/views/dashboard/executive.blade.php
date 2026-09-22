@@ -129,7 +129,7 @@
                     <p class="text-sm text-slate-500 text-center py-4">No recent activities.</p>
                 @else
                     <div class="space-y-2">
-                        @foreach(array_slice($recent_activities, 0, 6) as $log)
+                        @foreach($recent_activities->take(6) as $log)
                             <div class="flex items-start gap-2 p-2 border-b border-slate-50">
                                 <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-circle text-[8px]"></i>

@@ -65,7 +65,7 @@
             <x-empty-state icon="fa-history" title="No Activities" message="No recent activities." />
         @else
             <div class="space-y-2">
-                @foreach(array_slice($recent_activities, 0, 8) as $log)
+                @foreach($recent_activities->take(8) as $log)
                     <div class="flex items-start gap-3 p-3 border-b border-slate-50">
                         <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-circle text-xs"></i>
