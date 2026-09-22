@@ -1,33 +1,70 @@
-@extends('layouts.sapta')
+@extends('layouts.reports')
+
 @section('title', 'Documents Report')
-@section('page-title', 'Documents Report')
-@section('content')
-<div style="padding:1.5rem; max-width:1500px; margin:0 auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
-        <div><h1 style="font-size:1.75rem; font-weight:800; margin:0 0 0.25rem;">Documents Report</h1><p style="color:#64748b; margin:0;">All documents summary.</p></div>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <a href="{{ route('reports.index') }}" style="padding:0.6rem 1rem; background:#fff; color:#475569; border:1.5px solid #e2e8f0; border-radius:0.5rem; text-decoration:none; font-weight:700;"><i class="fas fa-arrow-left"></i> Back</a>
-    <a href="{{ route('reports.export.documents') }}" class="rp-btn rp-btn-csv" style="padding:0.6rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; text-decoration:none; font-weight:700; margin-left:8px;"><i class="fas fa-file-csv"></i> CSV</a>
-    <button onclick="window.print()" class="rp-btn rp-btn-print" style="padding:0.6rem 1rem; background:#3b82f6; color:#fff; border:none; border-radius:0.5rem; font-weight:700; cursor:pointer; margin-left:8px;"><i class="fas fa-print"></i> Print</button>
-        </div>
+@section('report-title', 'Documents Report')
+@section('report-subtitle', 'All system documents')
+@section('export-route', route('reports.export.documents'))
+
+@section('report-content')
+
+<div class="rp-stats">
+    <div class="rp-stat">
+        <p class="rp-stat-label">Total Documents</p>
+        <p class="rp-stat-value">{{ $stats['total'] ?? 0 }}</p>
+        <div class="rp-stat-icon"><i class="fas fa-file-lines"></i></div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
-        <div style="background:#fff; border-radius:0.875rem; padding:1.25rem; border:1px solid #e2e8f0;"><p style="font-size:0.72rem; color:#64748b; font-weight:800; text-transform:uppercase; margin:0;"><i class="fas fa-file-lines" style="color:#ec4899;"></i> Total</p><p style="font-size:1.5rem; font-weight:800; margin:0.35rem 0 0;">{{ $stats['total'] }}</p></div>
-        <div style="background:#fff; border-radius:0.875rem; padding:1.25rem; border:1px solid #e2e8f0;"><p style="font-size:0.72rem; color:#64748b; font-weight:800; text-transform:uppercase; margin:0;"><i class="fas fa-circle-check" style="color:#10b981;"></i> Active</p><p style="font-size:1.5rem; font-weight:800; margin:0.35rem 0 0;">{{ $stats['active'] }}</p></div>
-        <div style="background:#fff; border-radius:0.875rem; padding:1.25rem; border:1px solid #e2e8f0;"><p style="font-size:0.72rem; color:#64748b; font-weight:800; text-transform:uppercase; margin:0;"><i class="fas fa-clock" style="color:#94a3b8;"></i> Draft</p><p style="font-size:1.5rem; font-weight:800; margin:0.35rem 0 0;">{{ $stats['draft'] }}</p></div>
-        <div style="background:#fff; border-radius:0.875rem; padding:1.25rem; border:1px solid #e2e8f0;"><p style="font-size:0.72rem; color:#64748b; font-weight:800; text-transform:uppercase; margin:0;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;"></i> Expiring</p><p style="font-size:1.5rem; font-weight:800; margin:0.35rem 0 0;">{{ $stats['expiring'] }}</p></div>
+    <div class="rp-stat">
+        <p class="rp-stat-label">Active</p>
+        <p class="rp-stat-value">{{ $stats['active'] ?? 0 }}</p>
+        <div class="rp-stat-icon"><i class="fas fa-circle-check"></i></div>
     </div>
-    <div style="background:#fff; border-radius:0.875rem; border:1px solid #e2e8f0; overflow:hidden;">
-        <div style="padding:1rem 1.25rem; border-bottom:1px solid #f1f5f9; background:#fafbfc;"><h2 style="font-size:0.95rem; font-weight:700; margin:0;"><i class="fas fa-list" style="color:#ec4899;"></i> Documents ({{ $documents->count() }})</h2></div>
-        @if($documents->count() > 0)
-            <div class="sapta-table-wrap"><table class="sapta-table"><thead><tr><th>Document #</th><th>Title</th><th>Category</th><th>Size</th><th>Uploaded</th><th>Status</th></tr></thead><tbody>
-                @foreach($documents as $d)
-                    <tr><td><code>{{ $d->document_number }}</code></td><td><strong>{{ $d->title }}</strong></td><td>{{ ucfirst($d->category) }}</td><td>{{ $d->file_size_formatted }}</td><td>{{ $d->created_at->format('M d, Y') }}</td><td><span class="badge badge-{{ $d->status_color }}">{{ ucfirst($d->status) }}</span></td></tr>
-                @endforeach
-            </tbody></table></div>
-        @else
-            <div style="text-align:center; padding:3rem 1rem; color:#94a3b8;"><i class="fas fa-file-lines" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i> No documents yet.</div>
-        @endif
+    <div class="rp-stat">
+        <p class="rp-stat-label">Draft</p>
+        <p class="rp-stat-value">{{ $stats['draft'] ?? 0 }}</p>
+        <div class="rp-stat-icon"><i class="fas fa-clock"></i></div>
+    </div>
+    <div class="rp-stat">
+        <p class="rp-stat-label">Expiring</p>
+        <p class="rp-stat-value">{{ $stats['expiring'] ?? 0 }}</p>
+        <div class="rp-stat-icon"><i class="fas fa-triangle-exclamation"></i></div>
     </div>
 </div>
+
+<div class="rp-card">
+    <div class="rp-card-head">
+        <h2><i class="fas fa-list"></i> Documents ({{ $documents->count() ?? 0 }})</h2>
+    </div>
+    @if(($documents->count() ?? 0) > 0)
+        <div class="rp-table-wrap">
+            <table class="rp-table">
+                <thead>
+                    <tr>
+                        <th>Document #</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Uploaded</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($documents as $d)
+                    <tr>
+                        <td><code>{{ $d->document_number ?? $d->id }}</code></td>
+                        <td><strong>{{ $d->title ?? '—' }}</strong></td>
+                        <td>{{ ucfirst($d->category ?? '—') }}</td>
+                        <td>{{ isset($d->created_at) ? \Carbon\Carbon::parse($d->created_at)->format('M d, Y') : '—' }}</td>
+                        <td><span class="rp-badge rp-badge-{{ $d->status ?? 'draft' }}">{{ ucfirst($d->status ?? 'draft') }}</span></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <div class="rp-empty">
+            <i class="fas fa-inbox"></i>
+            <p>No documents found.</p>
+        </div>
+    @endif
+</div>
+
 @endsection
