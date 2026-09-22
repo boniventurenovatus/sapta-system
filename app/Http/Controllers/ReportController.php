@@ -23,28 +23,60 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(): View
     {
+        $user = auth()->user();
+        $roleCodes = $user->roles->pluck('code')->toArray();
+
+        // ============================================================
+        // STAFF — Anaona reports zake tu
+        // ============================================================
+        if (in_array('staff', $roleCodes)) {
+            $employeeId = $user->employee_id;
+
+            $myStats = [
+                'my_tasks' => \App\Models\Task::where('assigned_to', $user->id)->count(),
+                'my_completed_tasks' => \App\Models\Task::where('assigned_to', $user->id)->where('status', 'done')->count(),
+                'my_pending_tasks' => \App\Models\Task::where('assigned_to', $user->id)->where('status', '!=', 'done')->count(),
+                'my_leaves' => \App\Models\LeaveRequest::where('employee_id', $employeeId)->count(),
+                'my_pending_leaves' => \App\Models\LeaveRequest::where('employee_id', $employeeId)->where('status', 'pending')->count(),
+                'my_approved_leaves' => \App\Models\LeaveRequest::where('employee_id', $employeeId)->where('status', 'approved')->count(),
+                'my_attendance' => \App\Models\Attendance::where('employee_id', $employeeId)->count(),
+                'my_trainings' => \App\Models\TrainingEnrollment::where('employee_id', $employeeId)->count(),
+            ];
+
+            return view('reports.staff', compact('myStats'));
+        }
+
+        // ============================================================
+        // ADMIN, HR, FINANCE, DIRECTOR, MANAGER — Wanaona reports zote
+        // ============================================================
         $stats = [
-            'employees' => Employee::count(),
-            'attendance' => Attendance::count(),
-            'leaves' => LeaveRequest::count(),
-            'projects' => Project::count(),
-            'tasks' => Task::count(),
-            'payslips' => Payslip::count(),
-            'vouchers' => PaymentVoucher::count(),
-            'receipts' => Receipt::count(),
-            'budgets' => Budget::count(),
-            'trainings' => Training::count(),
-            'performance' => PerformanceReview::count(),
-            'documents' => Document::count(),
+            'employees' => \App\Models\Employee::count(),
+            'departments' => \App\Models\Department::count(),
+            'positions' => \App\Models\Position::count(),
+            'documents' => \App\Models\Document::count(),
+            'projects' => \App\Models\Project::count(),
+            'tasks' => \App\Models\Task::count(),
+            'budgets' => \App\Models\Budget::count(),
+            'receipts' => \App\Models\Receipt::count(),
         ];
 
-        return view('reports.index', compact('stats'));
-    }
+        $reports = [
+            ['title' => 'Employee Report', 'route' => 'reports.employees', 'icon' => 'fa-users', 'color' => 'blue', 'desc' => 'All employees data'],
+            ['title' => 'Attendance Report', 'route' => 'reports.attendance', 'icon' => 'fa-clock', 'color' => 'green', 'desc' => 'Attendance records'],
+            ['title' => 'Leaves Report', 'route' => 'reports.leaves', 'icon' => 'fa-calendar-check', 'color' => 'yellow', 'desc' => 'Leave requests'],
+            ['title' => 'Payroll Report', 'route' => 'reports.payroll', 'icon' => 'fa-money-bill-wave', 'color' => 'purple', 'desc' => 'Payroll data'],
+            ['title' => 'Budgets Report', 'route' => 'reports.budgets', 'icon' => 'fa-wallet', 'color' => 'green', 'desc' => 'Budget usage'],
+            ['title' => 'Projects Report', 'route' => 'reports.projects', 'icon' => 'fa-diagram-project', 'color' => 'indigo', 'desc' => 'Projects overview'],
+            ['title' => 'Tasks Report', 'route' => 'reports.tasks', 'icon' => 'fa-list-check', 'color' => 'red', 'desc' => 'Task status'],
+            ['title' => 'Recruitment Report', 'route' => 'reports.recruitment', 'icon' => 'fa-user-plus', 'color' => 'pink', 'desc' => 'Recruitment data'],
+            ['title' => 'Trainings Report', 'route' => 'reports.trainings', 'icon' => 'fa-graduation-cap', 'color' => 'orange', 'desc' => 'Training records'],
+            ['title' => 'Documents Report', 'route' => 'reports.documents', 'icon' => 'fa-file-lines', 'color' => 'slate', 'desc' => 'Documents data'],
+        ];
 
-    // ========== EMPLOYEES ==========
-    public function employees(Request $request)
+        return view('reports.index', compact('stats', 'reports'));
+    }public function employees(Request $request)
     {
         $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $query = Employee::with(['department', 'organization', 'region', 'district', 'ward']);

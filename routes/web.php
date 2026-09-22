@@ -99,7 +99,7 @@ Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->n
 Route::get('/language/switch', [LanguageController::class, 'switch'])->name('language.switch');
 
 // REPORTS
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:super_admin,admin,director,manager,finance_manager');
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('auth');
 Route::get('/reports/employees', [ReportController::class, 'employees'])->name('reports.employees')->middleware('role:super_admin,admin,director,manager,finance_manager');
 Route::get('/reports/attendance', [ReportController::class, 'attendance'])->name('reports.attendance')->middleware('role:super_admin,admin,director,manager,finance_manager');
 Route::get('/reports/projects', [ReportController::class, 'projects'])->name('reports.projects')->middleware('role:super_admin,admin,director,manager,finance_manager');
