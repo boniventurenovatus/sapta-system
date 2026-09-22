@@ -148,10 +148,6 @@ class User extends Authenticatable
         } else {
             $this->attributes['password_hash'] = Hash::make($value);
         }
-    } else {
-            $this->attributes['password_hash'] = Hash::make($value);
-        }
-    }
 
     /*
     |--------------------------------------------------------------------------
