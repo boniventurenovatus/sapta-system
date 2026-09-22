@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+
 use App\Models\Employee;
 use App\Models\Attendance;
 use App\Models\LeaveRequest;
@@ -14,7 +16,7 @@ use App\Models\Receipt;
 use App\Models\Budget;
 use App\Models\Training;
 use App\Models\TrainingEnrollment;
-use App\Models\PerformanceReview;
+use Illuminate\View\View;
 use App\Models\Document;
 use App\Models\JobPosting;
 use App\Models\JobApplication;
