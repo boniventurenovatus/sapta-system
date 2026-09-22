@@ -46,17 +46,26 @@ class TrainingController extends Controller
         return view('trainings.index', compact('trainings', 'stats', 'departments'));
     }
 
-    public function create()
+    public function create(): View
     {
-        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $regions = \App\Models\Region::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        $employees = Employee::orderBy('first_name')->get();
-        $nextNumber = Training::generateNumber();
-        return view('trainings.create', compact('departments', 'employees', 'nextNumber'));
-    }
+        $districts = \App\Models\District::orderBy('name')->get();
+        $wards = \App\Models\Ward::orderBy('name')->get();
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        $organizations = \App\Models\Organization::orderBy('name')->get();
+        $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
+        $trainers = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
 
-    public function store(Request $request)
+        return view('trainings.create', compact(
+            'regions',
+            'districts',
+            'wards',
+            'departments',
+            'organizations',
+            'employees',
+            'trainers'
+        ));
+    }public function store(Request $request)
     {
         $validated = $request->validate([
             'training_number' => 'required|string|max:50|unique:trainings,training_number',
@@ -98,14 +107,27 @@ class TrainingController extends Controller
         return view('trainings.show', compact('training', 'employees'));
     }
 
-    public function edit(Training $training)
+    public function edit(Training $training): View
     {
         $regions = \App\Models\Region::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        return view('trainings.edit', compact('training', 'departments', 'regions'));
-    }
+        $districts = \App\Models\District::orderBy('name')->get();
+        $wards = \App\Models\Ward::orderBy('name')->get();
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        $organizations = \App\Models\Organization::orderBy('name')->get();
+        $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
+        $trainers = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
 
-    public function update(Request $request, Training $training)
+        return view('trainings.edit', compact(
+            'training',
+            'regions',
+            'districts',
+            'wards',
+            'departments',
+            'organizations',
+            'employees',
+            'trainers'
+        ));
+    }public function update(Request $request, Training $training)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
