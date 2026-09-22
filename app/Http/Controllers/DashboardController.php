@@ -22,7 +22,7 @@ class DashboardController extends Controller
             return redirect()->route('dashboard.executive');
         }
 
-        if (in_array('hr_manager', $roles) || in_array('hr_officer', $roles)) {
+        if (in_array('hr_manager', $roles) || in_array('hr_officer', $roles) || in_array('admin_director', $roles)) {
             return redirect()->route('dashboard.hr');
         }
 
