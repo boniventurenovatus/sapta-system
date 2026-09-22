@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+
 use App\Models\Training;
 use App\Helpers\NotificationHelper;
 use App\Models\TrainingEnrollment;
@@ -46,8 +48,7 @@ class TrainingController extends Controller
         return view('trainings.index', compact('trainings', 'stats', 'departments'));
     }
 
-    public function create(): View
-    {
+    public function create(): View {
         $regions = \App\Models\Region::orderBy('name')->get();
         $districts = \App\Models\District::orderBy('name')->get();
         $wards = \App\Models\Ward::orderBy('name')->get();
@@ -107,8 +108,7 @@ class TrainingController extends Controller
         return view('trainings.show', compact('training', 'employees'));
     }
 
-    public function edit(Training $training): View
-    {
+    public function edit(Training $training): View {
         $regions = \App\Models\Region::orderBy('name')->get();
         $districts = \App\Models\District::orderBy('name')->get();
         $wards = \App\Models\Ward::orderBy('name')->get();
