@@ -814,3 +814,19 @@ Route::get('/debug/import-users', function() {
         'errors' => $errors,
     ]);
 })->name('debug.import-users');
+// ============================================================
+// REPORTS ROUTES (auto-generated)
+// ============================================================
+Route::middleware(['auth'])->get('/reports/employees', [\App\Http\Controllers\ReportController::class, 'employees'])->name('reports.employees');
+Route::middleware(['auth'])->get('/reports/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('reports.attendance');
+Route::middleware(['auth'])->get('/reports/leaves', [\App\Http\Controllers\ReportController::class, 'leaves'])->name('reports.leaves');
+Route::middleware(['auth'])->get('/reports/payroll', [\App\Http\Controllers\ReportController::class, 'payroll'])->name('reports.payroll');
+Route::middleware(['auth'])->get('/reports/payment-vouchers', [\App\Http\Controllers\ReportController::class, 'paymentVouchers'])->name('reports.payment-vouchers');
+Route::middleware(['auth'])->get('/reports/receipts', [\App\Http\Controllers\ReportController::class, 'receipts'])->name('reports.receipts');
+Route::middleware(['auth'])->get('/reports/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])->name('reports.budgets');
+Route::middleware(['auth'])->get('/reports/projects', [\App\Http\Controllers\ReportController::class, 'projects'])->name('reports.projects');
+Route::middleware(['auth'])->get('/reports/tasks', [\App\Http\Controllers\ReportController::class, 'tasks'])->name('reports.tasks');
+Route::middleware(['auth'])->get('/reports/recruitment', [\App\Http\Controllers\ReportController::class, 'recruitment'])->name('reports.recruitment');
+Route::middleware(['auth'])->get('/reports/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('reports.trainings');
+Route::middleware(['auth'])->get('/reports/performance', [\App\Http\Controllers\ReportController::class, 'performance'])->name('reports.performance');
+Route::middleware(['auth'])->get('/reports/documents', [\App\Http\Controllers\ReportController::class, 'documents'])->name('reports.documents');
