@@ -973,3 +973,59 @@ Route::get('/debug/run-migrations', function() {
         ], 500);
     }
 })->name('debug.run-migrations');
+// ============================================================
+// DEBUG: FORCE CREATE employee_audit_logs (bila migration)
+// ============================================================
+Route::get('/debug/force-create-audit-table', function() {
+    try {
+        // Drop kama ipo (kwa usalama)
+        \Schema::dropIfExists('employee_audit_logs');
+
+        // Unda upya
+        \Schema::create('employee_audit_logs', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('employee_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('action');
+            $table->string('old_status')->nullable();
+            $table->string('new_status')->nullable();
+            $table->text('reason')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamps();
+
+            $table->index('employee_id');
+            $table->index('user_id');
+            $table->index('action');
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Table employee_audit_logs imeundwa',
+            'columns' => \Schema::getColumnListing('employee_audit_logs'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.force-create-audit-table');
+
+// ============================================================
+// DEBUG: Check migrations zote
+// ============================================================
+Route::get('/debug/check-migrations', function() {
+    $pending = \DB::table('migrations')->pluck('migration')->toArray();
+    $files = [];
+    foreach (glob(database_path('migrations/*.php')) as $file) {
+        $files[] = basename($file, '.php');
+    }
+    $unrun = array_diff($files, $pending);
+    
+    return response()->json([
+        'total_migrations' => count($files),
+        'run_migrations' => count($pending),
+        'pending' => array_values($unrun),
+    ]);
+})->name('debug.check-migrations');
