@@ -595,3 +595,23 @@ Route::get('employees/{employee}/credentials', [App\Http\Controllers\EmployeeCon
 Route::post('employees/{employee}/reset-password', [App\Http\Controllers\EmployeeController::class, 'resetPassword'])
     ->name('employees.reset-password')
     ->middleware('role:super_admin,admin,hr_manager,hr_officer');
+
+// DEBUG ROUTE — Run seeders
+Route::get('/debug/run-seeder', function() {
+    try {
+        \Artisan::call('db:seed', ['--class' => 'FullAccessSeeder', '--force' => true]);
+        \Artisan::call('db:seed', ['--class' => 'DatabaseImportSeeder', '--force' => true]);
+        \Artisan::call('db:seed', ['--class' => 'RoleUsersSeeder', '--force' => true]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Seeders zimeendesha',
+            'users' => \App\Models\User::count(),
+            'roles' => \App\Models\Role::count(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.run-seeder');
