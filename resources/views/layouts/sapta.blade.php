@@ -87,7 +87,34 @@
             .tb-topbar { padding: 0.625rem 1rem; }
             .tb-title { font-size: 0.95rem; }
         }
-    </style>
+    
+        /* ============================================================
+           PRINT — ficha sidebar, topbar, buttons
+           ============================================================ */
+        @media print {
+            .sidebar, .topbar, .tb-topbar, .sidebar-toggle, .btn, button, .no-print,
+            nav, header, .navbar, .page-header .btn, .rp-header-actions,
+            .rp-filter, .pagination, .actions, .table-actions {
+                display: none !important;
+            }
+            body, .main-content, .content {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+            .rp-card, .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+            }
+            .rp-stats {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            table { font-size: 11px !important; }
+            th, td { padding: 6px 8px !important; }
+        }
+</style>
 
     @stack('styles')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -602,7 +629,34 @@ document.addEventListener('DOMContentLoaded', function() {
             from { transform: translateX(120%); opacity: 0; }
             to   { transform: translateX(0);    opacity: 1; }
         }
-    </style>
+    
+        /* ============================================================
+           PRINT — ficha sidebar, topbar, buttons
+           ============================================================ */
+        @media print {
+            .sidebar, .topbar, .tb-topbar, .sidebar-toggle, .btn, button, .no-print,
+            nav, header, .navbar, .page-header .btn, .rp-header-actions,
+            .rp-filter, .pagination, .actions, .table-actions {
+                display: none !important;
+            }
+            body, .main-content, .content {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+            .rp-card, .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+            }
+            .rp-stats {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            table { font-size: 11px !important; }
+            th, td { padding: 6px 8px !important; }
+        }
+</style>
 
 </body>
 </html>
