@@ -666,28 +666,40 @@ Route::get('/debug/login-test', function() {
 Route::get('/debug/reset-all-passwords', function() {
     $users = \App\Models\User::all();
     $reset = 0;
+    $hashedPassword = \Hash::make('Sapta@2025!');
     
     foreach ($users as $user) {
-        $user->update([
-            'password_hash' => \Hash::make('Sapta@2025!'),
-            'account_status' => 'active',
-            'is_first_login' => false,
-            'credentials_expires_at' => now()->addDays(30),
-        ]);
+        // Tumia DB::table — bypass setPasswordAttribute
+        \DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'password_hash' => $hashedPassword,
+                'account_status' => 'active',
+                'is_first_login' => false,
+                'credentials_expires_at' => now()->addDays(30),
+            ]);
         
         if ($user->employee) {
-            $user->employee->update([
-                'employment_status' => 'active',
-            ]);
+            \DB::table('employees')
+                ->where('id', $user->employee->id)
+                ->update([
+                    'employment_status' => 'active',
+                ]);
         }
         
         $reset++;
     }
+    
+    // Thibitisha
+    $checkUser = \App\Models\User::where('username', 'superadmin')->first();
+    $verify = \Hash::check('Sapta@2025!', $checkUser->password_hash);
     
     return response()->json([
         'success' => true,
         'message' => 'Passwords zote zimereset',
         'password' => 'Sapta@2025!',
         'users_reset' => $reset,
+        'superadmin_verify' => $verify,
+        'superadmin_hash' => substr($checkUser->password_hash, 0, 30),
     ]);
 })->name('debug.reset-all-passwords');
