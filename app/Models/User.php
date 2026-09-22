@@ -35,6 +35,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'credentials_expires_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_first_login' => 'boolean',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -137,7 +143,11 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password_hash'] = Hash::make($value);
+        if (is_string($value) && preg_match('/^\$2[aby]\$/', $value)) {
+            $this->attributes['password_hash'] = $value;
+        } else {
+            $this->attributes['password_hash'] = Hash::make($value);
+        }
     }
 
     /*
