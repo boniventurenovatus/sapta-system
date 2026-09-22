@@ -66,42 +66,34 @@ class TrainingController extends Controller
             'employees',
             'trainers'
         ));
-    }public function store(Request $request)
+    }public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'training_number' => 'required|string|max:50|unique:trainings,training_number',
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'required|in:orientation,technical,soft_skills,compliance,leadership,safety,other',
-            'trainer_name' => 'nullable|string|max:200',
-            'trainer_type' => 'required|in:internal,external',
-            'trainer_contact' => 'nullable|string|max:200',
-            'location' => 'nullable|string|max:255',
+            'type' => 'required|in:internal,external,online,workshop',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'start_time' => 'nullable',
-            'end_time' => 'nullable',
             'duration_hours' => 'nullable|integer|min:0',
-            'max_participants' => 'nullable|integer|min:0',
             'cost' => 'nullable|numeric|min:0',
-            'currency' => 'required|string|max:10',
-            'department_id' => 'nullable|exists:departments,id',
-            'notes' => 'nullable|string',
-            'region_id' => 'nullable|exists:regions,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'ward_id' => 'nullable|exists:wards,id',
+            'region_id' => 'nullable|integer|exists:regions,id',
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'ward_id' => 'nullable|integer|exists:wards,id',
+            'organization_id' => 'nullable|integer|exists:organizations,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'trainer_name' => 'nullable|string|max:255',
+            'trainer_email' => 'nullable|email|max:255',
+            'max_participants' => 'nullable|integer|min:0',
+            'venue' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         $validated['created_by'] = auth()->id();
-        $validated['status'] = 'planned';
+        $validated['status'] = 'draft';
 
         Training::create($validated);
 
-        return redirect()->route('trainings.index')
-            ->with('success', 'Training created successfully.');
-    }
-
-    public function show(Training $training)
+        return redirect()->route('trainings.index')->with('success', 'Training imeundwa kikamilifu.');
+    }public function show(Training $training)
     {
         $training->load(['department', 'createdBy', 'enrollments.employee']);
         $employees = Employee::orderBy('first_name')->get();
