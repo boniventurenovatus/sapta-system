@@ -418,26 +418,27 @@ public function markPaid(PaymentVoucher $paymentVoucher)
 
     public function downloadPdf(PaymentVoucher $paymentVoucher)
     {
-        if (!class_exists('Barryvdh\DomPDF\Facade\Pdf')) {
-            return back()->with('error', 'PDF package haipo. Endesha: composer require barryvdh/laravel-dompdf');
-        }
+        $paymentVoucher->load([
+            'items',
+            'organization',
+            'department',
+            'project',
+            'preparedBy',
+            'checkedBy',
+            'approvedBy',
+            'authorizedBy',
+        ]);
 
-        $data = [
-            'voucher'    => $paymentVoucher,
-            'creator'    => $paymentVoucher->creator,
-            'approver'   => $paymentVoucher->approver,
-            'project'    => $paymentVoucher->project_id ? DB::table('projects')->where('id', $paymentVoucher->project_id)->first() : null,
-            'department' => DB::table('departments')->where('name', $paymentVoucher->department)->first(),
-            'generated_at' => now(),
-        ];
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('payment-vouchers.pdf', [
+            'paymentVoucher' => $paymentVoucher,
+        ]);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('payment-vouchers.pdf', ['voucher' => $paymentVoucher]);
         $pdf->setPaper('A4', 'portrait');
 
-        return $pdf->download('Payment-Voucher-' . $paymentVoucher->voucher_number . '.pdf');
-    }
+        $fileName = 'payment-voucher-' . $paymentVoucher->voucher_number . '.pdf';
 
-    public function print(PaymentVoucher $paymentVoucher)
+        return $pdf->download($fileName);
+    }public function print(PaymentVoucher $paymentVoucher)
     {
         $data = [
             'voucher'    => $paymentVoucher,
