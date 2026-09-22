@@ -2,11 +2,12 @@
     $user = auth()->user();
     $roleCodes = $user ? $user->roles->pluck('code')->toArray() : [];
     
+    // Helper function
     $hasAnyRole = function($roles) use ($roleCodes) {
         return !empty(array_intersect($roleCodes, $roles));
     };
     
-    // Role Groups
+    // Role groups
     $isSuperAdmin = $hasAnyRole(['super_admin', 'admin']);
     $isExecutive = $hasAnyRole(['bod', 'ceo']);
     $isDirector = $hasAnyRole(['director', 'admin_director', 'program_director']);
@@ -18,14 +19,8 @@
     $isManager = in_array('manager', $roleCodes);
     $isStaff = in_array('staff', $roleCodes);
     
-    // Admin level — kwa menus za HR/Finance/Projects
+    // Admin-level access (kwa menus za HR/Finance/Admin)
     $isAdminLevel = $isSuperAdmin || $isExecutive || $isDirector;
-    
-    // Unread messages count
-    $unreadCount = 0;
-    try {
-        $unreadCount = \App\Models\Message::where('recipient_id', auth()->id())->where('is_read', false)->count();
-    } catch (\Exception $e) {}
 @endphp
 
 <aside class="sapta-sidebar" id="sapta-sidebar">
@@ -160,7 +155,7 @@
                     <span class="sapta-nav-text">Positions</span>
                 </a>
                 
-                <a href="{{ route('attendances.index') }}" class="sapta-nav-item {{ request()->routeIs('attendances.*') ? 'active' : '' }}">
+                <a href="{{ route('attendances.index') }}" class="sapta-nav-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
                     <i class="fas fa-clock"></i>
                     <span class="sapta-nav-text">Attendance</span>
                 </a>
@@ -212,7 +207,7 @@
         @endif
 
         {{-- ============================================ --}}
-        {{-- PROJECTS & PROGRAMS --}}
+        {{-- PROGRAMS --}}
         {{-- ============================================ --}}
         @if($isProgram || $isSuperAdmin)
             <div class="sapta-nav-section">
@@ -250,67 +245,17 @@
         @endif
 
         {{-- ============================================ --}}
-        {{-- MANAGER — Team --}}
-        {{-- ============================================ --}}
-        @if($isManager)
-            <div class="sapta-nav-section">
-                <div class="sapta-nav-section-title">Management</div>
-                
-                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span class="sapta-nav-text">My Team</span>
-                </a>
-                
-                <a href="{{ route('tasks.index') }}" class="sapta-nav-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
-                    <i class="fas fa-list-check"></i>
-                    <span class="sapta-nav-text">Team Tasks</span>
-                </a>
-            </div>
-        @endif
-
-        {{-- ============================================ --}}
-        {{-- STAFF — My Work --}}
-        {{-- ============================================ --}}
-        @if($isStaff)
-            <div class="sapta-nav-section">
-                <div class="sapta-nav-section-title">My Work</div>
-                
-                <a href="{{ route('tasks.index') }}" class="sapta-nav-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
-                    <i class="fas fa-tasks"></i>
-                    <span class="sapta-nav-text">My Tasks</span>
-                </a>
-                
-                <a href="{{ route('leave-requests.index') }}" class="sapta-nav-item {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-check"></i>
-                    <span class="sapta-nav-text">My Leaves</span>
-                </a>
-                
-                <a href="{{ route('attendances.index') }}" class="sapta-nav-item {{ request()->routeIs('attendances.*') ? 'active' : '' }}">
-                    <i class="fas fa-clock"></i>
-                    <span class="sapta-nav-text">My Attendance</span>
-                </a>
-                
-                <a href="{{ route('trainings.index') }}" class="sapta-nav-item {{ request()->routeIs('trainings.*') ? 'active' : '' }}">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span class="sapta-nav-text">My Trainings</span>
-                </a>
-                
-                <a href="{{ route('documents.index') }}" class="sapta-nav-item {{ request()->routeIs('documents.*') ? 'active' : '' }}">
-                    <i class="fas fa-folder"></i>
-                    <span class="sapta-nav-text">My Documents</span>
-                </a>
-            </div>
-        @endif
-
-        {{-- ============================================ --}}
         {{-- COMMUNICATION — Kwa wote --}}
         {{-- ============================================ --}}
         <div class="sapta-nav-section">
             <div class="sapta-nav-section-title">Communication</div>
             
-            <a href="{{ route('communication.inbox') }}" class="sapta-nav-item {{ request()->routeIs('communication.inbox') ? 'active' : '' }}">
+            <a href="{{ route('communication.inbox') }}" class="sapta-nav-item {{ request()->routeIs('inbox.*') ? 'active' : '' }}">
                 <i class="fas fa-inbox"></i>
                 <span class="sapta-nav-text">Inbox</span>
+                @php
+                    $unreadCount = \App\Models\Message::where('recipient_id', auth()->id())->where('is_read', false)->count();
+                @endphp
                 @if($unreadCount > 0)
                     <span class="sapta-nav-badge">{{ $unreadCount }}</span>
                 @endif
@@ -328,7 +273,7 @@
         <div class="sapta-nav-section">
             <div class="sapta-nav-section-title">Reports</div>
             
-            <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.index') ? 'active' : '' }}">
+            <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <i class="fas fa-file-lines"></i>
                 <span class="sapta-nav-text">All Reports</span>
             </a>
