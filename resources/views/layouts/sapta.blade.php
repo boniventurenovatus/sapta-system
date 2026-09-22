@@ -752,5 +752,41 @@ window.confirm = function(message) {
     border: none !important;
 }
 </style>
+
+<script>
+/* ============================================================
+   SAPTA FORM CONFIRM — SweetAlert2 kwa forms
+   ============================================================ */
+window.saptaFormConfirm = function(event, message, options) {
+    if (event) event.preventDefault();
+    
+    const form = event ? event.target : null;
+    if (!form) return false;
+    
+    const isDanger = message.toLowerCase().includes('delete') 
+        || message.toLowerCase().includes('deactivate')
+        || message.toLowerCase().includes('suspend')
+        || message.toLowerCase().includes('terminate');
+    
+    Swal.fire({
+        title: options && options.title ? options.title : (isDanger ? 'Are you sure?' : 'Confirm'),
+        text: message,
+        icon: isDanger ? 'warning' : 'question',
+        showCancelButton: true,
+        confirmButtonColor: isDanger ? '#dc2626' : '#3b82f6',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: options && options.confirmText ? options.confirmText : (isDanger ? 'Yes, continue' : 'OK'),
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        focusCancel: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+    
+    return false;
+};
+</script>
 </body>
 </html>

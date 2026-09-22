@@ -254,7 +254,7 @@
                                     </a>
                                     {{-- Suspend --}}
                                     @if($emp->employment_status === 'active')
-                                        <form method="POST" action="{{ route('employees.suspend', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Suspend employee?')">
+                                        <form method="POST" action="{{ route('employees.suspend', $emp->id) }}" style="display:inline;" onsubmit="return saptaFormConfirm(event, '')">
                                             @csrf
                                             <button type="submit" title="Suspend" style="background:none; border:none; color:#8b5cf6; font-size: 1.1rem; cursor: pointer;">
                                                 <i class="fas fa-pause"></i>
@@ -263,7 +263,7 @@
                                     @endif
                                     {{-- Deactivate --}}
                                     @if($emp->employment_status === 'active')
-                                        <form method="POST" action="{{ route('employees.deactivate', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Deactivate employee?')">
+                                        <form method="POST" action="{{ route('employees.deactivate', $emp->id) }}" style="display:inline;" onsubmit="return saptaFormConfirm(event, '')">
                                             @csrf
                                             <button type="submit" title="Deactivate" style="background:none; border:none; color:#dc2626; font-size: 1.1rem; cursor: pointer;">
                                                 <i class="fas fa-trash"></i>
