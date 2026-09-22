@@ -201,6 +201,8 @@
     <a href="{{ route('reports.index') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> <span data-en="Back" data-sw="Rudi">Back</span>
     </a>
+    <a href="{{ route('reports.export.leaves') }}" class="btn-csv" style="padding:0.6rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; text-decoration:none; font-weight:700; margin-left:8px;"><i class="fas fa-file-csv"></i> CSV</a>
+    <button onclick="window.print()" class="btn-print" style="padding:0.6rem 1rem; background:#3b82f6; color:#fff; border:none; border-radius:0.5rem; font-weight:700; cursor:pointer; margin-left:8px;"><i class="fas fa-print"></i> Print</button>
 </div>
 
 <!-- Stats -->

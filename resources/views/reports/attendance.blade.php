@@ -202,41 +202,10 @@
     <a href="{{ route('reports.index') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> <span data-en="Back" data-sw="Rudi">Back</span>
     </a>
+    <a href="{{ route('reports.export.attendance') }}" class="btn-csv" style="padding:0.6rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; text-decoration:none; font-weight:700; margin-left:8px;"><i class="fas fa-file-csv"></i> CSV</a>
+    <button onclick="window.print()" class="btn-print" style="padding:0.6rem 1rem; background:#3b82f6; color:#fff; border:none; border-radius:0.5rem; font-weight:700; cursor:pointer; margin-left:8px;"><i class="fas fa-print"></i> Print</button>
 </div>
 
-<div class="filter-card" style="background:#fff; border-radius:16px; border:1px solid #e8ecf1; padding:20px 24px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-    <h6 style="font-size:14px; font-weight:600; color:#1a1a2e; margin:0 0 16px 0; display:flex; align-items:center; gap:8px;">
-        <i class="fas fa-filter" style="color:#1a5276;"></i> Filters
-    </h6>
-    <form method="GET" action="{{ route('reports.attendance') }}">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:16px; align-items:end;">
-            <div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">From Date</label>
-    <input type="date" name="from" value="{{ request('from') }}" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-</div>
-<div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">To Date</label>
-    <input type="date" name="to" value="{{ request('to') }}" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-</div>
-<div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Region</label>
-    <select name="region_id" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-        <option value="">All Regions</option>
-        @foreach($regions ?? [] as $r)
-            <option value="{{ $r->id }}" @selected(request('region_id') == $r->id)>{{ $r->name }}</option>
-        @endforeach
-    </select>
-</div>
-            <div style="display:flex; gap:8px;">
-                <button type="submit" style="padding:10px 20px; border-radius:10px; font-weight:700; font-size:13px; background:linear-gradient(135deg,#1a5276,#2d8a9e); color:#fff; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                    <i class="fas fa-search"></i> Filter
-                </button>
-                <a href="{{ route('reports.attendance') }}" style="padding:10px 20px; border-radius:10px; font-weight:700; font-size:13px; background:#fff; color:#4a5a6f; border:1.5px solid #e8ecf1; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                    <i class="fas fa-rotate-left"></i> Clear
-                </a>
-            </div>
-        </div>
-    </form>
 </div>
 <!-- Stats -->
 <div class="stats-grid">
@@ -278,39 +247,6 @@
     </div>
 </div>
 
-<div class="filter-card" style="background:#fff; border-radius:16px; border:1px solid #e8ecf1; padding:20px 24px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-    <h6 style="font-size:14px; font-weight:600; color:#1a1a2e; margin:0 0 16px 0; display:flex; align-items:center; gap:8px;">
-        <i class="fas fa-filter" style="color:#1a5276;"></i> Filters
-    </h6>
-    <form method="GET" action="{{ route('reports.attendance') }}">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:16px; align-items:end;">
-            <div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">From Date</label>
-    <input type="date" name="from" value="{{ request('from') }}" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-</div>
-<div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">To Date</label>
-    <input type="date" name="to" value="{{ request('to') }}" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-</div>
-<div>
-    <label style="display:block; font-size:11px; font-weight:700; color:#4a5a6f; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Region</label>
-    <select name="region_id" style="width:100%; padding:10px 14px; border:1.5px solid #e8ecf1; border-radius:10px; font-size:14px; background:#fff;">
-        <option value="">All Regions</option>
-        @foreach($regions ?? [] as $r)
-            <option value="{{ $r->id }}" @selected(request('region_id') == $r->id)>{{ $r->name }}</option>
-        @endforeach
-    </select>
-</div>
-            <div style="display:flex; gap:8px;">
-                <button type="submit" style="padding:10px 20px; border-radius:10px; font-weight:700; font-size:13px; background:linear-gradient(135deg,#1a5276,#2d8a9e); color:#fff; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                    <i class="fas fa-search"></i> Filter
-                </button>
-                <a href="{{ route('reports.attendance') }}" style="padding:10px 20px; border-radius:10px; font-weight:700; font-size:13px; background:#fff; color:#4a5a6f; border:1.5px solid #e8ecf1; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                    <i class="fas fa-rotate-left"></i> Clear
-                </a>
-            </div>
-        </div>
-    </form>
 </div>
 <!-- Table -->
 <div class="table-container">

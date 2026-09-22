@@ -317,6 +317,8 @@
     <a href="{{ route('reports.index') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> Back
     </a>
+    <a href="{{ route('reports.export.employees') }}" class="btn-csv" style="padding:0.6rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; text-decoration:none; font-weight:700; margin-left:8px;"><i class="fas fa-file-csv"></i> CSV</a>
+    <button onclick="window.print()" class="btn-print" style="padding:0.6rem 1rem; background:#3b82f6; color:#fff; border:none; border-radius:0.5rem; font-weight:700; cursor:pointer; margin-left:8px;"><i class="fas fa-print"></i> Print</button>
 </div>
 
 <!-- Stats -->
@@ -360,49 +362,6 @@
 </div>
 
 <!-- Filters -->
-<div class="filter-card">
-    <h6 class="filter-title"><i class="fas fa-filter" style="color:#1a5276;"></i> Filters</h6>
-    <form method="GET" action="{{ route('reports.employees') }}">
-        <div class="filter-grid">
-            <div class="filter-group">
-                <label>Department</label>
-                <select name="department_id">
-                    <option value="">All Departments</option>
-                    @foreach($departments ?? [] as $d)
-                        <option value="{{ $d->id }}" @selected(request('department_id') == $d->id)>{{ $d->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Region</label>
-                <select name="region_id">
-                    <option value="">All Regions</option>
-                    @foreach($regions ?? [] as $r)
-                        <option value="{{ $r->id }}" @selected(request('region_id') == $r->id)>{{ $r->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Status</label>
-                <select name="status">
-                    <option value="">All Status</option>
-                    <option value="active" @selected(request('status') == 'active')>Active</option>
-                    <option value="inactive" @selected(request('status') == 'inactive')>Inactive</option>
-                    <option value="on_leave" @selected(request('status') == 'on_leave')>On Leave</option>
-                    <option value="suspended" @selected(request('status') == 'suspended')>Suspended</option>
-                    <option value="terminated" @selected(request('status') == 'terminated')>Terminated</option>
-                </select>
-            </div>
-            <div class="filter-actions">
-                <button type="submit" class="filter-btn filter-btn-primary">
-                    <i class="fas fa-search"></i> Filter
-                </button>
-                <a href="{{ route('reports.employees') }}" class="filter-btn filter-btn-secondary">
-                    <i class="fas fa-rotate-left"></i> Clear
-                </a>
-            </div>
-        </div>
-    </form>
 </div>
 
 <!-- Table -->
