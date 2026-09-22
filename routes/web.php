@@ -955,3 +955,21 @@ Route::middleware(['auth'])->prefix('reports/export')->name('reports.export.')->
     Route::get('/performance', [\App\Http\Controllers\ReportController::class, 'exportPerformanceCsv'])->name('performance');
     Route::get('/documents', [\App\Http\Controllers\ReportController::class, 'exportDocumentsCsv'])->name('documents');
 });
+// ============================================================
+// DEBUG: RUN MIGRATIONS
+// ============================================================
+Route::get('/debug/run-migrations', function() {
+    try {
+        \Artisan::call('migrate', ['--force' => true]);
+        $output = \Artisan::output();
+        return response()->json([
+            'success' => true,
+            'output' => $output,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.run-migrations');

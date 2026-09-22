@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmployeeAuditLog extends Model
 {
+    protected $table = 'employee_audit_logs';
+
     protected $fillable = [
         'employee_id',
         'user_id',
@@ -18,48 +19,13 @@ class EmployeeAuditLog extends Model
         'user_agent',
     ];
 
-    public function employee(): BelongsTo
+    public function employee()
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function getActionLabelAttribute(): string
-    {
-        return match ($this->action) {
-            'deactivate' => 'Deactivated',
-            'terminate'  => 'Terminated',
-            'activate'   => 'Activated',
-            'suspend'    => 'Suspended',
-            'delete'     => 'Deleted',
-            default      => ucfirst($this->action),
-        };
-    }
-
-    public function getActionColorAttribute(): string
-    {
-        return match ($this->action) {
-            'activate'   => 'green',
-            'deactivate' => 'yellow',
-            'suspend'    => 'purple',
-            'terminate'  => 'red',
-            'delete'     => 'red',
-            default      => 'gray',
-        };
-    }
-
-    public function getUserNameAttribute(): string
-    {
-        if (!$this->user) {
-            return 'System';
-        }
-
-        return $this->user->username
-            ?? $this->user->email
-            ?? 'User #' . $this->user_id;
     }
 }
