@@ -62,7 +62,35 @@ class DashboardController extends Controller
             'total_positions' => \Schema::hasTable('positions') ? \DB::table('positions')->count() : 0,
             'total_audit_logs' => \Schema::hasTable('audit_logs') ? \DB::table('audit_logs')->count() : 0,
         ];
-        return view('dashboard.admin', compact('kpis'));
+
+        // Users by role
+        $usersByRole = \DB::table('roles')
+            ->leftJoin('user_roles', 'roles.id', '=', 'user_roles.role_id')
+            ->select('roles.name', \DB::raw('COUNT(user_roles.user_id) as total'))
+            ->groupBy('roles.id', 'roles.name')
+            ->get();
+
+        $charts = [
+            'users_by_role' => [
+                'labels' => $usersByRole->pluck('name')->toArray(),
+                'datasets' => [[
+                    'label' => 'Users',
+                    'data' => $usersByRole->pluck('total')->map(fn($v) => (int)$v)->toArray(),
+                    'backgroundColor' => ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#6366f1'],
+                ]],
+            ],
+            'activity' => [
+                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'datasets' => [[
+                    'label' => 'Activity',
+                    'data' => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    'borderColor' => '#3b82f6',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                ]],
+            ],
+        ];
+
+        return view('dashboard.admin', compact('kpis', 'charts'));
     }
 
     public function director()
