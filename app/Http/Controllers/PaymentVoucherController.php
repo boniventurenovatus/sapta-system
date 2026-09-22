@@ -47,15 +47,24 @@ class PaymentVoucherController extends Controller
         return view('payment-vouchers.index', compact('vouchers', 'stats'));
     }
 
-    public function create()
+    public function create(): View
     {
-        $projects = DB::table('projects')->take(50)->get(['id', 'name']);
-        $departments = DB::table('departments')->get(['id', 'name']);
-        $users = \App\Models\User::orderBy('username')->get(['id', 'username', 'email']);
-        return view('payment-vouchers.create', compact('projects', 'departments', 'users'));
-    }
+        $regions = \App\Models\Region::orderBy('name')->get();
+        $districts = \App\Models\District::orderBy('name')->get();
+        $wards = \App\Models\Ward::orderBy('name')->get();
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        $organizations = \App\Models\Organization::orderBy('name')->get();
+        $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
 
-    public function store(StorePaymentVoucherRequest $request)
+        return view('payment-vouchers.create', compact(
+            'regions',
+            'districts',
+            'wards',
+            'departments',
+            'organizations',
+            'employees'
+        ));
+    }public function store(StorePaymentVoucherRequest $request)
     {
         $action = $request->input('action', 'draft');
 
@@ -179,25 +188,25 @@ class PaymentVoucherController extends Controller
         return view('payment-vouchers.show', ['voucher' => $paymentVoucher, 'versions' => $versions, 'auditLogs' => $auditLogs]);
     }
 
-public function edit(PaymentVoucher $paymentVoucher)
+public function edit(PaymentVoucher $paymentVoucher): View
     {
-        $projects = DB::table('projects')->take(50)->get(['id', 'name']);
-        $departments = DB::table('departments')->get(['id', 'name']);
-        $users = \App\Models\User::orderBy('username')->get(['id', 'username', 'email']);
-        
-        // Location data
-        $regions = \App\Models\Region::orderBy('name')->get(['id', 'name']);
-        $districts = \App\Models\District::orderBy('name')->get(['id', 'name', 'region_id']);
-        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'district_id']);
-        $organizations = \App\Models\Organization::orderBy('name')->get(['id', 'name']);
-        
-        return view('payment-vouchers.edit', compact(
-            'paymentVoucher', 'projects', 'departments', 'users',
-            'regions', 'districts', 'wards', 'organizations'
-        ));
-    }
+        $regions = \App\Models\Region::orderBy('name')->get();
+        $districts = \App\Models\District::orderBy('name')->get();
+        $wards = \App\Models\Ward::orderBy('name')->get();
+        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        $organizations = \App\Models\Organization::orderBy('name')->get();
+        $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
 
-    public function update(UpdatePaymentVoucherRequest $request, PaymentVoucher $paymentVoucher)
+        return view('payment-vouchers.edit', compact(
+            'paymentVoucher',
+            'regions',
+            'districts',
+            'wards',
+            'departments',
+            'organizations',
+            'employees'
+        ));
+    }public function update(UpdatePaymentVoucherRequest $request, PaymentVoucher $paymentVoucher)
     {
         $action = $request->input('action', 'draft');
 
