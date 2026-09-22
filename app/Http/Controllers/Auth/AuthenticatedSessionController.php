@@ -79,7 +79,7 @@ class AuthenticatedSessionController extends Controller
         // ============================================================
         // CHECK: Credentials Expiry
         // ============================================================
-        if ($user->credentials_expires_at && $user->credentials_expires_at->isPast() && $user->is_first_login) {
+        if ($user->credentials_expires_at && \Carbon\Carbon::parse($user->credentials_expires_at)->isPast() && $user->is_first_login) {
             return back()
                 ->withErrors([
                     'email' => 'Credentials zako zime-expire. Tafadhali wasiliana na Admin.',
