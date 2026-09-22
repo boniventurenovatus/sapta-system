@@ -70,16 +70,25 @@ class DashboardController extends Controller
             ->groupBy('roles.id', 'roles.name')
             ->get();
 
+        // Documents by category
+        $documentsByCategory = collect();
+        if (\Schema::hasTable('documents')) {
+            $documentsByCategory = \DB::table('documents')
+                ->select('category', \DB::raw('COUNT(*) as total'))
+                ->groupBy('category')
+                ->get();
+        }
+
         $charts = [
             'users_by_role' => [
                 'labels' => $usersByRole->pluck('name')->toArray(),
                 'datasets' => [[
                     'label' => 'Users',
                     'data' => $usersByRole->pluck('total')->map(fn($v) => (int)$v)->toArray(),
-                    'backgroundColor' => ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#6366f1'],
+                    'backgroundColor' => ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#6366f1', '#14b8a6', '#f97316'],
                 ]],
             ],
-            'activity' => [
+            'user_activity' => [
                 'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 'datasets' => [[
                     'label' => 'Activity',
@@ -88,9 +97,24 @@ class DashboardController extends Controller
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
                 ]],
             ],
+            'documents_by_category' => [
+                'labels' => $documentsByCategory->pluck('category')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
+                'datasets' => [[
+                    'label' => 'Documents',
+                    'data' => $documentsByCategory->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                    'backgroundColor' => ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
+                ]],
+            ],
         ];
 
-        return view('dashboard.admin', compact('kpis', 'charts'));
+        $recent_users = \App\Models\User::orderByDesc('created_at')->limit(5)->get();
+
+        $recent_logs = collect();
+        if (\Schema::hasTable('audit_logs')) {
+            $recent_logs = \DB::table('audit_logs')->orderByDesc('created_at')->limit(10)->get();
+        }
+
+        return view('dashboard.admin', compact('kpis', 'charts', 'recent_users', 'recent_logs'));
     }
 
     public function director()
