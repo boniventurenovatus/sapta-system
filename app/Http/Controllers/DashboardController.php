@@ -2,67 +2,91 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\DashboardService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    protected DashboardService $dashboard;
-
-    public function __construct(DashboardService $dashboard)
-    {
-        $this->dashboard = $dashboard;
-    }
-
     public function index()
     {
         $user = auth()->user();
-        $roleCodes = $user->roles->pluck('code')->toArray();
+        $roles = $user->roles()->pluck('code')->toArray();
 
-        // ================================================================
-        // CHAGUA DASHBOARD KWA ROLE
-        // ================================================================
-        if (array_intersect($roleCodes, ['super_admin', 'admin'])) {
-            return view('dashboard.admin', $this->dashboard->adminData());
+        // ============================================================
+        // REDIRECT KULINGANA NA ROLE
+        // ============================================================
+        if (in_array('super_admin', $roles) || in_array('admin', $roles)) {
+            return redirect()->route('dashboard.super_admin');
         }
 
-        if (array_intersect($roleCodes, ['bod', 'ceo'])) {
-            return view('dashboard.executive', $this->dashboard->executiveData());
+        if (in_array('ceo', $roles) || in_array('bod', $roles) || in_array('director', $roles)) {
+            return redirect()->route('dashboard.executive');
         }
 
-        if (array_intersect($roleCodes, ['director', 'admin_director', 'program_director'])) {
-            return view('dashboard.director', $this->dashboard->directorData());
+        if (in_array('hr_manager', $roles) || in_array('hr_officer', $roles)) {
+            return redirect()->route('dashboard.hr');
         }
 
-        if (array_intersect($roleCodes, ['hr_manager', 'hr_officer'])) {
-            return view('dashboard.hr', $this->dashboard->hrData());
+        if (in_array('finance_manager', $roles) || in_array('accountant', $roles)) {
+            return redirect()->route('dashboard.finance');
         }
 
-        if (array_intersect($roleCodes, ['finance_manager', 'accountant', 'procurement_manager'])) {
-            return view('dashboard.finance', $this->dashboard->financeData());
+        if (in_array('manager', $roles) || in_array('project_manager', $roles) 
+            || in_array('project_officer', $roles) || in_array('program_director', $roles)) {
+            return redirect()->route('dashboard.manager');
         }
 
-        if (array_intersect($roleCodes, ['project_manager', 'project_officer', 'field_trainer', 'partnerships_manager'])) {
-            return view('dashboard.program', $this->dashboard->programData());
+        if (in_array('procurement_manager', $roles)) {
+            return redirect()->route('dashboard.procurement');
         }
 
-        if (array_intersect($roleCodes, ['meal_manager', 'meal_officer', 'research_officer'])) {
-            return view('dashboard.meal', $this->dashboard->mealData());
-        }
+        // Default — staff
+        return redirect()->route('dashboard.staff');
+    }
 
-        if (array_intersect($roleCodes, ['ict_manager', 'community_manager'])) {
-            return view('dashboard.ict', $this->dashboard->ictData());
-        }
+    // ============================================================
+    // DASHBOARD VIEWS
+    // ============================================================
 
-        if (in_array('manager', $roleCodes)) {
-            return view('dashboard.manager', $this->dashboard->managerData());
-        }
+    public function superAdmin()
+    {
+        $totalUsers = \App\Models\User::count();
+        $totalEmployees = \App\Models\Employee::count();
+        $totalRoles = \DB::table('roles')->count();
+        $activeUsers = \App\Models\User::where('account_status', 'active')->count();
 
-        if (in_array('staff', $roleCodes)) {
-            return view('dashboard.staff', $this->dashboard->staffData($user->id));
-        }
+        return view('dashboards.super_admin', compact(
+            'totalUsers', 'totalEmployees', 'totalRoles', 'activeUsers'
+        ));
+    }
 
-        // Default — Admin dashboard
-        return view('dashboard.admin', $this->dashboard->adminData());
+    public function executive()
+    {
+        return view('dashboards.executive');
+    }
+
+    public function hr()
+    {
+        $totalEmployees = \App\Models\Employee::count();
+        return view('dashboards.hr', compact('totalEmployees'));
+    }
+
+    public function finance()
+    {
+        return view('dashboards.finance');
+    }
+
+    public function manager()
+    {
+        return view('dashboards.manager');
+    }
+
+    public function procurement()
+    {
+        return view('dashboards.procurement');
+    }
+
+    public function staff()
+    {
+        return view('dashboards.staff');
     }
 }

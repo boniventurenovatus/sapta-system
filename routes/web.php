@@ -703,3 +703,28 @@ Route::get('/debug/reset-all-passwords', function() {
         'superadmin_hash' => substr($checkUser->password_hash, 0, 30),
     ]);
 })->name('debug.reset-all-passwords');
+// ============================================================
+// ROLE-BASED DASHBOARDS
+// ============================================================
+Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('/super-admin', [\App\Http\Controllers\DashboardController::class, 'superAdmin'])
+        ->middleware('role:super_admin,admin')->name('super_admin');
+
+    Route::get('/executive', [\App\Http\Controllers\DashboardController::class, 'executive'])
+        ->middleware('role:ceo,bod,director')->name('executive');
+
+    Route::get('/hr', [\App\Http\Controllers\DashboardController::class, 'hr'])
+        ->middleware('role:hr_manager,hr_officer,admin_director')->name('hr');
+
+    Route::get('/finance', [\App\Http\Controllers\DashboardController::class, 'finance'])
+        ->middleware('role:finance_manager,accountant')->name('finance');
+
+    Route::get('/manager', [\App\Http\Controllers\DashboardController::class, 'manager'])
+        ->middleware('role:manager,project_manager,project_officer,program_director')->name('manager');
+
+    Route::get('/procurement', [\App\Http\Controllers\DashboardController::class, 'procurement'])
+        ->middleware('role:procurement_manager')->name('procurement');
+
+    Route::get('/staff', [\App\Http\Controllers\DashboardController::class, 'staff'])
+        ->middleware('role:staff')->name('staff');
+});
