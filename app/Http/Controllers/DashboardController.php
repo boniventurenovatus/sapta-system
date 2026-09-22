@@ -54,7 +54,15 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        return view('dashboard.admin');
+        $kpis = [
+            'total_users' => \DB::table('users')->count(),
+            'total_roles' => \DB::table('roles')->count(),
+            'total_permissions' => \Schema::hasTable('permissions') ? \DB::table('permissions')->count() : 0,
+            'total_departments' => \Schema::hasTable('departments') ? \DB::table('departments')->count() : 0,
+            'total_positions' => \Schema::hasTable('positions') ? \DB::table('positions')->count() : 0,
+            'total_audit_logs' => \Schema::hasTable('audit_logs') ? \DB::table('audit_logs')->count() : 0,
+        ];
+        return view('dashboard.admin', compact('kpis'));
     }
 
     public function director()
