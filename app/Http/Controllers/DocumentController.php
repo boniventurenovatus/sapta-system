@@ -65,67 +65,103 @@ class DocumentController extends Controller
     /**
      * Store new document
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        // ============================================================
+        // VALIDATION
+        // ============================================================
         $validated = $request->validate([
-            'title'        => 'required|string|max:255',
-            'description'  => 'nullable|string|max:2000',
-            'category'     => 'required|in:contract,policy,report,invoice,receipt,certificate,memo,other',
-            'visibility'   => 'required|in:private,team,public',
-            'employee_id'  => 'nullable|integer|exists:employees,id',
-            'project_id'   => 'nullable|integer|exists:projects,id',
-            'issue_date'   => 'nullable|date',
-            'expiry_date'  => 'nullable|date|after:issue_date',
-            'tags'         => 'nullable|string|max:500',
-            'notes'        => 'nullable|string|max:2000',
-            'file'         => 'required|file|max:51200', // 50MB
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'required|string|max:100',
+            'visibility' => 'required|in:public,private,department,organization',
+            'employee_id' => 'nullable|integer|exists:employees,id',
+            'project_id' => 'nullable|integer|exists:projects,id',
+            'region_id' => 'nullable|integer|exists:regions,id',
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'ward_id' => 'nullable|integer|exists:wards,id',
+            'issue_date' => 'required|date',
+            'expiry_date' => 'nullable|date|after_or_equal:issue_date',
+            'tags' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'file' => 'required|file|max:10240',
         ]);
 
-        // Upload file
+        // ============================================================
+        // HANDLE FILE UPLOAD
+        // ============================================================
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $storedName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('documents/' . date('Y/m'), $storedName, 'public');
+        $path = $file->store('documents/' . date('Y/m'), 'public');
 
-        // Generate document number
-        $docNumber = 'DOC-' . date('Y') . '-' . str_pad(Document::whereYear('created_at', date('Y'))->count() + 1, 4, '0', STR_PAD_LEFT);
+        // ============================================================
+        // AUTO-GENERATE DOCUMENT NUMBER
+        // Format: DOC-YYYY-XXXX
+        // ============================================================
+        $year = date('Y');
+        $prefix = 'DOC-' . $year . '-';
 
-        // Tags kama JSON array
+        // Tafuta number ya mwisho kwa mwaka huu
+        $lastDoc = Document::withTrashed()
+            ->where('document_number', 'LIKE', $prefix . '%')
+            ->orderBy('document_number', 'desc')
+            ->first();
+
+        if ($lastDoc) {
+            // Chukua namba ya mwisho
+            $lastNumber = (int) substr($lastDoc->document_number, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        $docNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+        // Hakikisha ni unique — kama ipo, ongeza
+        while (Document::withTrashed()->where('document_number', $docNumber)->exists()) {
+            $newNumber++;
+            $docNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        }
+
+        // ============================================================
+        // TAGS
+        // ============================================================
         $tags = null;
         if (!empty($validated['tags'])) {
             $tags = json_encode(array_map('trim', explode(',', $validated['tags'])));
         }
 
-        // Unda document
+        // ============================================================
+        // UNDA DOCUMENT
+        // ============================================================
         $document = Document::create([
-            'document_number'  => $docNumber,
-            'title'            => $validated['title'],
-            'description'      => $validated['description'] ?? null,
-            'category'         => $validated['category'],
-            'file_path'        => $path,
-            'file_name'        => $originalName,
-            'file_type'        => $file->getMimeType(),
-            'file_size'        => $file->getSize(),
-            'employee_id'      => $validated['employee_id'] ?? null,
-            'project_id'       => $validated['project_id'] ?? null,
-            'status'           => 'active',
-            'visibility'       => $validated['visibility'],
-            'issue_date'       => $validated['issue_date'] ?? now()->format('Y-m-d'),
-            'expiry_date'      => $validated['expiry_date'] ?? null,
-            'uploaded_by'      => Auth::id(),
-            'version'          => '1.0',
-            'tags'             => $tags,
-            'notes'            => $validated['notes'] ?? null,
+            'document_number' => $docNumber,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'category' => $validated['category'],
+            'file_path' => $path,
+            'file_name' => $originalName,
+            'file_type' => $file->getMimeType(),
+            'file_size' => $file->getSize(),
+            'employee_id' => $validated['employee_id'] ?? null,
+            'project_id' => $validated['project_id'] ?? null,
+            'region_id' => $validated['region_id'] ?? null,
+            'district_id' => $validated['district_id'] ?? null,
+            'ward_id' => $validated['ward_id'] ?? null,
+            'status' => 'active',
+            'visibility' => $validated['visibility'],
+            'issue_date' => $validated['issue_date'],
+            'expiry_date' => $validated['expiry_date'] ?? null,
+            'uploaded_by' => auth()->id(),
+            'version' => 1.0,
+            'tags' => $tags,
+            'notes' => $validated['notes'] ?? null,
         ]);
 
-        return redirect()->route('documents.show', $document->id)
-            ->with('success', 'Document "' . $document->title . '" uploaded successfully!');
-    }
-
-    /**
-     * Show single document
-     */
-    public function show(Document $document)
+        return redirect()
+            ->route('documents.index')
+            ->with('success', 'Document imeundwa kikamilifu. Document Number: ' . $docNumber);
+    }public function show(Document $document)
     {
         $document->load(['uploader', 'approvedBy', 'employee', 'project']);
         return view('documents.show', compact('document'));
