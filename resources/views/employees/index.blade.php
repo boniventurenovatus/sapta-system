@@ -88,11 +88,6 @@
     @endif
 
     {{-- SUCCESS MESSAGE --}}
-    @if (session('success'))
-        <div style="background: #dcfce7; border: 1px solid #22c55e; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #166534;">
-            {{ session('success') }}
-        </div>
-    @endif
 
     {{-- HEADER --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
