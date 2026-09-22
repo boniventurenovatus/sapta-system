@@ -1139,3 +1139,22 @@ Route::get('/debug/recreate-audit-table', function() {
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 })->name('debug.recreate-audit-table');
+// ============================================================
+// DEBUG: SESSION TEST
+// ============================================================
+Route::get('/debug/session-test', function() {
+    return response()->json([
+        'session_driver' => config('session.driver'),
+        'session_lifetime' => config('session.lifetime'),
+        'session_encrypt' => config('session.encrypt'),
+        'app_key' => config('app.key'),
+        'session_id' => session()->getId(),
+        'has_success' => session()->has('success'),
+        'success_message' => session('success'),
+        'all_session' => session()->all(),
+    ]);
+})->name('debug.session-test');
+
+Route::get('/debug/set-success', function() {
+    return redirect()->route('employees.index')->with('success', 'Test message from debug!');
+})->name('debug.set-success');
