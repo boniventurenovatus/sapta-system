@@ -638,3 +638,56 @@ Route::get('/debug/data-check', function() {
             ->get(),
     ]);
 })->name('debug.data-check');
+// DEBUG ROUTE — Test login kwenye Render
+Route::get('/debug/login-test', function() {
+    $users = \App\Models\User::take(10)->get();
+    $result = [];
+    
+    foreach ($users as $user) {
+        $result[] = [
+            'username' => $user->username,
+            'email' => $user->email,
+            'password_hash' => substr($user->password_hash, 0, 30) . '...',
+            'account_status' => $user->account_status,
+            'password_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash),
+            'password_check_password' => \Hash::check('password', $user->password_hash),
+        ];
+    }
+    
+    return response()->json([
+        'total_users' => \App\Models\User::count(),
+        'app_key' => config('app.key') ? 'IPO' : 'HAIPO',
+        'session_driver' => config('session.driver'),
+        'users' => $result,
+    ]);
+})->name('debug.login-test');
+
+// DEBUG ROUTE — Reset password kwenye Render
+Route::get('/debug/reset-all-passwords', function() {
+    $users = \App\Models\User::all();
+    $reset = 0;
+    
+    foreach ($users as $user) {
+        $user->update([
+            'password_hash' => \Hash::make('Sapta@2025!'),
+            'account_status' => 'active',
+            'is_first_login' => false,
+            'credentials_expires_at' => now()->addDays(30),
+        ]);
+        
+        if ($user->employee) {
+            $user->employee->update([
+                'employment_status' => 'active',
+            ]);
+        }
+        
+        $reset++;
+    }
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Passwords zote zimereset',
+        'password' => 'Sapta@2025!',
+        'users_reset' => $reset,
+    ]);
+})->name('debug.reset-all-passwords');
