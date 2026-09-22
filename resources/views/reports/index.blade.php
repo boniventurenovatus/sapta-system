@@ -5,6 +5,16 @@
 
 @section('content')
 <style>
+    .rp-card { position: relative; }
+    .rp-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+    .rp-card:hover .rp-actions { opacity: 1; }
+    .rp-action-btn { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; text-decoration: none; transition: all 0.2s; }
+    .rp-action-csv { background: #10b981; color: white; }
+    .rp-action-csv:hover { background: #059669; transform: translateY(-1px); }
+    .rp-action-print { background: #6366f1; color: white; }
+    .rp-action-print:hover { background: #4f46e5; transform: translateY(-1px); }
+</style>
+<style>
     .rp-page { padding: 1.5rem; max-width: 1500px; margin: 0 auto; }
     .rp-head { margin-bottom: 2rem; }
     .rp-head h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem; }

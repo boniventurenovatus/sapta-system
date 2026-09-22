@@ -938,3 +938,20 @@ Route::middleware(['auth'])->prefix('location')->name('location.')->group(functi
     Route::get('/districts', [\App\Http\Controllers\LocationController::class, 'districts'])->name('districts');
     Route::get('/wards', [\App\Http\Controllers\LocationController::class, 'wards'])->name('wards');
 });
+// ============================================================
+// REPORTS CSV EXPORT ROUTES
+// ============================================================
+Route::middleware(['auth'])->prefix('reports/export')->name('reports.export.')->group(function () {
+    Route::get('/employees', [\App\Http\Controllers\ReportController::class, 'exportEmployeesCsv'])->name('employees');
+    Route::get('/attendance', [\App\Http\Controllers\ReportController::class, 'exportAttendanceCsv'])->name('attendance');
+    Route::get('/leaves', [\App\Http\Controllers\ReportController::class, 'exportLeavesCsv'])->name('leaves');
+    Route::get('/projects', [\App\Http\Controllers\ReportController::class, 'exportProjectsCsv'])->name('projects');
+    Route::get('/tasks', [\App\Http\Controllers\ReportController::class, 'exportTasksCsv'])->name('tasks');
+    Route::get('/budgets', [\App\Http\Controllers\ReportController::class, 'exportBudgetsCsv'])->name('budgets');
+    Route::get('/receipts', [\App\Http\Controllers\ReportController::class, 'exportReceiptsCsv'])->name('receipts');
+    Route::get('/payroll', [\App\Http\Controllers\ReportController::class, 'exportPayrollCsv'])->name('payroll');
+    Route::get('/vouchers', [\App\Http\Controllers\ReportController::class, 'exportVouchersCsv'])->name('vouchers');
+    Route::get('/trainings', [\App\Http\Controllers\ReportController::class, 'exportTrainingsCsv'])->name('trainings');
+    Route::get('/performance', [\App\Http\Controllers\ReportController::class, 'exportPerformanceCsv'])->name('performance');
+    Route::get('/documents', [\App\Http\Controllers\ReportController::class, 'exportDocumentsCsv'])->name('documents');
+});

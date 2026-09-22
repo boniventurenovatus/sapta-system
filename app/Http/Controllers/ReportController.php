@@ -233,4 +233,50 @@ class ReportController extends Controller
             'users' => $this->count('users'),
         ];
     }
+
+    // ============================================================
+    // CSV EXPORTS
+    // ============================================================
+    public function exportEmployeesCsv() { return $this->csv('employees'); }
+    public function exportAttendanceCsv() { return $this->csv('attendances'); }
+    public function exportLeavesCsv() { return $this->csv('leave_requests'); }
+    public function exportProjectsCsv() { return $this->csv('projects'); }
+    public function exportTasksCsv() { return $this->csv('tasks'); }
+    public function exportBudgetsCsv() { return $this->csv('budgets'); }
+    public function exportReceiptsCsv() { return $this->csv('receipts'); }
+    public function exportPayrollCsv() { return $this->csv('payslips'); }
+    public function exportVouchersCsv() { return $this->csv('payment_vouchers'); }
+    public function exportTrainingsCsv() { return $this->csv('trainings'); }
+    public function exportPerformanceCsv() { return $this->csv('performance_reviews'); }
+    public function exportDocumentsCsv() { return $this->csv('documents'); }
+
+    private function csv(string $table)
+    {
+        if (!$this->has($table)) {
+            return back()->with('error', "Table $table haipo.");
+        }
+        $rows = DB::table($table)->limit(5000)->get();
+        $filename = $table . '_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ];
+
+        $callback = function() use ($rows) {
+            $out = fopen('php://output', 'w');
+            // BOM kwa Excel
+            fputs($out, "\xEF\xBB\xBF");
+            if ($rows->isNotEmpty()) {
+                fputcsv($out, array_keys((array) $rows->first()));
+                foreach ($rows as $row) {
+                    fputcsv($out, (array) $row);
+                }
+            }
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
