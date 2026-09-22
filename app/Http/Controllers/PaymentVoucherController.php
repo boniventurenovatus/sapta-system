@@ -450,4 +450,31 @@ public function markPaid(PaymentVoucher $paymentVoucher)
 
         return view('payment-vouchers.print', ['voucher' => $paymentVoucher]);
     }
+
+    /**
+     * Download Payment Voucher as PDF
+     */
+    public function printPdf(PaymentVoucher $paymentVoucher)
+    {
+        $paymentVoucher->load([
+            'items',
+            'organization',
+            'department',
+            'project',
+            'preparedBy',
+            'checkedBy',
+            'approvedBy',
+            'authorizedBy',
+        ]);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('payment-vouchers.pdf', [
+            'paymentVoucher' => $paymentVoucher,
+        ]);
+
+        $pdf->setPaper('A4', 'portrait');
+
+        $fileName = 'payment-voucher-' . $paymentVoucher->voucher_number . '.pdf';
+
+        return $pdf->download($fileName);
+    }
 }
