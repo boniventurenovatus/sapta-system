@@ -59,6 +59,8 @@ class PaymentVoucherController extends Controller
         $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $organizations = \App\Models\Organization::orderBy('name')->get();
         $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
+        $users = \App\Models\User::orderBy('username')->get();
+        $projects = \App\Models\Project::orderBy('name')->get();
 
         return view('payment-vouchers.create', compact(
             'regions',
@@ -66,7 +68,9 @@ class PaymentVoucherController extends Controller
             'wards',
             'departments',
             'organizations',
-            'employees'
+            'employees',
+            'users',
+            'projects'
         ));
     }public function store(StorePaymentVoucherRequest $request)
     {
@@ -200,6 +204,8 @@ public function edit(PaymentVoucher $paymentVoucher): View
         $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
         $organizations = \App\Models\Organization::orderBy('name')->get();
         $employees = \App\Models\Employee::where('employment_status', 'active')->orderBy('first_name')->get();
+        $users = \App\Models\User::orderBy('username')->get();
+        $projects = \App\Models\Project::orderBy('name')->get();
 
         return view('payment-vouchers.edit', compact(
             'paymentVoucher',
@@ -208,7 +214,9 @@ public function edit(PaymentVoucher $paymentVoucher): View
             'wards',
             'departments',
             'organizations',
-            'employees'
+            'employees',
+            'users',
+            'projects'
         ));
     }public function update(UpdatePaymentVoucherRequest $request, PaymentVoucher $paymentVoucher)
     {
