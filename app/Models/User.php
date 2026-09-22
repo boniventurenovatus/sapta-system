@@ -145,9 +145,7 @@ class User extends Authenticatable
     {
         if (is_string($value) && preg_match('/^\$2[aby]\$/', $value)) {
             $this->attributes['password_hash'] = $value;
-        } else {
-            $this->attributes['password_hash'] = Hash::make($value);
-        }
+    }
     }
 
     /*
