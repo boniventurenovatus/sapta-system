@@ -1,299 +1,295 @@
-<aside class="sapta-sidebar" id="saptaSidebar">
+@php
+    $user = auth()->user();
+    $roleCodes = $user ? $user->roles->pluck('code')->toArray() : [];
+    
+    // Helper function
+    $hasAnyRole = function($roles) use ($roleCodes) {
+        return !empty(array_intersect($roleCodes, $roles));
+    };
+    
+    // Role groups
+    $isSuperAdmin = $hasAnyRole(['super_admin', 'admin']);
+    $isExecutive = $hasAnyRole(['bod', 'ceo']);
+    $isDirector = $hasAnyRole(['director', 'admin_director', 'program_director']);
+    $isHR = $hasAnyRole(['hr_manager', 'hr_officer']);
+    $isFinance = $hasAnyRole(['finance_manager', 'accountant', 'procurement_manager']);
+    $isProgram = $hasAnyRole(['project_manager', 'project_officer', 'field_trainer', 'partnerships_manager']);
+    $isMEAL = $hasAnyRole(['meal_manager', 'meal_officer', 'research_officer']);
+    $isICT = $hasAnyRole(['ict_manager', 'community_manager']);
+    $isManager = in_array('manager', $roleCodes);
+    $isStaff = in_array('staff', $roleCodes);
+    
+    // Admin-level access (kwa menus za HR/Finance/Admin)
+    $isAdminLevel = $isSuperAdmin || $isExecutive || $isDirector;
+@endphp
 
+<aside class="sapta-sidebar" id="sapta-sidebar">
+    
+    {{-- LOGO --}}
     <div class="sapta-sidebar-header">
-        <a href="{{ url('/dashboard') }}" class="sapta-brand">
-            <img src="{{ asset('images/sapta-logo.png') }}?v={{ time() }}" alt="SAPTA" class="sapta-brand-logo">
-            <span class="sapta-brand-text">
-                <strong>SAPTA</strong>
-                <small>Management System</small>
-            </span>
+        <a href="{{ route('dashboard') }}" class="sapta-logo">
+            <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA" style="height: 32px;">
+            <div>
+                <div class="sapta-logo-title">SAPTA</div>
+                <div class="sapta-logo-subtitle">Management System</div>
+            </div>
         </a>
     </div>
 
-    @php
-    $user = auth()->user();
-    $roleCodes = $user->roles->pluck('code')->toArray();
-
-    $isStaff = in_array('staff', $roleCodes);
-    $isManager = in_array('manager', $roleCodes);
-    $isDirector = in_array('director', $roleCodes);
-    $isAdmin = in_array('super_admin', $roleCodes) || in_array('admin', $roleCodes);
-@endphp
-
-@if($isStaff)
-    @include('layouts.partials.sapta-sidebar-staff')
-@elseif($isManager)
-    @include('layouts.partials.sapta-sidebar-manager')
-@elseif($isDirector)
-    @include('layouts.partials.sapta-sidebar-director')
-@else
-    @include('layouts.partials.sapta-sidebar-admin')
-@endif
-
-    {{-- OLD NAV (kama ipo) --}}
-    <nav class="sapta-sidebar-nav" style="display:none;">
-
-        {{-- MAIN --}}
+    {{-- NAVIGATION --}}
+    <nav class="sapta-sidebar-nav">
+        
+        {{-- ============================================ --}}
+        {{-- MAIN — Kwa wote --}}
+        {{-- ============================================ --}}
         <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">MAIN</div>
-            <a href="{{ url('/dashboard') }}" class="sapta-nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                <span class="sapta-nav-icon"><i class="fas fa-gauge-high"></i></span>
+            <div class="sapta-nav-section-title">Main</div>
+            
+            <a href="{{ route('dashboard') }}" class="sapta-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="fas fa-gauge-high"></i>
                 <span class="sapta-nav-text">Dashboard</span>
             </a>
         </div>
 
-        {{-- COMPANY --}}
-        <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">COMPANY</div>
-
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('organizations*') || request()->is('organogram*') ? 'active' : '' }}" onclick="toggleNavGroup('company', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-building"></i></span>
-                    <span class="sapta-nav-text">Company</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-company">
-                    <a href="{{ url('/organizations') }}" class="sapta-nav-subitem {{ request()->is('organizations*') ? 'active' : '' }}">
-                        <i class="fas fa-building"></i> Organizations
-                    </a>
-                    <a href="{{ url('/organogram') }}" class="sapta-nav-subitem {{ request()->is('organogram*') ? 'active' : '' }}">
-                        <i class="fas fa-network-wired"></i> Organogram
-                    </a>
-                </div>
+        {{-- ============================================ --}}
+        {{-- SUPER ADMIN / ADMIN --}}
+        {{-- ============================================ --}}
+        @if($isSuperAdmin)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Administration</div>
+                
+                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span class="sapta-nav-text">Employees</span>
+                </a>
+                
+                <a href="{{ route('users.index') }}" class="sapta-nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-gear"></i>
+                    <span class="sapta-nav-text">System Users</span>
+                </a>
+                
+                <a href="{{ route('roles.index') }}" class="sapta-nav-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="sapta-nav-text">Roles</span>
+                </a>
+                
+                <a href="{{ route('permissions.index') }}" class="sapta-nav-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
+                    <i class="fas fa-key"></i>
+                    <span class="sapta-nav-text">Permissions</span>
+                </a>
+                
+                <a href="{{ route('activity-logs.index') }}" class="sapta-nav-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <span class="sapta-nav-text">Activity Logs</span>
+                </a>
+                
+                <a href="{{ route('settings.index') }}" class="sapta-nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                    <i class="fas fa-gear"></i>
+                    <span class="sapta-nav-text">Settings</span>
+                </a>
             </div>
-        </div>
+        @endif
 
+        {{-- ============================================ --}}
+        {{-- EXECUTIVE (BOD, CEO) --}}
+        {{-- ============================================ --}}
+        @if($isExecutive)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Executive</div>
+                
+                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span class="sapta-nav-text">Employees</span>
+                </a>
+                
+                <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sapta-nav-text">Reports</span>
+                </a>
+            </div>
+        @endif
+
+        {{-- ============================================ --}}
+        {{-- DIRECTOR --}}
+        {{-- ============================================ --}}
+        @if($isDirector)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Management</div>
+                
+                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span class="sapta-nav-text">Employees</span>
+                </a>
+                
+                <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
+                    <i class="fas fa-sitemap"></i>
+                    <span class="sapta-nav-text">Departments</span>
+                </a>
+                
+                <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sapta-nav-text">Reports</span>
+                </a>
+            </div>
+        @endif
+
+        {{-- ============================================ --}}
         {{-- HR --}}
-        <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">HR</div>
-
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('employees*') || request()->is('departments*') || request()->is('positions*') || request()->is('employee-positions*') ? 'active' : '' }}" onclick="toggleNavGroup('hr', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-users"></i></span>
-                    <span class="sapta-nav-text">Human Resources</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-hr">
-                    <a href="{{ url('/employees') }}" class="sapta-nav-subitem {{ request()->is('employees*') ? 'active' : '' }}">
-                        <i class="fas fa-user"></i> Employees
-                    </a>
-                    <a href="{{ route('departments.index') }}" class="sapta-nav-subitem {{ request()->is('departments*') ? 'active' : '' }}">
-                        <i class="fas fa-sitemap"></i> Departments
-                    </a>
-                    <a href="{{ route('positions.index') }}" class="sapta-nav-subitem {{ request()->is('positions*') ? 'active' : '' }}">
-                        <i class="fas fa-briefcase"></i> Positions
-                    </a>
-                    <a href="{{ route('employee-positions.index') }}" class="sapta-nav-subitem {{ request()->is('employee-positions*') ? 'active' : '' }}">
-                        <i class="fas fa-id-badge"></i> Employee Positions
-                    </a>
-                </div>
+        {{-- ============================================ --}}
+        @if($isHR || $isSuperAdmin)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Human Resources</div>
+                
+                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span class="sapta-nav-text">Employees</span>
+                </a>
+                
+                <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
+                    <i class="fas fa-sitemap"></i>
+                    <span class="sapta-nav-text">Departments</span>
+                </a>
+                
+                <a href="{{ route('positions.index') }}" class="sapta-nav-item {{ request()->routeIs('positions.*') ? 'active' : '' }}">
+                    <i class="fas fa-briefcase"></i>
+                    <span class="sapta-nav-text">Positions</span>
+                </a>
+                
+                <a href="{{ route('attendance.index') }}" class="sapta-nav-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+                    <i class="fas fa-clock"></i>
+                    <span class="sapta-nav-text">Attendance</span>
+                </a>
+                
+                <a href="{{ route('leave-requests.index') }}" class="sapta-nav-item {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="sapta-nav-text">Leave Requests</span>
+                </a>
+                
+                <a href="{{ route('trainings.index') }}" class="sapta-nav-item {{ request()->routeIs('trainings.*') ? 'active' : '' }}">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="sapta-nav-text">Trainings</span>
+                </a>
+                
+                <a href="{{ route('recruitment.index') }}" class="sapta-nav-item {{ request()->routeIs('recruitment.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-plus"></i>
+                    <span class="sapta-nav-text">Recruitment</span>
+                </a>
             </div>
+        @endif
 
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('attendances*') || request()->is('leave-requests*') || request()->is('performance-reviews*') ? 'active' : '' }}" onclick="toggleNavGroup('time', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-clock"></i></span>
-                    <span class="sapta-nav-text">Time & Leave</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-time">
-                    <a href="{{ url('/attendances') }}" class="sapta-nav-subitem {{ request()->is('attendances*') ? 'active' : '' }}">
-                        <i class="fas fa-clock"></i> Attendance
-                    </a>
-                    <a href="{{ url('/leave-requests') }}" class="sapta-nav-subitem {{ request()->is('leave-requests*') ? 'active' : '' }}">
-                        <i class="fas fa-calendar-check"></i> Leave Requests
-                    </a>
-                    <a href="{{ route('performance-reviews.index') }}" class="sapta-nav-subitem {{ request()->is('performance-reviews*') ? 'active' : '' }}">
-                        <i class="fas fa-star"></i> Performance Reviews
-                    </a>
-                </div>
-            </div>
-
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('trainings*') || request()->is('recruitment*') ? 'active' : '' }}" onclick="toggleNavGroup('talent', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-graduation-cap"></i></span>
-                    <span class="sapta-nav-text">Talent</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-talent">
-                    <a href="{{ route('trainings.index') }}" class="sapta-nav-subitem {{ request()->is('trainings*') ? 'active' : '' }}">
-                        <i class="fas fa-graduation-cap"></i> Trainings
-                    </a>
-                    <a href="{{ route('recruitment.index') }}" class="sapta-nav-subitem {{ request()->is('recruitment*') ? 'active' : '' }}">
-                        <i class="fas fa-user-plus"></i> Recruitment
-                    </a>
-                </div>
-            </div>
-        </div>
-
+        {{-- ============================================ --}}
         {{-- FINANCE --}}
-        <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">FINANCE</div>
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('payroll*') || request()->is('payment-vouchers*') || request()->is('receipts*') || request()->is('budgets*') ? 'active' : '' }}" onclick="toggleNavGroup('finance', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-money-bill-wave"></i></span>
-                    <span class="sapta-nav-text">Finance</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-finance">
-                    <a href="{{ route('payroll.index') }}" class="sapta-nav-subitem {{ request()->is('payroll*') ? 'active' : '' }}">
-                        <i class="fas fa-money-bill-wave"></i> Payroll
-                    </a>
-                    <a href="{{ route('payment-vouchers.index') }}" class="sapta-nav-subitem {{ request()->is('payment-vouchers*') ? 'active' : '' }}">
-                        <i class="fas fa-file-invoice"></i> Payment Vouchers
-                    </a>
-                    <a href="{{ route('receipts.index') }}" class="sapta-nav-subitem {{ request()->is('receipts*') ? 'active' : '' }}">
-                        <i class="fas fa-receipt"></i> Receipts
-                    </a>
-                    <a href="{{ route('budgets.index') }}" class="sapta-nav-subitem {{ request()->is('budgets*') ? 'active' : '' }}">
-                        <i class="fas fa-chart-pie"></i> Budgets
-                    </a>
-                </div>
+        {{-- ============================================ --}}
+        @if($isFinance || $isSuperAdmin)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Finance</div>
+                
+                <a href="{{ route('budgets.index') }}" class="sapta-nav-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
+                    <i class="fas fa-wallet"></i>
+                    <span class="sapta-nav-text">Budgets</span>
+                </a>
+                
+                <a href="{{ route('receipts.index') }}" class="sapta-nav-item {{ request()->routeIs('receipts.*') ? 'active' : '' }}">
+                    <i class="fas fa-receipt"></i>
+                    <span class="sapta-nav-text">Receipts</span>
+                </a>
+                
+                <a href="{{ route('payment-vouchers.index') }}" class="sapta-nav-item {{ request()->routeIs('payment-vouchers.*') ? 'active' : '' }}">
+                    <i class="fas fa-money-check"></i>
+                    <span class="sapta-nav-text">Payment Vouchers</span>
+                </a>
+                
+                <a href="{{ route('payroll.index') }}" class="sapta-nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="sapta-nav-text">Payroll</span>
+                </a>
             </div>
-        </div>
+        @endif
 
-        {{-- OPERATIONS --}}
-        <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">OPERATIONS</div>
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('projects*') || request()->is('tasks*') || request()->is('documents*') ? 'active' : '' }}" onclick="toggleNavGroup('ops', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-folder-open"></i></span>
-                    <span class="sapta-nav-text">Operations</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-ops">
-                    <a href="{{ url('/projects') }}" class="sapta-nav-subitem {{ request()->is('projects*') ? 'active' : '' }}">
-                        <i class="fas fa-folder-open"></i> Projects
-                    </a>
-                    <a href="{{ route('tasks.index') }}" class="sapta-nav-subitem {{ request()->is('tasks*') ? 'active' : '' }}">
-                        <i class="fas fa-list-check"></i> Tasks
-                    </a>
-                    <a href="{{ route('documents.index') }}" class="sapta-nav-subitem {{ request()->is('documents*') ? 'active' : '' }}">
-                        <i class="fas fa-file-lines"></i> Documents
-                    </a>
-                </div>
+        {{-- ============================================ --}}
+        {{-- PROGRAMS --}}
+        {{-- ============================================ --}}
+        @if($isProgram || $isSuperAdmin)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">Projects & Programs</div>
+                
+                <a href="{{ route('projects.index') }}" class="sapta-nav-item {{ request()->routeIs('projects.*') ? 'active' : '' }}">
+                    <i class="fas fa-diagram-project"></i>
+                    <span class="sapta-nav-text">Projects</span>
+                </a>
+                
+                <a href="{{ route('tasks.index') }}" class="sapta-nav-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
+                    <i class="fas fa-list-check"></i>
+                    <span class="sapta-nav-text">Tasks</span>
+                </a>
+                
+                <a href="{{ route('documents.index') }}" class="sapta-nav-item {{ request()->routeIs('documents.*') ? 'active' : '' }}">
+                    <i class="fas fa-folder"></i>
+                    <span class="sapta-nav-text">Documents</span>
+                </a>
             </div>
-        </div>
+        @endif
 
-        {{-- ADMINISTRATION --}}
+        {{-- ============================================ --}}
+        {{-- MEAL --}}
+        {{-- ============================================ --}}
+        @if($isMEAL || $isSuperAdmin)
+            <div class="sapta-nav-section">
+                <div class="sapta-nav-section-title">MEAL</div>
+                
+                <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-pie"></i>
+                    <span class="sapta-nav-text">Reports</span>
+                </a>
+            </div>
+        @endif
+
+        {{-- ============================================ --}}
+        {{-- COMMUNICATION — Kwa wote --}}
+        {{-- ============================================ --}}
         <div class="sapta-nav-section">
-            <div class="sapta-nav-section-title">ADMINISTRATION</div>
-
-            <div class="sapta-nav-group">
-                <button type="button" class="sapta-nav-item sapta-nav-group-toggle {{ request()->is('users*') || request()->is('roles*') || request()->is('permissions*') ? 'active' : '' }}" onclick="toggleNavGroup('admin', event)">
-                    <span class="sapta-nav-icon"><i class="fas fa-user-shield"></i></span>
-                    <span class="sapta-nav-text">Access Control</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
-                </button>
-                <div class="sapta-nav-group-items" id="nav-group-admin">
-                    <a href="{{ url('/users') }}" class="sapta-nav-subitem {{ request()->is('users*') ? 'active' : '' }}">
-                        <i class="fas fa-user-shield"></i> Users
-                    </a>
-                    <a href="{{ url('/roles') }}" class="sapta-nav-subitem {{ request()->is('roles*') ? 'active' : '' }}">
-                        <i class="fas fa-user-tag"></i> Roles
-                    </a>
-                    <a href="{{ url('/permissions') }}" class="sapta-nav-subitem {{ request()->is('permissions*') ? 'active' : '' }}">
-                        <i class="fas fa-key"></i> Permissions
-                    </a>
-            <a href="{{ url('/activity-logs') }}" class="sapta-nav-subitem {{ request()->is('activity-logs*') ? 'active' : '' }}">
-                <i class="fas fa-history"></i> Activity Logs
+            <div class="sapta-nav-section-title">Communication</div>
+            
+            <a href="{{ route('inbox.index') }}" class="sapta-nav-item {{ request()->routeIs('inbox.*') ? 'active' : '' }}">
+                <i class="fas fa-inbox"></i>
+                <span class="sapta-nav-text">Inbox</span>
+                @php
+                    $unreadCount = \App\Models\Message::where('recipient_id', auth()->id())->where('is_read', false)->count();
+                @endphp
+                @if($unreadCount > 0)
+                    <span class="sapta-nav-badge">{{ $unreadCount }}</span>
+                @endif
             </a>
-                </div>
-            </div>
-
-            <a href="{{ route('notifications.index') }}" class="sapta-nav-item {{ request()->is('notifications*') ? 'active' : '' }}">
-                <span class="sapta-nav-icon"><i class="fas fa-bell"></i></span>
+            
+            <a href="{{ route('notifications.index') }}" class="sapta-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
+                <i class="fas fa-bell"></i>
                 <span class="sapta-nav-text">Notifications</span>
-                @auth
-                    @if(auth()->check() && \Schema::hasTable('notifications') && \Schema::hasTable('notifications') && \Schema::hasTable('notifications') && \Schema::hasTable('notifications') && auth()->user()->unreadNotifications->count() > 0)
-                        <span class="sapta-nav-badge">{{ \Schema::hasTable('notifications') ? auth()->user()->unreadNotifications->count() : 0 }}</span>
-                    @endif
-                @endauth
-            </a>
-
-            <a href="{{ url('/reports') }}" class="sapta-nav-item {{ request()->is('reports*') ? 'active' : '' }}">
-                <span class="sapta-nav-icon"><i class="fas fa-chart-column"></i></span>
-                <span class="sapta-nav-text">Reports</span>
-            </a>
-
-            <a href="{{ route('audit-logs.index') }}" class="sapta-nav-item {{ request()->is('audit-logs*') ? 'active' : '' }}">
-                <span class="sapta-nav-icon"><i class="fas fa-history"></i></span>
-                <span class="sapta-nav-text">Audit Logs</span>
-            </a>
-
-            <a href="{{ url('/settings') }}" class="sapta-nav-item {{ request()->is('settings*') ? 'active' : '' }}">
-                <span class="sapta-nav-icon"><i class="fas fa-gear"></i></span>
-                <span class="sapta-nav-text">Settings</span>
             </a>
         </div>
+
+        {{-- ============================================ --}}
+        {{-- REPORTS — Kwa wote --}}
+        {{-- ============================================ --}}
+        <div class="sapta-nav-section">
+            <div class="sapta-nav-section-title">Reports</div>
+            
+            <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                <i class="fas fa-file-lines"></i>
+                <span class="sapta-nav-text">All Reports</span>
+            </a>
+        </div>
+
     </nav>
 
+    {{-- FOOTER — Logout --}}
     <div class="sapta-sidebar-footer">
-        <div class="sapta-user-card">
-            <div class="sapta-user-avatar"><i class="fas fa-user"></i></div>
-            <div class="sapta-user-info">
-                <strong>{{ auth()->user()->username ?? 'User' }}</strong>
-                <small>{{ auth()->user()->role ?? 'User' }}</small>
-            </div>
-        </div>
-        <form method="POST" action="{{ url('/logout') }}">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="sapta-nav-item sapta-logout-button">
-                <span class="sapta-nav-icon"><i class="fas fa-right-from-bracket"></i></span>
+                <i class="fas fa-right-from-bracket"></i>
                 <span class="sapta-nav-text">Logout</span>
             </button>
         </form>
     </div>
+
 </aside>
-
-@push('scripts')
-<script>
-function toggleNavGroup(id, event) {
-    if (event) event.preventDefault();
-
-    const group = document.getElementById('nav-group-' + id);
-    const toggle = event ? event.currentTarget : null;
-    if (!group) return;
-
-    // Funga zote nyingine
-    document.querySelectorAll('.sapta-nav-group-items').forEach(g => {
-        if (g.id !== 'nav-group-' + id) {
-            g.classList.remove('open');
-            const parentToggle = g.previousElementSibling;
-            if (parentToggle) parentToggle.classList.remove('open');
-        }
-    });
-
-    // Toggle ya sasa
-    group.classList.toggle('open');
-    if (toggle) toggle.classList.toggle('open');
-
-    // Save kwenye localStorage
-    if (group.classList.contains('open')) {
-        localStorage.setItem('sapta_nav_open', id);
-    } else {
-        localStorage.removeItem('sapta_nav_open');
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.sapta-nav-group-items').forEach(group => {
-        const hasActive = group.querySelector('.sapta-nav-subitem.active');
-        if (hasActive) {
-            group.classList.add('open');
-            const toggle = group.previousElementSibling;
-            if (toggle) toggle.classList.add('open');
-        }
-    });
-
-    const lastOpen = localStorage.getItem('sapta_nav_open');
-    if (lastOpen) {
-        const group = document.getElementById('nav-group-' + lastOpen);
-        if (group && !group.classList.contains('open')) {
-            group.classList.add('open');
-            const toggle = group.previousElementSibling;
-            if (toggle) toggle.classList.add('open');
-        }
-    }
-});
-</script>
-@endpush
