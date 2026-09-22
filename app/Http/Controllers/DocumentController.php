@@ -21,41 +21,31 @@ class DocumentController extends Controller
     /**
      * List all documents with filters
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $query = Document::query()->with(['uploader', 'employee', 'project']);
+        $query = Document::with(['uploader', 'employee', 'project', 'approvedBy'])
+            ->orderBy('created_at', 'desc');
 
-        // Filters
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', "%{$request->search}%")
-                  ->orWhere('document_number', 'like', "%{$request->search}%")
-                  ->orWhere('description', 'like', "%{$request->search}%");
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")
+                  ->orWhere('document_number', 'like', "%{$s}%")
+                  ->orWhere('description', 'like', "%{$s}%");
             });
         }
 
-        $documents = $query->orderBy('created_at', 'desc')->paginate(20);
+        $documents = $query->paginate(20);
 
         $stats = [
-            'total'    => Document::count(),
-            'active'   => Document::where('status', 'active')->count(),
-            'draft'    => Document::where('status', 'draft')->count(),
-            'expired'  => Document::where('status', 'expired')->count(),
+            'total' => Document::count(),
+            'active' => Document::where('status', 'active')->count(),
+            'draft' => Document::where('status', 'draft')->count(),
+            'expired' => Document::where('status', 'expired')->count(),
         ];
 
         return view('documents.index', compact('documents', 'stats'));
-    }
-
-    /**
-     * Show create form
-     */
-    public function create()
+    }public function create()
     {
         $departments = Department::where('is_active', true)->orderBy('name')->get();
         $employees = Employee::take(100)->get();
@@ -165,16 +155,11 @@ class DocumentController extends Controller
         return redirect()
             ->route('documents.index')
             ->with('success', 'Document imeundwa kikamilifu. Document Number: ' . $docNumber);
-    }public function show(Document $document)
+    }public function show(Document $document): View
     {
-        $document->load(['uploader', 'approvedBy', 'employee', 'project']);
+        $document->load(['uploader', 'approvedBy', 'employee', 'project', 'region', 'district', 'ward']);
         return view('documents.show', compact('document'));
-    }
-
-    /**
-     * Show edit form
-     */
-    public function edit(Document $document)
+    }public function edit(Document $document)
     {
         $departments = Department::where('is_active', true)->orderBy('name')->get();
         $employees = Employee::take(100)->get();

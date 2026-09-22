@@ -35,6 +35,21 @@ class Document extends Model
     // RELATIONSHIPS
     // ============================================================
 
+    public function uploader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function uploadedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
@@ -60,16 +75,6 @@ class Document extends Model
         return $this->belongsTo(Ward::class);
     }
 
-    public function uploadedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'uploaded_by');
-    }
-
-    public function approvedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
-
     // ============================================================
     // SCOPES
     // ============================================================
@@ -87,5 +92,10 @@ class Document extends Model
     public function scopePrivate($query)
     {
         return $query->where('visibility', 'private');
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiry_date', '<', now());
     }
 }
