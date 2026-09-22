@@ -338,7 +338,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        EmployeeAuditLog::create([
+        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'deactivate',
@@ -377,7 +377,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        EmployeeAuditLog::create([
+        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'terminate',
@@ -416,7 +416,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'active']);
         }
 
-        EmployeeAuditLog::create([
+        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'activate',
@@ -464,7 +464,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        EmployeeAuditLog::create([
+        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'suspend',
@@ -647,4 +647,30 @@ class EmployeeController extends Controller
         \App\Services\NotificationService::sendCredentials($user, $newPassword);
 
         return back()->with('success', "Password reset successfully. New password: {$newPassword}");
-    }}
+    }
+    /**
+     * Unda employee_audit_logs table kama haipo
+     * (defensive — inazuia error kwenye production)
+     */
+    private function ensureAuditTableExists()
+    {
+        if (!\Schema::hasTable('employee_audit_logs')) {
+            try {
+                \Schema::create('employee_audit_logs', function ($table) {
+                    $table->id();
+                    $table->unsignedBigInteger('employee_id')->nullable();
+                    $table->unsignedBigInteger('user_id')->nullable();
+                    $table->string('action');
+                    $table->string('old_status')->nullable();
+                    $table->string('new_status')->nullable();
+                    $table->text('reason')->nullable();
+                    $table->string('ip_address')->nullable();
+                    $table->text('user_agent')->nullable();
+                    $table->timestamps();
+                });
+            } catch (\Exception $e) {
+                \Log::error('Failed to create employee_audit_logs: ' . $e->getMessage());
+            }
+        }
+    }
+}

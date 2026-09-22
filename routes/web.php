@@ -1071,3 +1071,71 @@ Route::get('/debug/manage-audit-table', function() {
     
     return response()->json($result);
 })->name('debug.manage-audit-table');
+// ============================================================
+// DEBUG: OPTIMIZE (cache + speed boost)
+// ============================================================
+Route::get('/debug/optimize', function() {
+    try {
+        \Artisan::call('config:cache');
+        \Artisan::call('route:cache');
+        \Artisan::call('view:cache');
+        \Artisan::call('cache:clear');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Optimization complete',
+            'config' => \Artisan::output(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.optimize');
+
+// ============================================================
+// DEBUG: CLEAR CACHE
+// ============================================================
+Route::get('/debug/clear-cache', function() {
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('route:clear');
+    \Artisan::call('view:clear');
+    \Artisan::call('optimize:clear');
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Cache cleared',
+    ]);
+})->name('debug.clear-cache');
+
+// ============================================================
+// DEBUG: RE-CREATE AUDIT TABLE (kila mara)
+// ============================================================
+Route::get('/debug/recreate-audit-table', function() {
+    try {
+        \Schema::dropIfExists('employee_audit_logs');
+        \Schema::create('employee_audit_logs', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('employee_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('action');
+            $table->string('old_status')->nullable();
+            $table->string('new_status')->nullable();
+            $table->text('reason')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamps();
+        });
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Table re-created',
+            'exists' => \Schema::hasTable('employee_audit_logs'),
+            'columns' => \Schema::getColumnListing('employee_audit_logs'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+})->name('debug.recreate-audit-table');
