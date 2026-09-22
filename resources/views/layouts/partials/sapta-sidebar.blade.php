@@ -28,7 +28,7 @@
     } catch (\Exception $e) {}
 @endphp
 
-<aside class="sapta-sidebar" id="sapta-sidebar">
+<aside class="sapta-sidebar" id="saptaSidebar">
     
     {{-- LOGO --}}
     <div class="sapta-sidebar-header">
