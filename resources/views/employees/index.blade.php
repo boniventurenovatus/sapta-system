@@ -1,4 +1,64 @@
-@extends('layouts.sapta')
+<style>
+    .emp-action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin: 0 2px;
+    }
+    .emp-action-view {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    .emp-action-view:hover {
+        background: #2563eb;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .emp-action-edit {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    .emp-action-edit:hover {
+        background: #d97706;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .emp-action-key {
+        background: #fef9c3;
+        color: #ca8a04;
+    }
+    .emp-action-key:hover {
+        background: #ca8a04;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .emp-action-suspend {
+        background: #dbeafe;
+        color: #0284c7;
+    }
+    .emp-action-suspend:hover {
+        background: #0284c7;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .emp-action-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    .emp-action-delete:hover {
+        background: #dc2626;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+</style>@extends('layouts.sapta')
 
 @section('title', 'Employees')
 @section('page-title', 'Employees')
@@ -18,11 +78,11 @@
                 <div><strong>Password:</strong> {{ session('generated_credentials')['password'] }}</div>
                 <div><strong>Role:</strong> {{ session('generated_credentials')['role'] }}</div>
                 <div><strong>Expires:</strong> {{ session('generated_credentials')['expires_at'] }}</div>
-                <div><strong>Internal Message:</strong> {{ session('generated_credentials')['internal_sent'] ? 'SENT ✅' : 'FAILED ❌' }}</div>
-                <div><strong>Email:</strong> {{ session('generated_credentials')['email_sent'] ? 'SENT ✅' : 'FAILED ❌' }}</div>
+                <div><strong>Internal Message:</strong> {{ session('generated_credentials')['internal_sent'] ? 'SENT <i class="fas fa-check"></i>' : 'FAILED <i class="fas fa-times"></i>' }}</div>
+                <div><strong>Email:</strong> {{ session('generated_credentials')['email_sent'] ? 'SENT <i class="fas fa-check"></i>' : 'FAILED <i class="fas fa-times"></i>' }}</div>
             </div>
             <div style="margin-top: 1rem; color: #166534; font-size: 0.9rem;">
-                ⚠️ Mpe Employee credentials hizi. Anaweza kubadilisha password kwa <strong>forgot-password</strong>.
+                <i class="fas fa-ban"></i> Mpe Employee credentials hizi. Anaweza kubadilisha password kwa <strong>forgot-password</strong>.
             </div>
         </div>
     @endif
@@ -181,23 +241,23 @@
                             <td style="padding: 0.75rem 1rem;">
                                 <div style="display: flex; gap: 0.5rem;">
                                     {{-- View --}}
-                                    <a href="{{ route('employees.show', $emp->id) }}" title="View" style="color:#1a5276; font-size: 1.1rem;">
-                                        👁️
+                                    <a href="{{ route('employees.show', $emp->id) }}" title="View" style="color:#1a5276; font-size: 1.1rem;" class="emp-action-btn emp-action-view">
+                                        <i class="fas fa-eye"></i>
                                     </a>
                                     {{-- Edit --}}
-                                    <a href="{{ route('employees.edit', $emp->id) }}" title="Edit" style="color:#1a5276; font-size: 1.1rem;">
-                                        ✏️
+                                    <a href="{{ route('employees.edit', $emp->id) }}" title="Edit" style="color:#1a5276; font-size: 1.1rem;" class="emp-action-btn emp-action-edit">
+                                        <i class="fas fa-pen"></i>
                                     </a>
                                     {{-- Credentials --}}
                                     <a href="{{ route('employees.credentials', $emp->id) }}" title="Credentials" style="color:#f59e0b; font-size: 1.1rem;">
-                                        🔑
+                                        <i class="fas fa-key"></i>
                                     </a>
                                     {{-- Suspend --}}
                                     @if($emp->employment_status === 'active')
                                         <form method="POST" action="{{ route('employees.suspend', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Suspend employee?')">
                                             @csrf
                                             <button type="submit" title="Suspend" style="background:none; border:none; color:#8b5cf6; font-size: 1.1rem; cursor: pointer;">
-                                                ⏸️
+                                                <i class="fas fa-pause"></i>
                                             </button>
                                         </form>
                                     @endif
@@ -206,7 +266,7 @@
                                         <form method="POST" action="{{ route('employees.deactivate', $emp->id) }}" style="display:inline;" onsubmit="return confirm('Deactivate employee?')">
                                             @csrf
                                             <button type="submit" title="Deactivate" style="background:none; border:none; color:#dc2626; font-size: 1.1rem; cursor: pointer;">
-                                                🚫
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     @endif
