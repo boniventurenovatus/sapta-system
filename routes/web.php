@@ -1029,3 +1029,45 @@ Route::get('/debug/check-migrations', function() {
         'pending' => array_values($unrun),
     ]);
 })->name('debug.check-migrations');
+// ============================================================
+// DEBUG: MANAGE employee_audit_logs
+// ============================================================
+Route::get('/debug/manage-audit-table', function() {
+    $result = [];
+    
+    // 1. Angalia kama ipo
+    $result['exists_before'] = \Schema::hasTable('employee_audit_logs');
+    
+    // 2. Kama haipo, unda
+    if (!$result['exists_before']) {
+        try {
+            \Schema::create('employee_audit_logs', function ($table) {
+                $table->id();
+                $table->unsignedBigInteger('employee_id')->nullable();
+                $table->unsignedBigInteger('user_id')->nullable();
+                $table->string('action');
+                $table->string('old_status')->nullable();
+                $table->string('new_status')->nullable();
+                $table->text('reason')->nullable();
+                $table->string('ip_address')->nullable();
+                $table->text('user_agent')->nullable();
+                $table->timestamps();
+                $table->index('employee_id');
+                $table->index('user_id');
+                $table->index('action');
+            });
+            $result['created'] = true;
+        } catch (\Exception $e) {
+            $result['error'] = $e->getMessage();
+        }
+    }
+    
+    // 3. Angalia tena
+    $result['exists_after'] = \Schema::hasTable('employee_audit_logs');
+    
+    if ($result['exists_after']) {
+        $result['columns'] = \Schema::getColumnListing('employee_audit_logs');
+    }
+    
+    return response()->json($result);
+})->name('debug.manage-audit-table');
