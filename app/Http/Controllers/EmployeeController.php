@@ -338,7 +338,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
+        $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'deactivate',
@@ -377,7 +377,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
+        $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'terminate',
@@ -416,7 +416,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'active']);
         }
 
-        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
+        $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'activate',
@@ -464,7 +464,7 @@ class EmployeeController extends Controller
             $employee->user->update(['account_status' => 'inactive']);
         }
 
-        if (\Schema::hasTable('employee_audit_logs')) { $this->ensureAuditTableExists(); EmployeeAuditLog::create([
+        $this->ensureAuditTableExists(); EmployeeAuditLog::create([
             'employee_id' => $employee->id,
             'user_id'     => auth()->id(),
             'action'      => 'suspend',
