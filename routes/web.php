@@ -738,3 +738,79 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::get('/program', [\App\Http\Controllers\DashboardController::class, 'program'])
         ->middleware('role:program_director')->name('program');
 });
+// ============================================================
+// DEBUG: IMPORT USERS KUTOKA LOCAL → RENDER
+// ONDOA BAADA YA KUTUMIA!
+// ============================================================
+Route::get('/debug/import-users', function() {
+    $jsonFile = base_path('users-export.json');
+    if (!file_exists($jsonFile)) {
+        return response()->json(['success' => false, 'error' => 'users-export.json haipo'], 404);
+    }
+
+    $users = json_decode(file_get_contents($jsonFile), true);
+    if (!is_array($users)) {
+        return response()->json(['success' => false, 'error' => 'JSON si sahihi'], 400);
+    }
+
+    $imported = 0;
+    $updated = 0;
+    $errors = [];
+
+    foreach ($users as $u) {
+        try {
+            $existing = \DB::table('users')->where('username', $u['username'])->first();
+
+            if ($existing) {
+                \DB::table('users')->where('id', $existing->id)->update([
+                    'email' => $u['email'],
+                    'password_hash' => $u['password_hash'],
+                    'account_status' => $u['account_status'],
+                    'is_first_login' => $u['is_first_login'] ? 1 : 0,
+                    'credentials_expires_at' => $u['credentials_expires_at'] ?? now()->addDays(30),
+                    'updated_at' => now(),
+                ]);
+                $userId = $existing->id;
+                $updated++;
+            } else {
+                $userId = \DB::table('users')->insertGetId([
+                    'username' => $u['username'],
+                    'email' => $u['email'],
+                    'password_hash' => $u['password_hash'],
+                    'account_status' => $u['account_status'],
+                    'is_first_login' => $u['is_first_login'] ? 1 : 0,
+                    'credentials_expires_at' => $u['credentials_expires_at'] ?? now()->addDays(30),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $imported++;
+            }
+
+            // Roles
+            if (!empty($u['roles'])) {
+                \DB::table('user_roles')->where('user_id', $userId)->delete();
+                foreach ($u['roles'] as $roleCode) {
+                    $role = \DB::table('roles')->where('code', $roleCode)->first();
+                    if ($role) {
+                        \DB::table('user_roles')->insert([
+                            'user_id' => $userId,
+                            'role_id' => $role->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $errors[] = $u['username'] . ': ' . $e->getMessage();
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'total_in_json' => count($users),
+        'imported' => $imported,
+        'updated' => $updated,
+        'errors' => $errors,
+    ]);
+})->name('debug.import-users');

@@ -1,0 +1,338 @@
+﻿[
+    {
+        "username": "superadmin",
+        "email": "boniventurenovatus@gmail.com",
+        "password_hash": "$2y$12$e7UhqQezf.VCJl/FuDiTkenTd4woz/S2pHJokR4x0zZ4Y1NOMZA1G",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 2,
+        "credentials_expires_at": null,
+        "roles": [
+            "super_admin"
+        ]
+    },
+    {
+        "username": "admin",
+        "email": "hr@sapta.co.tz",
+        "password_hash": "$2y$12$KYnKZV04abH02qtD9tI78.FWwecdAeoVpgyawMyzEQwaKIl4v./tC",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 3,
+        "credentials_expires_at": null,
+        "roles": [
+            "admin"
+        ]
+    },
+    {
+        "username": "director",
+        "email": "director@sapta.local",
+        "password_hash": "$2y$12$UyyIFfSqIfITqNKEJT0qBepyo0Z2nTopLDBR5gVcBxVI2bp.ozrPa",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 5,
+        "credentials_expires_at": null,
+        "roles": [
+            "director"
+        ]
+    },
+    {
+        "username": "manager",
+        "email": "manager@sapta.local",
+        "password_hash": "$2y$12$QajSZDUgcamZ1SgSGW6EcO31M4TxGnDmrhzFaRJ23dHORYUHV9O4S",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 6,
+        "credentials_expires_at": null,
+        "roles": [
+            "manager"
+        ]
+    },
+    {
+        "username": "staff",
+        "email": "staff@sapta.local",
+        "password_hash": "$2y$12$2tv8ZlGIO7pMnkVQEiUjkOogZYrjpep5P9uk0JZsgiajXmZX0zSvu",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 7,
+        "credentials_expires_at": null,
+        "roles": [
+            "staff"
+        ]
+    },
+    {
+        "username": "bod",
+        "email": "bod@sapta.local",
+        "password_hash": "$2y$12$goa9nW6TvwzXfy6gyBKQH.eBZI5SVsnf7/y7j561s/r1tBsEeOpom",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 66,
+        "credentials_expires_at": null,
+        "roles": [
+            "bod"
+        ]
+    },
+    {
+        "username": "ceo",
+        "email": "ceo@sapta.local",
+        "password_hash": "$2y$12$fyxzqt5Br0SnAMTQQ6ziWOTbzEh7g/.sdBiGqGJmfClfEYqC7T19a",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 67,
+        "credentials_expires_at": null,
+        "roles": [
+            "ceo"
+        ]
+    },
+    {
+        "username": "admin.director",
+        "email": "admin.director@sapta.local",
+        "password_hash": "$2y$12$yW2pvlqc7WQTeP1hzTZmV.6DQQ8znbc9Ql5KjB6qe2RDWLs56ov5O",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 68,
+        "credentials_expires_at": null,
+        "roles": [
+            "admin_director"
+        ]
+    },
+    {
+        "username": "program.director",
+        "email": "program.director@sapta.local",
+        "password_hash": "$2y$12$/ekNCTjkYftHZBxc8DekeeRECAiNoZzWeUprWNSld956L/GV9Gax2",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 69,
+        "credentials_expires_at": null,
+        "roles": [
+            "program_director"
+        ]
+    },
+    {
+        "username": "hr.manager",
+        "email": "hr.manager@sapta.local",
+        "password_hash": "$2y$12$6Ea985ZF.KqNUVI4Q/s5CuzyptykUFDHhb40lfDHkvApCLNGQedwy",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 70,
+        "credentials_expires_at": null,
+        "roles": [
+            "hr_manager"
+        ]
+    },
+    {
+        "username": "finance.manager",
+        "email": "finance.manager@sapta.local",
+        "password_hash": "$2y$12$BgLeGcVhTclqrpjBl9VpKursygb99Q4Qhwg0uiwMvgwqZ/5rNlaRW",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 71,
+        "credentials_expires_at": null,
+        "roles": [
+            "finance_manager"
+        ]
+    },
+    {
+        "username": "accountant.test",
+        "email": "accountant.test@sapta.local",
+        "password_hash": "$2y$12$kyBxvEsCxtC2KbacK.V4p.n5DL03Z.N9XOfkAmfZ8QBR9VZliiYvm",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 72,
+        "credentials_expires_at": null,
+        "roles": [
+            "accountant"
+        ]
+    },
+    {
+        "username": "procurement.manager",
+        "email": "procurement.manager@sapta.local",
+        "password_hash": "$2y$12$1JTT.67FqCRfZnTBiM2qUO99CO999vfahEFNRWffIe2M7NAG19yU6",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 73,
+        "credentials_expires_at": null,
+        "roles": [
+            "procurement_manager"
+        ]
+    },
+    {
+        "username": "project.manager",
+        "email": "project.manager@sapta.local",
+        "password_hash": "$2y$12$eSV78FMXNNq6CbG07wrTe.9xfFlc0MGGf9mLVPbNdS/sgMXtWDLiO",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 74,
+        "credentials_expires_at": null,
+        "roles": [
+            "project_manager"
+        ]
+    },
+    {
+        "username": "project.officer",
+        "email": "project.officer@sapta.local",
+        "password_hash": "$2y$12$XQitlZKrN5RaPWVut4d4Bew4YdB0uKXK4prfpv1lszMN1mDt97VCO",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 75,
+        "credentials_expires_at": null,
+        "roles": [
+            "project_officer"
+        ]
+    },
+    {
+        "username": "field.trainer",
+        "email": "field.trainer@sapta.local",
+        "password_hash": "$2y$12$Mk8bfJTnOb3cRtjP458rDeIARWn9Yu/hitXTl2fky7UMSb4g5A50.",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 76,
+        "credentials_expires_at": null,
+        "roles": [
+            "field_trainer"
+        ]
+    },
+    {
+        "username": "meal.manager",
+        "email": "meal.manager@sapta.local",
+        "password_hash": "$2y$12$2qkVAC43z4VfmlYmJaLn9O3NsOXExrqqm12OKGJ7vNloyucRy22A6",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 77,
+        "credentials_expires_at": null,
+        "roles": [
+            "meal_manager"
+        ]
+    },
+    {
+        "username": "meal.officer",
+        "email": "meal.officer@sapta.local",
+        "password_hash": "$2y$12$nukz6UZeH5AMEjv16T3IYecWhXsLrGn.0OaVsstvHlsqcAN10mAu2",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 78,
+        "credentials_expires_at": null,
+        "roles": [
+            "meal_officer"
+        ]
+    },
+    {
+        "username": "research.officer",
+        "email": "research.officer@sapta.local",
+        "password_hash": "$2y$12$8Mf.eSYpRKTZZ9BcVisli.zHkCxODrzgalecZ0xN06Fok/8TKAoze",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 79,
+        "credentials_expires_at": null,
+        "roles": [
+            "research_officer"
+        ]
+    },
+    {
+        "username": "community.manager",
+        "email": "community.manager@sapta.local",
+        "password_hash": "$2y$12$24PnrnJly5QgR/ZmRhnYPO7AdoHOMKmju9gK6KqU0FxGVw5eBKWSy",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 80,
+        "credentials_expires_at": null,
+        "roles": [
+            "community_manager"
+        ]
+    },
+    {
+        "username": "ict.manager",
+        "email": "ict.manager@sapta.local",
+        "password_hash": "$2y$12$TgOTTPY61Nlx3OmV0os91eTSgsdscnpRvmSjvqUFH/m9E9D5.AkUi",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 81,
+        "credentials_expires_at": null,
+        "roles": [
+            "ict_manager"
+        ]
+    },
+    {
+        "username": "hr.officer",
+        "email": "hr.officer@sapta.co.tz",
+        "password_hash": "$2y$12$hXwVCfBZAghUJPq.sR9KUeFm96WhoKhA6sHZ189AQS8cdpTqTn7aq",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 25,
+        "credentials_expires_at": null,
+        "roles": [
+            "hr_officer"
+        ]
+    },
+    {
+        "username": "partnership.manager",
+        "email": "partner@gmail.com",
+        "password_hash": "$2y$12$PJUjHWDzB.Z3MLYYxq5esuHdIbcV2B7vxGO7geE1jPZ1qNKtvi9L2",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 54,
+        "credentials_expires_at": null,
+        "roles": [
+            "partnerships_manager"
+        ]
+    },
+    {
+        "username": "logistics.manager",
+        "email": "logistics@manager.gmail.com",
+        "password_hash": "$2y$12$WgU26ArwtsNrfX3JkDbDOuMNt0sWkVIwYOK9QrzAuv3VpCX.hiNaG",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 55,
+        "credentials_expires_at": null,
+        "roles": [
+            "meal_manager"
+        ]
+    },
+    {
+        "username": "powershell@sapta2024a",
+        "email": "ps15096@sapta.co.tz",
+        "password_hash": "$2y$12$dHVWaB0AxeQilI616sgP4.KtWXKEdlbLnbcYhB9sOrfw/OvGXeBM.",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 61,
+        "credentials_expires_at": null,
+        "roles": [
+            "super_admin"
+        ]
+    },
+    {
+        "username": "victory@sapta2024a",
+        "email": "victory49792@gmail.com",
+        "password_hash": "$2y$12$tcue9PnscMaghMFZmWR1m.8UqTHBRduqKDLojLZSrPbwK.o3LwKdy",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 62,
+        "credentials_expires_at": null,
+        "roles": [
+            "manager"
+        ]
+    },
+    {
+        "username": "jeremia@sapta2024T",
+        "email": "victory40147@gmail.com",
+        "password_hash": "$2y$12$9aZWxo3P8B0qFqzyat4Ok.EuZZ.FT2e1fUDAYCwwa0jH6OdA.3kHK",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 63,
+        "credentials_expires_at": null,
+        "roles": [
+            "manager"
+        ]
+    },
+    {
+        "username": "test@sapta2024p",
+        "email": "test34759@gmail.com",
+        "password_hash": "$2y$12$uarFyDk.Zzt03YoCaodKCe647/ngIN5ahsgtqz/.atLjUKVRlt/Be",
+        "account_status": "active",
+        "is_first_login": false,
+        "employee_id": 65,
+        "credentials_expires_at": null,
+        "roles": [
+            "manager"
+        ]
+    }
+]
