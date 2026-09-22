@@ -830,3 +830,103 @@ Route::middleware(['auth'])->get('/reports/recruitment', [\App\Http\Controllers\
 Route::middleware(['auth'])->get('/reports/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('reports.trainings');
 Route::middleware(['auth'])->get('/reports/performance', [\App\Http\Controllers\ReportController::class, 'performance'])->name('reports.performance');
 Route::middleware(['auth'])->get('/reports/documents', [\App\Http\Controllers\ReportController::class, 'documents'])->name('reports.documents');
+
+// ============================================================
+// DEBUG: SEED LOCATIONS (Mkoa/Wilaya/Kata)
+// ============================================================
+Route::get('/debug/seed-locations', function() {
+    $results = [];
+
+    // === REGIONS ===
+    if (\Schema::hasTable('regions')) {
+        $count = \DB::table('regions')->count();
+        $results['regions_before'] = $count;
+        if ($count == 0) {
+            $regions = [
+                ['name' => 'Arusha', 'code' => 'AR'],
+                ['name' => 'Dar es Salaam', 'code' => 'DS'],
+                ['name' => 'Dodoma', 'code' => 'DD'],
+                ['name' => 'Geita', 'code' => 'GT'],
+                ['name' => 'Iringa', 'code' => 'IR'],
+                ['name' => 'Kagera', 'code' => 'KG'],
+                ['name' => 'Katavi', 'code' => 'KT'],
+                ['name' => 'Kigoma', 'code' => 'KM'],
+                ['name' => 'Kilimanjaro', 'code' => 'KL'],
+                ['name' => 'Lindi', 'code' => 'LD'],
+                ['name' => 'Manyara', 'code' => 'MY'],
+                ['name' => 'Mara', 'code' => 'MR'],
+                ['name' => 'Mbeya', 'code' => 'MB'],
+                ['name' => 'Morogoro', 'code' => 'MG'],
+                ['name' => 'Mtwara', 'code' => 'MT'],
+                ['name' => 'Mwanza', 'code' => 'MW'],
+                ['name' => 'Njombe', 'code' => 'NJ'],
+                ['name' => 'Pemba Kaskazini', 'code' => 'PK'],
+                ['name' => 'Pemba Kusini', 'code' => 'PS'],
+                ['name' => 'Pwani', 'code' => 'PW'],
+                ['name' => 'Rukwa', 'code' => 'RK'],
+                ['name' => 'Ruvuma', 'code' => 'RV'],
+                ['name' => 'Shinyanga', 'code' => 'SH'],
+                ['name' => 'Simiyu', 'code' => 'SM'],
+                ['name' => 'Singida', 'code' => 'SG'],
+                ['name' => 'Songwe', 'code' => 'SW'],
+                ['name' => 'Tabora', 'code' => 'TB'],
+                ['name' => 'Tanga', 'code' => 'TG'],
+                ['name' => 'Zanzibar Kaskazini', 'code' => 'ZK'],
+                ['name' => 'Zanzibar Kusini', 'code' => 'ZS'],
+                ['name' => 'Zanzibar Mjini', 'code' => 'ZM'],
+            ];
+            foreach ($regions as $r) {
+                \DB::table('regions')->insert(array_merge($r, ['created_at' => now(), 'updated_at' => now()]));
+            }
+        }
+        $results['regions_after'] = \DB::table('regions')->count();
+    }
+
+    // === DISTRICTS ===
+    if (\Schema::hasTable('districts')) {
+        $count = \DB::table('districts')->count();
+        $results['districts_before'] = $count;
+        if ($count == 0) {
+            // Chukua regions zote
+            $regions = \DB::table('regions')->get();
+            foreach ($regions as $r) {
+                // Kwa kila region, ongeza districts 3 za mfano
+                for ($i = 1; $i <= 3; $i++) {
+                    \DB::table('districts')->insert([
+                        'name' => $r->name . ' District ' . $i,
+                        'region_id' => $r->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+        $results['districts_after'] = \DB::table('districts')->count();
+    }
+
+    // === WARDS ===
+    if (\Schema::hasTable('wards')) {
+        $count = \DB::table('wards')->count();
+        $results['wards_before'] = $count;
+        if ($count == 0) {
+            $districts = \DB::table('districts')->get();
+            foreach ($districts as $d) {
+                for ($i = 1; $i <= 3; $i++) {
+                    \DB::table('wards')->insert([
+                        'name' => $d->name . ' Ward ' . $i,
+                        'district_id' => $d->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+        $results['wards_after'] = \DB::table('wards')->count();
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Locations zimejazwa',
+        'results' => $results,
+    ]);
+})->name('debug.seed-locations');
