@@ -711,32 +711,23 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::get('/admin', [\App\Http\Controllers\DashboardController::class, 'admin'])
         ->middleware('role:super_admin,admin')->name('admin');
 
-    Route::get('/director', [\App\Http\Controllers\DashboardController::class, 'director'])
-        ->middleware('role:ceo,bod,director')->name('director');
+    Route::get('/director', [\App\Http\Controllers\DashboardController::class, 'director'])->middleware('role:ceo,bod,director,super_admin,admin')->name('director');
 
-    Route::get('/executive', [\App\Http\Controllers\DashboardController::class, 'executive'])
-        ->middleware('role:ceo,bod,director')->name('executive');
+    Route::get('/executive', [\App\Http\Controllers\DashboardController::class, 'executive'])->middleware('role:ceo,bod,director,super_admin,admin')->name('executive');
 
-    Route::get('/hr', [\App\Http\Controllers\DashboardController::class, 'hr'])
-        ->middleware('role:hr_manager,hr_officer,admin_director')->name('hr');
+    Route::get('/hr', [\App\Http\Controllers\DashboardController::class, 'hr'])->middleware('role:hr_manager,hr_officer,admin_director,super_admin,admin')->name('hr');
 
-    Route::get('/finance', [\App\Http\Controllers\DashboardController::class, 'finance'])
-        ->middleware('role:finance_manager,accountant')->name('finance');
+    Route::get('/finance', [\App\Http\Controllers\DashboardController::class, 'finance'])->middleware('role:finance_manager,accountant,super_admin,admin')->name('finance');
 
-    Route::get('/manager', [\App\Http\Controllers\DashboardController::class, 'manager'])
-        ->middleware('role:manager,project_manager,project_officer,program_director')->name('manager');
+    Route::get('/manager', [\App\Http\Controllers\DashboardController::class, 'manager'])->middleware('role:manager,project_manager,project_officer,program_director,super_admin,admin')->name('manager');
 
-    Route::get('/staff', [\App\Http\Controllers\DashboardController::class, 'staff'])
-        ->middleware('role:staff')->name('staff');
+    Route::get('/staff', [\App\Http\Controllers\DashboardController::class, 'staff'])->middleware('role:staff,super_admin,admin')->name('staff');
 
-    Route::get('/ict', [\App\Http\Controllers\DashboardController::class, 'ict'])
-        ->middleware('role:ict_manager')->name('ict');
+    Route::get('/ict', [\App\Http\Controllers\DashboardController::class, 'ict'])->middleware('role:ict_manager,super_admin,admin')->name('ict');
 
-    Route::get('/meal', [\App\Http\Controllers\DashboardController::class, 'meal'])
-        ->middleware('role:meal_manager,meal_officer')->name('meal');
+    Route::get('/meal', [\App\Http\Controllers\DashboardController::class, 'meal'])->middleware('role:meal_manager,meal_officer,super_admin,admin')->name('meal');
 
-    Route::get('/program', [\App\Http\Controllers\DashboardController::class, 'program'])
-        ->middleware('role:program_director')->name('program');
+    Route::get('/program', [\App\Http\Controllers\DashboardController::class, 'program'])->middleware('role:program_director,super_admin,admin')->name('program');
 });
 // ============================================================
 // DEBUG: IMPORT USERS KUTOKA LOCAL → RENDER
