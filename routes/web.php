@@ -1158,3 +1158,28 @@ Route::get('/debug/session-test', function() {
 Route::get('/debug/set-success', function() {
     return redirect()->route('employees.index')->with('success', 'Test message from debug!');
 })->name('debug.set-success');
+// ============================================================
+// DEBUG: LIST ALL USERS
+// ============================================================
+Route::get('/debug/list-users', function() {
+    $users = \DB::table('users')->select('id', 'username', 'email', 'account_status')->get();
+    return response()->json([
+        'total' => $users->count(),
+        'users' => $users,
+    ]);
+})->name('debug.list-users');
+
+// ============================================================
+// DEBUG: RESET PASSWORD YA SUPERADMIN
+// ============================================================
+Route::get('/debug/reset-superadmin', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->where('username', 'superadmin')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+    ]);
+    return response()->json([
+        'success' => true,
+        'updated' => $updated,
+    ]);
+})->name('debug.reset-superadmin');
