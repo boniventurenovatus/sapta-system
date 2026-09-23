@@ -1183,3 +1183,39 @@ Route::get('/debug/reset-superadmin', function() {
         'updated' => $updated,
     ]);
 })->name('debug.reset-superadmin');
+// ============================================================
+// DEBUG: CHECK + RESET superadmin
+// ============================================================
+Route::get('/debug/check-superadmin', function() {
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    if (!$user) {
+        return response()->json(['success' => false, 'error' => 'superadmin haipo']);
+    }
+    return response()->json([
+        'id' => $user->id,
+        'username' => $user->username,
+        'email' => $user->email,
+        'account_status' => $user->account_status,
+        'hash_40' => substr($user->password_hash ?? 'NULL', 0, 40),
+        'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash ?? ''),
+        'is_first_login' => $user->is_first_login ?? null,
+        'credentials_expires_at' => $user->credentials_expires_at ?? null,
+    ]);
+})->name('debug.check-superadmin');
+
+Route::get('/debug/force-reset-superadmin', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->where('username', 'superadmin')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'credentials_expires_at' => now()->addDays(90),
+    ]);
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'updated' => $updated,
+        'verify' => \Hash::check('Sapta@2025!', $user->password_hash),
+        'hash_40' => substr($user->password_hash, 0, 40),
+    ]);
+})->name('debug.force-reset-superadmin');
