@@ -89,6 +89,16 @@ class DashboardController extends Controller
     // ============================================================
     public function hr()
     {
+        $pendingLeaves = $this->has('leave_requests')
+            ? DB::table('leave_requests')
+                ->leftJoin('employees', 'leave_requests.employee_id', '=', 'employees.id')
+                ->select('leave_requests.*', 'employees.first_name', 'employees.last_name')
+                ->where('leave_requests.status', 'pending')
+                ->orderByDesc('leave_requests.created_at')
+                ->limit(10)
+                ->get()
+            : collect();
+
         return view('dashboard.hr', [
             'kpis' => [
                 'total_employees' => $this->count('employees'),
@@ -98,7 +108,7 @@ class DashboardController extends Controller
                 'total_departments' => $this->count('departments'),
             ],
             'charts' => $this->allCharts(),
-            'pending_leaves_list' => collect(),
+            'pending_leaves_list' => $pendingLeaves,
         ]);
     }
 
@@ -141,15 +151,20 @@ class DashboardController extends Controller
     // ============================================================
     public function staff()
     {
+        $user = auth()->user();
+        $employeeId = $user->employee_id ?? null;
+
         return view('dashboard.staff', [
             'kpis' => [
-                'my_tasks' => 0,
-                'pending_tasks' => $this->countWhere('tasks', 'status', 'pending'),
-                'completed_tasks' => $this->countWhere('tasks', 'status', 'completed'),
+                'my_tasks' => $this->has('tasks') ? DB::table('tasks')->where('assigned_to', $user->id)->count() : 0,
+                'pending_tasks' => $this->has('tasks') ? DB::table('tasks')->where('assigned_to', $user->id)->where('status', 'pending')->count() : 0,
+                'completed_tasks' => $this->has('tasks') ? DB::table('tasks')->where('assigned_to', $user->id)->where('status', 'completed')->count() : 0,
+                'pending_leaves' => $employeeId && $this->has('leave_requests') ? DB::table('leave_requests')->where('employee_id', $employeeId)->where('status', 'pending')->count() : 0,
+                'my_attendance' => $employeeId && $this->has('attendances') ? DB::table('attendances')->where('employee_id', $employeeId)->whereMonth('created_at', now()->month)->count() : 0,
                 'attendance_rate' => 100,
             ],
             'charts' => $this->allCharts(),
-            'recent_tasks' => $this->has('tasks') ? DB::table('tasks')->orderByDesc('created_at')->limit(5)->get() : collect(),
+            'recent_tasks' => $this->has('tasks') ? DB::table('tasks')->where('assigned_to', $user->id)->orderByDesc('created_at')->limit(5)->get() : collect(),
         ]);
     }
 
