@@ -202,11 +202,14 @@ class DashboardController extends Controller
         return [
             'users_by_role' => $this->chartUsersByRole(),
             'user_activity' => $this->chartEmpty('Activity'),
-            'documents_by_category' => $this->chartGroupBy('documents', ['category','document_category','type'], 'Documents'),
+            'documents_by_category' => $this->chartGroupBy('documents', ['category'], 'Documents'),
             'projects_by_status' => $this->chartGroupBy('projects', ['status'], 'Projects'),
             'tasks_by_status' => $this->chartGroupBy('tasks', ['status'], 'Tasks'),
             'employees_by_department' => $this->chartEmployeesByDept(),
+            'employees_by_gender' => $this->chartEmployeesByGender(),
+            'employees_by_status' => $this->chartEmployeesByStatus(),
             'leaves_by_status' => $this->chartGroupBy('leave_requests', ['status'], 'Leaves'),
+            'leaves_by_type' => $this->chartGroupBy('leave_requests', ['leave_type'], 'Leave Types'),
             'attendance_overview' => $this->chartEmpty('Attendance'),
             'budget_overview' => $this->chartEmpty('Budget'),
             'budget_utilization' => $this->chartEmpty('Utilization'),
@@ -219,6 +222,46 @@ class DashboardController extends Controller
             'my_activity' => $this->chartEmpty('Activity'),
             'projects_by_department' => $this->chartEmpty('Projects'),
             'recent_activities' => $this->chartEmpty('Activities'),
+            'tasks_by_priority' => $this->chartGroupBy('tasks', ['priority'], 'Priority'),
+            'payroll_overview' => $this->chartEmpty('Payroll'),
+            'vouchers_by_status' => $this->chartGroupBy('payment_vouchers', ['status'], 'Vouchers'),
+            'receipts_by_status' => $this->chartGroupBy('receipts', ['status'], 'Receipts'),
+            'trainings_by_status' => $this->chartGroupBy('trainings', ['status'], 'Trainings'),
+            'performance_by_status' => $this->chartGroupBy('performance_reviews', ['status'], 'Reviews'),
+        ];
+    }
+
+    private function chartEmployeesByGender(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'gender')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')->select('gender', \DB::raw('COUNT(*) as total'))
+            ->whereNull('deleted_at')->groupBy('gender')->get();
+        return [
+            'labels' => $rows->pluck('gender')->map(fn($v) => $v ? ucfirst($v) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'],
+            ]],
+        ];
+    }
+
+    private function chartEmployeesByStatus(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'employment_status')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')->select('employment_status', \DB::raw('COUNT(*) as total'))
+            ->whereNull('deleted_at')->groupBy('employment_status')->get();
+        return [
+            'labels' => $rows->pluck('employment_status')->map(fn($v) => $v ? ucfirst(str_replace('_', ' ', $v)) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6'],
+            ]],
         ];
     }
 
