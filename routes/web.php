@@ -733,202 +733,7 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 // DEBUG: IMPORT USERS KUTOKA LOCAL → RENDER
 // ONDOA BAADA YA KUTUMIA!
 // ============================================================
-Route::get('/debug/import-users', function() {
-    $jsonFile = base_path('users-export.json');
-    if (!file_exists($jsonFile)) {
-        return response()->json(['success' => false, 'error' => 'users-export.json haipo'], 404);
-    }
 
-    $users = json_decode(file_get_contents($jsonFile), true);
-    if (!is_array($users)) {
-        return response()->json(['success' => false, 'error' => 'JSON si sahihi'], 400);
-    }
-
-    $imported = 0;
-    $updated = 0;
-    $errors = [];
-
-    foreach ($users as $u) {
-        try {
-            $existing = \DB::table('users')->where('username', $u['username'])->first();
-
-            if ($existing) {
-                \DB::table('users')->where('id', $existing->id)->update([
-                    'email' => $u['email'],
-                    'password_hash' => $u['password_hash'],
-                    'account_status' => $u['account_status'],
-                    'is_first_login' => $u['is_first_login'] ? 1 : 0,
-                    'credentials_expires_at' => $u['credentials_expires_at'] ?? now()->addDays(30),
-                    'updated_at' => now(),
-                ]);
-                $userId = $existing->id;
-                $updated++;
-            } else {
-                $userId = \DB::table('users')->insertGetId([
-                    'username' => $u['username'],
-                    'email' => $u['email'],
-                    'password_hash' => $u['password_hash'],
-                    'account_status' => $u['account_status'],
-                    'is_first_login' => $u['is_first_login'] ? 1 : 0,
-                    'credentials_expires_at' => $u['credentials_expires_at'] ?? now()->addDays(30),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $imported++;
-            }
-
-            // Roles
-            if (!empty($u['roles'])) {
-                \DB::table('user_roles')->where('user_id', $userId)->delete();
-                foreach ($u['roles'] as $roleCode) {
-                    $role = \DB::table('roles')->where('code', $roleCode)->first();
-                    if ($role) {
-                        \DB::table('user_roles')->insert([
-                            'user_id' => $userId,
-                            'role_id' => $role->id,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            $errors[] = $u['username'] . ': ' . $e->getMessage();
-        }
-    }
-
-    return response()->json([
-        'success' => true,
-        'total_in_json' => count($users),
-        'imported' => $imported,
-        'updated' => $updated,
-        'errors' => $errors,
-    ]);
-})->name('debug.import-users');
-// ============================================================
-// REPORTS ROUTES (auto-generated)
-// ============================================================
-Route::middleware(['auth'])->get('/reports/employees', [\App\Http\Controllers\ReportController::class, 'employees'])->name('reports.employees');
-Route::middleware(['auth'])->get('/reports/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('reports.attendance');
-Route::middleware(['auth'])->get('/reports/leaves', [\App\Http\Controllers\ReportController::class, 'leaves'])->name('reports.leaves');
-Route::middleware(['auth'])->get('/reports/payroll', [\App\Http\Controllers\ReportController::class, 'payroll'])->name('reports.payroll');
-Route::middleware(['auth'])->get('/reports/payment-vouchers', [\App\Http\Controllers\ReportController::class, 'paymentVouchers'])->name('reports.payment-vouchers');
-Route::middleware(['auth'])->get('/reports/receipts', [\App\Http\Controllers\ReportController::class, 'receipts'])->name('reports.receipts');
-Route::middleware(['auth'])->get('/reports/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])->name('reports.budgets');
-Route::middleware(['auth'])->get('/reports/projects', [\App\Http\Controllers\ReportController::class, 'projects'])->name('reports.projects');
-Route::middleware(['auth'])->get('/reports/tasks', [\App\Http\Controllers\ReportController::class, 'tasks'])->name('reports.tasks');
-Route::middleware(['auth'])->get('/reports/recruitment', [\App\Http\Controllers\ReportController::class, 'recruitment'])->name('reports.recruitment');
-Route::middleware(['auth'])->get('/reports/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('reports.trainings');
-Route::middleware(['auth'])->get('/reports/performance', [\App\Http\Controllers\ReportController::class, 'performance'])->name('reports.performance');
-Route::middleware(['auth'])->get('/reports/documents', [\App\Http\Controllers\ReportController::class, 'documents'])->name('reports.documents');
-
-// ============================================================
-// DEBUG: SEED LOCATIONS (Mkoa/Wilaya/Kata)
-// ============================================================
-Route::get('/debug/seed-locations', function() {
-    $results = [];
-
-    // === REGIONS ===
-    if (\Schema::hasTable('regions')) {
-        $count = \DB::table('regions')->count();
-        $results['regions_before'] = $count;
-        if ($count == 0) {
-            $regions = [
-                ['name' => 'Arusha', 'code' => 'AR'],
-                ['name' => 'Dar es Salaam', 'code' => 'DS'],
-                ['name' => 'Dodoma', 'code' => 'DD'],
-                ['name' => 'Geita', 'code' => 'GT'],
-                ['name' => 'Iringa', 'code' => 'IR'],
-                ['name' => 'Kagera', 'code' => 'KG'],
-                ['name' => 'Katavi', 'code' => 'KT'],
-                ['name' => 'Kigoma', 'code' => 'KM'],
-                ['name' => 'Kilimanjaro', 'code' => 'KL'],
-                ['name' => 'Lindi', 'code' => 'LD'],
-                ['name' => 'Manyara', 'code' => 'MY'],
-                ['name' => 'Mara', 'code' => 'MR'],
-                ['name' => 'Mbeya', 'code' => 'MB'],
-                ['name' => 'Morogoro', 'code' => 'MG'],
-                ['name' => 'Mtwara', 'code' => 'MT'],
-                ['name' => 'Mwanza', 'code' => 'MW'],
-                ['name' => 'Njombe', 'code' => 'NJ'],
-                ['name' => 'Pemba Kaskazini', 'code' => 'PK'],
-                ['name' => 'Pemba Kusini', 'code' => 'PS'],
-                ['name' => 'Pwani', 'code' => 'PW'],
-                ['name' => 'Rukwa', 'code' => 'RK'],
-                ['name' => 'Ruvuma', 'code' => 'RV'],
-                ['name' => 'Shinyanga', 'code' => 'SH'],
-                ['name' => 'Simiyu', 'code' => 'SM'],
-                ['name' => 'Singida', 'code' => 'SG'],
-                ['name' => 'Songwe', 'code' => 'SW'],
-                ['name' => 'Tabora', 'code' => 'TB'],
-                ['name' => 'Tanga', 'code' => 'TG'],
-                ['name' => 'Zanzibar Kaskazini', 'code' => 'ZK'],
-                ['name' => 'Zanzibar Kusini', 'code' => 'ZS'],
-                ['name' => 'Zanzibar Mjini', 'code' => 'ZM'],
-            ];
-            foreach ($regions as $r) {
-                \DB::table('regions')->insert(array_merge($r, ['created_at' => now(), 'updated_at' => now()]));
-            }
-        }
-        $results['regions_after'] = \DB::table('regions')->count();
-    }
-
-    // === DISTRICTS ===
-    if (\Schema::hasTable('districts')) {
-        $count = \DB::table('districts')->count();
-        $results['districts_before'] = $count;
-        if ($count == 0) {
-            // Chukua regions zote
-            $regions = \DB::table('regions')->get();
-            foreach ($regions as $r) {
-                // Kwa kila region, ongeza districts 3 za mfano
-                for ($i = 1; $i <= 3; $i++) {
-                    \DB::table('districts')->insert([
-                        'name' => $r->name . ' District ' . $i,
-                        'region_id' => $r->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-        }
-        $results['districts_after'] = \DB::table('districts')->count();
-    }
-
-    // === WARDS ===
-    if (\Schema::hasTable('wards')) {
-        $count = \DB::table('wards')->count();
-        $results['wards_before'] = $count;
-        if ($count == 0) {
-            $districts = \DB::table('districts')->get();
-            foreach ($districts as $d) {
-                for ($i = 1; $i <= 3; $i++) {
-                    \DB::table('wards')->insert([
-                        'name' => $d->name . ' Ward ' . $i,
-                        'district_id' => $d->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-        }
-        $results['wards_after'] = \DB::table('wards')->count();
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Locations zimejazwa',
-        'results' => $results,
-    ]);
-})->name('debug.seed-locations');
-// ============================================================
-// LOCATION API — kwa dropdowns (Mkoa/Wilaya/Kata)
-// ============================================================
-Route::middleware(['auth'])->prefix('location')->name('location.')->group(function () {
-    Route::get('/regions', [\App\Http\Controllers\LocationController::class, 'regions'])->name('regions');
-    Route::get('/districts', [\App\Http\Controllers\LocationController::class, 'districts'])->name('districts');
-    Route::get('/wards', [\App\Http\Controllers\LocationController::class, 'wards'])->name('wards');
-});
 // ============================================================
 // REPORTS CSV EXPORT ROUTES
 // ============================================================
@@ -1551,3 +1356,26 @@ Route::get('/debug/create-all-roles', function() {
         'errors' => $errors,
     ]);
 })->name('debug.create-all-roles');
+// ============================================================
+// RESET PASSWORDS — kwa kudumu (isiharibike)
+// ============================================================
+Route::get('/debug/reset-passwords-final', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'credentials_expires_at' => now()->addDays(365),
+    ]);
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('session:clear');
+    
+    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'users_updated' => $updated,
+        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
+        'message' => 'Password zote ni Sapta@2025! — haitaharibika tena',
+    ]);
+})->name('debug.reset-passwords-final');
