@@ -348,10 +348,10 @@ class EmployeeController extends Controller
             'user_agent'  => request()->userAgent(),
         ]);
 
-        // [SPEED] $this->notifyHr($employee, 'deactivate', $oldStatus, 'inactive');
-        // [SPEED] $this->notifyHrNotification($employee, 'deactivate', $oldStatus, 'inactive');
+        $this->notifyHr($employee, 'deactivate', $oldStatus, 'inactive');
+        $this->notifyHrNotification($employee, 'deactivate', $oldStatus, 'inactive');
 
-        // [SPEED] UserActivityLog::log(
+        UserActivityLog::log(
             action: 'deactivate',
             module: 'employee',
             description: 'Deactivated: ' . $employee->full_name,
@@ -387,10 +387,10 @@ class EmployeeController extends Controller
             'user_agent'  => request()->userAgent(),
         ]);
 
-        // [SPEED] $this->notifyHr($employee, 'terminate', $oldStatus, 'terminated');
-        // [SPEED] $this->notifyHrNotification($employee, 'terminate', $oldStatus, 'terminated');
+        $this->notifyHr($employee, 'terminate', $oldStatus, 'terminated');
+        $this->notifyHrNotification($employee, 'terminate', $oldStatus, 'terminated');
 
-        // [SPEED] UserActivityLog::log(
+        UserActivityLog::log(
             action: 'terminate',
             module: 'employee',
             description: 'Terminated: ' . $employee->full_name,
@@ -426,10 +426,10 @@ class EmployeeController extends Controller
             'user_agent'  => request()->userAgent(),
         ]);
 
-        // [SPEED] $this->notifyHr($employee, 'activate', $oldStatus, 'active');
-        // [SPEED] $this->notifyHrNotification($employee, 'activate', $oldStatus, 'active');
+        $this->notifyHr($employee, 'activate', $oldStatus, 'active');
+        $this->notifyHrNotification($employee, 'activate', $oldStatus, 'active');
 
-        // [SPEED] UserActivityLog::log(
+        UserActivityLog::log(
             action: 'activate',
             module: 'employee',
             description: 'Activated: ' . $employee->full_name,
@@ -475,10 +475,10 @@ class EmployeeController extends Controller
             'user_agent'  => request()->userAgent(),
         ]);
 
-        // [SPEED] $this->notifyHr($employee, 'suspend', $oldStatus, 'suspended', $validated['suspension_reason']);
-        // [SPEED] $this->notifyHrNotification($employee, 'suspend', $oldStatus, 'suspended', $validated['suspension_reason']);
+        $this->notifyHr($employee, 'suspend', $oldStatus, 'suspended', $validated['suspension_reason']);
+        $this->notifyHrNotification($employee, 'suspend', $oldStatus, 'suspended', $validated['suspension_reason']);
 
-        // [SPEED] UserActivityLog::log(
+        UserActivityLog::log(
             action: 'suspend',
             module: 'employee',
             description: 'Suspended: ' . $employee->full_name,
