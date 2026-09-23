@@ -1379,3 +1379,24 @@ Route::get('/debug/reset-passwords-final', function() {
         'message' => 'Password zote ni Sapta@2025! — haitaharibika tena',
     ]);
 })->name('debug.reset-passwords-final');
+// ============================================================
+// DEBUG: TEST REGIONS
+// ============================================================
+Route::get('/debug/test-regions', function() {
+    try {
+        $regions = \App\Models\Region::orderBy('name')->get();
+        return response()->json([
+            'model' => \App\Models\Region::class,
+            'table' => (new \App\Models\Region)->getTable(),
+            'count' => $regions->count(),
+            'first_5' => $regions->take(5)->map(fn($r) => ['id' => $r->id, 'name' => $r->name]),
+            'db_count' => \DB::table('regions')->count(),
+            'db_first_5' => \DB::table('regions')->take(5)->get(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+})->name('debug.test-regions');
