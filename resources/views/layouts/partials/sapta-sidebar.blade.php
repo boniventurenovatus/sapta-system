@@ -102,9 +102,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Executive</div>
                 
-                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span class="sapta-nav-text">Employees</span>
                 </a>
                 
                 <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
@@ -121,9 +118,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Management</div>
                 
-                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span class="sapta-nav-text">Employees</span>
                 </a>
                 
                 <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
@@ -145,9 +139,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Human Resources</div>
                 
-                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span class="sapta-nav-text">Employees</span>
                 </a>
                 
                 <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
