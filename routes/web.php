@@ -1369,7 +1369,7 @@ Route::get('/debug/reset-passwords-final', function() {
     ]);
     \Artisan::call('cache:clear');
     \Artisan::call('config:clear');
-    \Artisan::call('session:clear');
+    
     
     $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
     return response()->json([
