@@ -346,6 +346,103 @@ class DashboardController extends Controller
         ];
     }
 
+    private function chartUsersByRole(): array
+    {
+        $rows = \DB::table('roles')
+            ->leftJoin('user_roles', 'roles.id', '=', 'user_roles.role_id')
+            ->select('roles.name', \DB::raw('COUNT(user_roles.user_id) as total'))
+            ->groupBy('roles.id', 'roles.name')->get();
+        return [
+            'labels' => $rows->pluck('name')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Users',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartEmployeesByDept(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'department_id')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('departments.name as dept', \DB::raw('COUNT(*) as total'))
+            ->whereNull('employees.deleted_at')
+            ->groupBy('departments.name')->get();
+        return [
+            'labels' => $rows->pluck('dept')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartEmployeesByGender(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'gender')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')->select('gender', \DB::raw('COUNT(*) as total'))
+            ->whereNull('deleted_at')->groupBy('gender')->get();
+        return [
+            'labels' => $rows->pluck('gender')->map(fn($v) => $v ? ucfirst($v) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'],
+            ]],
+        ];
+    }
+
+    private function chartGroupBy(string $table, array $candidates, string $label): array
+    {
+        if (!$this->has($table)) return $this->chartEmpty($label);
+        $col = null;
+        foreach ($candidates as $c) {
+            if (\Schema::hasColumn($table, $c)) { $col = $c; break; }
+        }
+        if (!$col) return $this->chartEmpty($label);
+        $rows = \DB::table($table)->select($col.' as k', \DB::raw('COUNT(*) as total'))->groupBy($col)->get();
+        return [
+            'labels' => $rows->pluck('k')->map(fn($v) => $v ? ucfirst(str_replace('_', ' ', $v)) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => $label,
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartSystemHealth(): array
+    {
+        return [
+            'labels' => ['Healthy', 'Warning', 'Critical'],
+            'datasets' => [[
+                'label' => 'System',
+                'data' => [95, 4, 1],
+                'backgroundColor' => ['#10b981', '#f59e0b', '#ef4444'],
+            ]],
+        ];
+    }
+
+    private function chartEmpty(string $label): array
+    {
+        return [
+            'labels' => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            'datasets' => [[
+                'label' => $label,
+                'data' => array_fill(0, 12, 0),
+                'borderColor' => '#3b82f6',
+                'backgroundColor' => 'rgba(59,130,246,0.1)',
+            ]],
+        ];
+    }
+
     private function chartEmployeesByGender(): array
     {
         if (!$this->has('employees') || !\Schema::hasColumn('employees', 'gender')) {
