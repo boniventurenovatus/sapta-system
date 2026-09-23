@@ -1416,3 +1416,138 @@ Route::get('/debug/assign-roles-all', function() {
         'errors' => $errors,
     ]);
 })->name('debug.assign-roles-all');
+// ============================================================
+// DEBUG: UNDA ROLES ZOTE + ASSIGN KWA USERS
+// ============================================================
+Route::get('/debug/create-all-roles', function() {
+    $allRoles = [
+        ['code' => 'super_admin', 'name' => 'Super Admin', 'description' => 'Full system access'],
+        ['code' => 'admin', 'name' => 'Admin', 'description' => 'System administration'],
+        ['code' => 'director', 'name' => 'Director', 'description' => 'Organization-wide management'],
+        ['code' => 'manager', 'name' => 'Manager', 'description' => 'Department management'],
+        ['code' => 'staff', 'name' => 'Staff', 'description' => 'Standard staff access'],
+        ['code' => 'finance_manager', 'name' => 'Finance Manager', 'description' => 'Finance Manager'],
+        ['code' => 'accountant', 'name' => 'Accountant', 'description' => 'Accountant'],
+        ['code' => 'bod', 'name' => 'Board of Directors', 'description' => 'Board of Directors'],
+        ['code' => 'ceo', 'name' => 'Chief Executive Officer', 'description' => 'CEO'],
+        ['code' => 'admin_director', 'name' => 'Administrative Director', 'description' => 'Administrative Director'],
+        ['code' => 'hr_manager', 'name' => 'HR Manager', 'description' => 'HR Manager'],
+        ['code' => 'procurement_manager', 'name' => 'Procurement Manager', 'description' => 'Procurement Manager'],
+        ['code' => 'program_director', 'name' => 'Program Director', 'description' => 'Program Director'],
+        ['code' => 'project_manager', 'name' => 'Project Manager', 'description' => 'Project Manager'],
+        ['code' => 'project_officer', 'name' => 'Project Officer', 'description' => 'Project Officer'],
+        ['code' => 'field_trainer', 'name' => 'Field Trainer', 'description' => 'Field Trainer'],
+        ['code' => 'partnerships_manager', 'name' => 'Partnerships Manager', 'description' => 'Partnerships Manager'],
+        ['code' => 'meal_manager', 'name' => 'MEAL Manager', 'description' => 'MEAL Manager'],
+        ['code' => 'meal_officer', 'name' => 'MEAL Officer', 'description' => 'MEAL Officer'],
+        ['code' => 'research_officer', 'name' => 'Research Officer', 'description' => 'Research Officer'],
+        ['code' => 'community_manager', 'name' => 'Community Knowledge Manager', 'description' => 'Community Manager'],
+        ['code' => 'ict_manager', 'name' => 'ICT Manager', 'description' => 'ICT Manager'],
+        ['code' => 'hr_officer', 'name' => 'HR Officer', 'description' => 'HR Officer'],
+    ];
+
+    $created = [];
+    $existed = [];
+
+    foreach ($allRoles as $r) {
+        $existing = \DB::table('roles')->where('code', $r['code'])->first();
+        if ($existing) {
+            $existed[] = $r['code'];
+            continue;
+        }
+        \DB::table('roles')->insert([
+            'code' => $r['code'],
+            'name' => $r['name'],
+            'description' => $r['description'],
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $created[] = $r['code'];
+    }
+
+    // ============================================================
+    // ASSIGN ROLES KWA USERS WOTE (kwa email)
+    // ============================================================
+    $emailMap = [
+        'boniventurenovatus@gmail.com' => 'super_admin',
+        'hr@sapta.co.tz' => 'admin',
+        'ps15096@sapta.co.tz' => 'super_admin',
+        'director@sapta.local' => 'director',
+        'director@sapta.co.tz' => 'director',
+        'ceo@sapta.local' => 'ceo',
+        'ceo@sapta.co.tz' => 'ceo',
+        'bod@sapta.local' => 'bod',
+        'bod@sapta.co.tz' => 'bod',
+        'hr.manager@sapta.local' => 'hr_manager',
+        'hr.manager@sapta.co.tz' => 'hr_manager',
+        'hr.officer@sapta.co.tz' => 'hr_officer',
+        'admin.director@sapta.local' => 'admin_director',
+        'admin.director@sapta.co.tz' => 'admin_director',
+        'finance.manager@sapta.local' => 'finance_manager',
+        'finance.manager@sapta.co.tz' => 'finance_manager',
+        'accountant.test@sapta.local' => 'accountant',
+        'accountant@sapta.co.tz' => 'accountant',
+        'manager@sapta.local' => 'manager',
+        'manager@sapta.co.tz' => 'manager',
+        'program.director@sapta.local' => 'program_director',
+        'program.director@sapta.co.tz' => 'program_director',
+        'project.manager@sapta.local' => 'project_manager',
+        'project.manager@sapta.co.tz' => 'project_manager',
+        'project.officer@sapta.local' => 'project_officer',
+        'project.officer@sapta.co.tz' => 'project_officer',
+        'procurement.manager@sapta.local' => 'procurement_manager',
+        'procurement.manager@sapta.co.tz' => 'procurement_manager',
+        'staff@sapta.local' => 'staff',
+        'staff@sapta.co.tz' => 'staff',
+        'field.trainer@sapta.local' => 'field_trainer',
+        'field.trainer@sapta.co.tz' => 'field_trainer',
+        'meal.manager@sapta.local' => 'meal_manager',
+        'meal.manager@sapta.co.tz' => 'meal_manager',
+        'meal.officer@sapta.local' => 'meal_officer',
+        'meal.officer@sapta.co.tz' => 'meal_officer',
+        'research.officer@sapta.local' => 'research_officer',
+        'research.officer@sapta.co.tz' => 'research_officer',
+        'community.manager@sapta.local' => 'community_manager',
+        'community.manager@sapta.co.tz' => 'community_manager',
+        'ict.manager@sapta.local' => 'ict_manager',
+        'ict.manager@sapta.co.tz' => 'ict_manager',
+        'partner@gmail.com' => 'partnerships_manager',
+        'partnerships.manager@sapta.co.tz' => 'partnerships_manager',
+        'logistics@manager.gmail.com' => 'meal_manager',
+        'victory49792@gmail.com' => 'manager',
+        'victory40147@gmail.com' => 'manager',
+        'test34759@gmail.com' => 'manager',
+    ];
+
+    $assigned = []; $errors = [];
+    $users = \App\Models\User::all();
+    $roles = \DB::table('roles')->get();
+
+    foreach ($users as $user) {
+        $roleCode = $emailMap[$user->email] ?? null;
+        if (!$roleCode) continue;
+        $role = $roles->where('code', $roleCode)->first();
+        if (!$role) {
+            $errors[] = "$user->email: role $roleCode haipo";
+            continue;
+        }
+        try {
+            \DB::table('user_roles')->where('user_id', $user->id)->delete();
+            \DB::table('user_roles')->insert([
+                'user_id' => $user->id, 'role_id' => $role->id,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            $assigned[] = "$user->username => $roleCode";
+        } catch (\Exception $e) { $errors[] = "$user->username: " . $e->getMessage(); }
+    }
+
+    return response()->json([
+        'success' => true,
+        'roles_created' => $created,
+        'roles_existed' => $existed,
+        'assigned_count' => count($assigned),
+        'assigned' => $assigned,
+        'errors' => $errors,
+    ]);
+})->name('debug.create-all-roles');
