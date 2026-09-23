@@ -1210,3 +1210,61 @@ Route::get('/debug/force-reset-superadmin', function() {
         'hash_40' => substr($user->password_hash, 0, 40),
     ]);
 })->name('debug.force-reset-superadmin');
+// ============================================================
+// DEBUG: CHECK SUPERADMIN ROLE
+// ============================================================
+Route::get('/debug/check-superadmin-role', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    if (!$user) {
+        return response()->json(['success' => false, 'error' => 'User haipo']);
+    }
+    
+    return response()->json([
+        'username' => $user->username,
+        'roles_relationship' => $user->roles()->get()->map(fn($r) => ['id' => $r->id, 'code' => $r->code, 'name' => $r->name]),
+        'hasRole_super_admin' => $user->hasRole('super_admin'),
+        'hasRole_admin' => $user->hasRole('admin'),
+        'user_roles_pivot' => \DB::table('user_roles')->where('user_id', $user->id)->get(),
+    ]);
+})->name('debug.check-superadmin-role');
+
+// ============================================================
+// DEBUG: FIX SUPERADMIN ROLE (assign super_admin)
+// ============================================================
+Route::get('/debug/fix-superadmin-role', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    if (!$user) {
+        return response()->json(['success' => false, 'error' => 'User haipo']);
+    }
+    
+    // Tafuta role super_admin
+    $role = \DB::table('roles')->where('code', 'super_admin')->first();
+    if (!$role) {
+        return response()->json(['success' => false, 'error' => 'Role super_admin haipo']);
+    }
+    
+    // Angalia kama tayari ipo
+    $exists = \DB::table('user_roles')
+        ->where('user_id', $user->id)
+        ->where('role_id', $role->id)
+        ->exists();
+    
+    if (!$exists) {
+        \DB::table('user_roles')->insert([
+            'user_id' => $user->id,
+            'role_id' => $role->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+    
+    // Angalia tena
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    
+    return response()->json([
+        'success' => true,
+        'role_assigned' => !$exists,
+        'hasRole_super_admin' => $user->hasRole('super_admin'),
+        'user_roles' => \DB::table('user_roles')->where('user_id', $user->id)->get(),
+    ]);
+})->name('debug.fix-superadmin-role');
