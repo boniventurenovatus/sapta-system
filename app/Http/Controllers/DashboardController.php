@@ -121,6 +121,7 @@ class DashboardController extends Controller
         'total_roles' => DB::table('roles')->count(),
         'total_permissions' => $this->count('permissions'),
         'total_departments' => $this->count('departments'),
+            'total_trainings' => $this->has('trainings') ? \DB::table('trainings')->count() : 0,
         'total_positions' => $this->count('positions'),
         'total_audit_logs' => $this->count('audit_logs'),
     ];}
@@ -148,6 +149,7 @@ class DashboardController extends Controller
         'active_employees' => $this->countWhere('employees', 'employment_status', 'active'),
         'pending_leaves' => $this->countWhere('leave_requests', 'status', 'pending'),
         'total_departments' => $this->count('departments'),
+            'total_trainings' => $this->has('trainings') ? \DB::table('trainings')->count() : 0,
     ];}
 
     private function kpisFinance(): array { return [
