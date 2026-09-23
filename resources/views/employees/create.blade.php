@@ -38,7 +38,7 @@
             <div><label>Region *</label>
                 <select name="region_id" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;">
                     <option value="">-- Select --</option>
-                    @foreach(\App\Models\Region::orderBy('name')->get() as \$region)
+                    @foreach(\App\Models\Region::orderBy('name')->get() as $region)
                         <option value="{{ $region->id }}" @selected(old('region_id') == $region->id)>{{ $region->name }}</option>
                     @endforeach
                 </select>
@@ -46,7 +46,7 @@
             <div><label>District *</label>
                 <select name="district_id" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;">
                     <option value="">-- Select --</option>
-                    @foreach(\App\Models\District::orderBy('name')->get() as \$district)
+                    @foreach(\App\Models\District::orderBy('name')->get() as $district)
                         <option value="{{ $district->id }}" @selected(old('district_id') == $district->id)>{{ $district->name }}</option>
                     @endforeach
                 </select>
@@ -54,7 +54,7 @@
             <div><label>Ward *</label>
                 <select name="ward_id" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;">
                     <option value="">-- Select --</option>
-                    @foreach(\App\Models\Ward::orderBy('name')->get() as \$ward)
+                    @foreach(\App\Models\Ward::orderBy('name')->get() as $ward)
                         <option value="{{ $ward->id }}" @selected(old('ward_id') == $ward->id)>{{ $ward->name }}</option>
                     @endforeach
                 </select>
