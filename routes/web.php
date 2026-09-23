@@ -1312,3 +1312,42 @@ Route::get('/debug/reset-all-to-sapta', function() {
         'superadmin_verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
     ]);
 })->name('debug.reset-all-to-sapta');
+// ============================================================
+// DEBUG: ASSIGN ROLES KWA USERS WOTE
+// ============================================================
+Route::get('/debug/assign-roles-now', function() {
+    $roleMap = [
+        'superadmin' => 'super_admin', 'admin' => 'admin',
+        'powershell@sapta2024a' => 'super_admin',
+        'director' => 'director', 'ceo' => 'ceo', 'bod' => 'bod',
+        'hr.manager' => 'hr_manager', 'hr.officer' => 'hr_officer',
+        'admin.director' => 'admin_director',
+        'finance.manager' => 'finance_manager', 'accountant.test' => 'accountant',
+        'manager' => 'manager', 'program.director' => 'program_director',
+        'project.manager' => 'project_manager', 'project.officer' => 'project_officer',
+        'procurement.manager' => 'procurement_manager',
+        'staff' => 'staff', 'field.trainer' => 'field_trainer',
+        'meal.manager' => 'meal_manager', 'meal.officer' => 'meal_officer',
+        'research.officer' => 'research_officer',
+        'community.manager' => 'community_manager', 'ict.manager' => 'ict_manager',
+        'partnership.manager' => 'partnerships_manager', 'logistics.manager' => 'meal_manager',
+        'victory@sapta2024a' => 'manager', 'jeremia@sapta2024T' => 'manager',
+        'test@sapta2024p' => 'manager',
+    ];
+    $assigned = []; $errors = [];
+    foreach ($roleMap as $username => $roleCode) {
+        try {
+            $user = \App\Models\User::where('username', $username)->first();
+            if (!$user) continue;
+            $role = \DB::table('roles')->where('code', $roleCode)->first();
+            if (!$role) continue;
+            \DB::table('user_roles')->where('user_id', $user->id)->delete();
+            \DB::table('user_roles')->insert([
+                'user_id' => $user->id, 'role_id' => $role->id,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            $assigned[] = "$username => $roleCode";
+        } catch (\Exception $e) { $errors[] = "$username: " . $e->getMessage(); }
+    }
+    return response()->json(['success' => true, 'count' => count($assigned), 'assigned' => $assigned, 'errors' => $errors]);
+})->name('debug.assign-roles-now');
