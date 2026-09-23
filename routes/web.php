@@ -1268,3 +1268,21 @@ Route::get('/debug/fix-superadmin-role', function() {
         'user_roles' => \DB::table('user_roles')->where('user_id', $user->id)->get(),
     ]);
 })->name('debug.fix-superadmin-role');
+// ============================================================
+// DEBUG: WHOAMI — angalia user na roles
+// ============================================================
+Route::get('/debug/whoami', function() {
+    $user = auth()->user();
+    if (!$user) {
+        return response()->json(['error' => 'Hakuna user logged in']);
+    }
+    return response()->json([
+        'id' => $user->id,
+        'username' => $user->username,
+        'roles' => $user->roles()->pluck('code')->toArray(),
+        'hasRole_super_admin' => $user->hasRole('super_admin'),
+        'hasRole_admin' => $user->hasRole('admin'),
+        'hasRole_staff' => $user->hasRole('staff'),
+        'middleware_aliases' => app('router')->getMiddleware(),
+    ]);
+})->middleware(['web', 'auth'])->name('debug.whoami');
