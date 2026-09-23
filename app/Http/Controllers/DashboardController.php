@@ -200,34 +200,149 @@ class DashboardController extends Controller
     private function allCharts(): array
     {
         return [
+            // Users
             'users_by_role' => $this->chartUsersByRole(),
             'user_activity' => $this->chartEmpty('Activity'),
+
+            // Documents
             'documents_by_category' => $this->chartGroupBy('documents', ['category'], 'Documents'),
-            'projects_by_status' => $this->chartGroupBy('projects', ['status'], 'Projects'),
-            'tasks_by_status' => $this->chartGroupBy('tasks', ['status'], 'Tasks'),
+
+            // Employees
             'employees_by_department' => $this->chartEmployeesByDept(),
             'employees_by_gender' => $this->chartEmployeesByGender(),
-            'employees_by_status' => $this->chartEmployeesByStatus(),
-            'leaves_by_status' => $this->chartGroupBy('leave_requests', ['status'], 'Leaves'),
-            'leaves_by_type' => $this->chartGroupBy('leave_requests', ['leave_type'], 'Leave Types'),
-            'attendance_overview' => $this->chartEmpty('Attendance'),
-            'budget_overview' => $this->chartEmpty('Budget'),
-            'budget_utilization' => $this->chartEmpty('Utilization'),
-            'income_expense' => $this->chartEmpty('Income vs Expense'),
-            'revenue_trend' => $this->chartEmpty('Revenue'),
-            'department_performance' => $this->chartEmpty('Performance'),
-            'team_performance' => $this->chartEmpty('Team'),
-            'system_usage' => $this->chartEmpty('System'),
-            'reports_overview' => $this->chartEmpty('Reports'),
-            'my_activity' => $this->chartEmpty('Activity'),
-            'projects_by_department' => $this->chartEmpty('Projects'),
-            'recent_activities' => $this->chartEmpty('Activities'),
-            'tasks_by_priority' => $this->chartGroupBy('tasks', ['priority'], 'Priority'),
-            'payroll_overview' => $this->chartEmpty('Payroll'),
+
+            // Projects
+            'projects_by_status' => $this->chartGroupBy('projects', ['status'], 'Projects'),
+            'project_progress' => $this->chartEmpty('Project Progress'),
+            'budget_by_project' => $this->chartEmpty('Budget by Project'),
+
+            // Tasks
+            'tasks_by_status' => $this->chartGroupBy('tasks', ['status'], 'Tasks'),
+            'my_tasks_by_status' => $this->chartGroupBy('tasks', ['status'], 'My Tasks'),
+
+            // Leaves
+            'leave_by_type' => $this->chartGroupBy('leave_requests', ['leave_type'], 'Leave Types'),
+
+            // Trainings
+            'trainings_by_category' => $this->chartGroupBy('trainings', ['category'], 'Trainings'),
+
+            // Finance
+            'budget_vs_actual' => $this->chartEmpty('Budget vs Actual'),
+            'expenses_by_category' => $this->chartEmpty('Expenses'),
+            'monthly_expenses' => $this->chartEmpty('Monthly Expenses'),
+            'monthly_revenue' => $this->chartEmpty('Monthly Revenue'),
+
+            // Vouchers
             'vouchers_by_status' => $this->chartGroupBy('payment_vouchers', ['status'], 'Vouchers'),
-            'receipts_by_status' => $this->chartGroupBy('receipts', ['status'], 'Receipts'),
-            'trainings_by_status' => $this->chartGroupBy('trainings', ['status'], 'Trainings'),
-            'performance_by_status' => $this->chartGroupBy('performance_reviews', ['status'], 'Reviews'),
+
+            // Performance
+            'monthly_performance' => $this->chartEmpty('Performance'),
+
+            // Attendance
+            'my_attendance_chart' => $this->chartEmpty('My Attendance'),
+
+            // Reports
+            'monthly_reports' => $this->chartEmpty('Monthly Reports'),
+
+            // System
+            'system_health' => $this->chartSystemHealth(),
+        ];
+    }
+
+    private function chartUsersByRole(): array
+    {
+        $rows = \DB::table('roles')
+            ->leftJoin('user_roles', 'roles.id', '=', 'user_roles.role_id')
+            ->select('roles.name', \DB::raw('COUNT(user_roles.user_id) as total'))
+            ->groupBy('roles.id', 'roles.name')->get();
+        return [
+            'labels' => $rows->pluck('name')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Users',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartEmployeesByDept(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'department_id')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('departments.name as dept', \DB::raw('COUNT(*) as total'))
+            ->whereNull('employees.deleted_at')
+            ->groupBy('departments.name')->get();
+        return [
+            'labels' => $rows->pluck('dept')->map(fn($v) => $v ?: 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartEmployeesByGender(): array
+    {
+        if (!$this->has('employees') || !\Schema::hasColumn('employees', 'gender')) {
+            return $this->chartEmpty('Employees');
+        }
+        $rows = \DB::table('employees')->select('gender', \DB::raw('COUNT(*) as total'))
+            ->whereNull('deleted_at')->groupBy('gender')->get();
+        return [
+            'labels' => $rows->pluck('gender')->map(fn($v) => $v ? ucfirst($v) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => 'Employees',
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'],
+            ]],
+        ];
+    }
+
+    private function chartGroupBy(string $table, array $candidates, string $label): array
+    {
+        if (!$this->has($table)) return $this->chartEmpty($label);
+        $col = null;
+        foreach ($candidates as $c) {
+            if (\Schema::hasColumn($table, $c)) { $col = $c; break; }
+        }
+        if (!$col) return $this->chartEmpty($label);
+        $rows = \DB::table($table)->select($col.' as k', \DB::raw('COUNT(*) as total'))->groupBy($col)->get();
+        return [
+            'labels' => $rows->pluck('k')->map(fn($v) => $v ? ucfirst(str_replace('_', ' ', $v)) : 'Nyingine')->toArray() ?: ['Hakuna'],
+            'datasets' => [[
+                'label' => $label,
+                'data' => $rows->pluck('total')->map(fn($v) => (int)$v)->toArray() ?: [0],
+                'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'],
+            ]],
+        ];
+    }
+
+    private function chartSystemHealth(): array
+    {
+        return [
+            'labels' => ['Healthy', 'Warning', 'Critical'],
+            'datasets' => [[
+                'label' => 'System',
+                'data' => [95, 4, 1],
+                'backgroundColor' => ['#10b981', '#f59e0b', '#ef4444'],
+            ]],
+        ];
+    }
+
+    private function chartEmpty(string $label): array
+    {
+        return [
+            'labels' => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            'datasets' => [[
+                'label' => $label,
+                'data' => array_fill(0, 12, 0),
+                'borderColor' => '#3b82f6',
+                'backgroundColor' => 'rgba(59,130,246,0.1)',
+            ]],
         ];
     }
 
