@@ -1286,3 +1286,12 @@ Route::get('/debug/whoami', function() {
         'middleware_aliases' => app('router')->getMiddleware(),
     ]);
 })->middleware(['web', 'auth'])->name('debug.whoami');
+// ============================================================
+// LOGOUT — GET (kwa urahisi)
+// ============================================================
+Route::get('/logout', function() {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->middleware('auth')->name('logout.get');
