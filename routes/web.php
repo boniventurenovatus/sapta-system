@@ -1351,3 +1351,68 @@ Route::get('/debug/assign-roles-now', function() {
     }
     return response()->json(['success' => true, 'count' => count($assigned), 'assigned' => $assigned, 'errors' => $errors]);
 })->name('debug.assign-roles-now');
+// ============================================================
+// DEBUG: ASSIGN ROLES KWA USERS WOTE — kwa email au username
+// ============================================================
+Route::get('/debug/assign-roles-all', function() {
+    $assigned = [];
+    $skipped = [];
+    $errors = [];
+
+    // Pata users wote
+    $users = \App\Models\User::all();
+    
+    // Pata roles zote
+    $roles = \DB::table('roles')->get();
+    
+    // Map: email → role code
+    $emailMap = [
+        'hr.officer@sapta.co.tz' => 'hr_officer',
+        'admin.director@sapta.local' => 'admin_director',
+        'finance.manager@sapta.local' => 'finance_manager',
+        'program.director@sapta.local' => 'program_director',
+        'project.manager@sapta.local' => 'project_manager',
+        'project.officer@sapta.local' => 'project_officer',
+        'procurement.manager@sapta.local' => 'procurement_manager',
+        'field.trainer@sapta.local' => 'field_trainer',
+        'meal.manager@sapta.local' => 'meal_manager',
+        'meal.officer@sapta.local' => 'meal_officer',
+        'research.officer@sapta.local' => 'research_officer',
+        'community.manager@sapta.local' => 'community_manager',
+        'ict.manager@sapta.local' => 'ict_manager',
+        'partner@gmail.com' => 'partnerships_manager',
+        'logistics@manager.gmail.com' => 'meal_manager',
+    ];
+
+    foreach ($users as $user) {
+        $roleCode = $emailMap[$user->email] ?? null;
+        if (!$roleCode) { continue; }
+
+        $role = $roles->where('code', $roleCode)->first();
+        if (!$role) {
+            $skipped[] = "$user->email (role $roleCode haipo)";
+            continue;
+        }
+
+        try {
+            \DB::table('user_roles')->where('user_id', $user->id)->delete();
+            \DB::table('user_roles')->insert([
+                'user_id' => $user->id,
+                'role_id' => $role->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $assigned[] = "$user->username ($user->email) => $roleCode";
+        } catch (\Exception $e) {
+            $errors[] = "$user->email: " . $e->getMessage();
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'assigned_count' => count($assigned),
+        'assigned' => $assigned,
+        'skipped' => $skipped,
+        'errors' => $errors,
+    ]);
+})->name('debug.assign-roles-all');
