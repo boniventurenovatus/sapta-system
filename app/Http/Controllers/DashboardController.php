@@ -191,12 +191,7 @@ class DashboardController extends Controller
     public function meal()
     {
         return view('dashboard.meal', [
-            'kpis' => [
-                'total_reports' => 0,
-                'pending_reports' => 0,
-                'completed_reports' => 0,
-                'total_projects' => $this->count('projects'),
-            ],
+            'kpis' => $this->kpisMeal(),
             'charts' => $this->allCharts(),
             'recent_reports' => collect(),
         ]);
@@ -208,15 +203,7 @@ class DashboardController extends Controller
     public function program()
     {
         return view('dashboard.program', [
-            'kpis' => [
-                'total_projects' => $this->count('projects'),
-                'active_projects' => $this->countWhere('projects', 'status', 'active'),
-                'completed_projects' => $this->countWhere('projects', 'status', 'completed'),
-                'total_budget' => $this->getBudgetSum(),
-                'total_tasks' => $this->count('tasks'),
-                'pending_tasks' => $this->countWhere('tasks', 'status', 'pending'),
-                'active_beneficiaries' => 500,
-            ],
+            'kpis' => array_merge($this->kpisProgram(), ['active_beneficiaries' => 500]),
             'charts' => $this->allCharts(),
             'recent_projects' => $this->has('projects') ? DB::table('projects')->orderByDesc('created_at')->limit(5)->get() : collect(),
         ]);
@@ -362,5 +349,42 @@ class DashboardController extends Controller
             if (Schema::hasColumn('budgets', $c)) return (int) DB::table('budgets')->sum($c);
         }
         return 0;
+    }
+
+    // ============================================================
+    // KPIS HELPERS — kila dashboard ina kpis zake
+    // ============================================================
+    private function kpisMeal(): array
+    {
+        return [
+            'total_projects' => $this->count('projects'),
+            'active_projects' => $this->countWhere('projects', 'status', 'active'),
+            'total_trainings' => $this->count('trainings'),
+            'total_documents' => $this->count('documents'),
+            'total_reports' => $this->count('documents'),
+            'total_indicators' => 0,
+        ];
+    }
+
+    private function kpisProgram(): array
+    {
+        return [
+            'total_projects' => $this->count('projects'),
+            'active_projects' => $this->countWhere('projects', 'status', 'active'),
+            'completed_projects' => $this->countWhere('projects', 'status', 'completed'),
+            'total_budget' => $this->getBudgetSum(),
+            'total_tasks' => $this->count('tasks'),
+            'pending_tasks' => $this->countWhere('tasks', 'status', 'pending'),
+        ];
+    }
+
+    private function kpisIct(): array
+    {
+        return [
+            'total_users' => $this->has('users') ? DB::table('users')->count() : 0,
+            'active_sessions' => 0,
+            'system_health' => 95,
+            'total_logs' => $this->count('audit_logs'),
+        ];
     }
 }
