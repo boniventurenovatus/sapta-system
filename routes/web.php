@@ -156,3 +156,131 @@ Route::get('/debug/reset-passwords', function() {
         'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
     ]);
 })->name('debug.reset-passwords');
+// ============================================================
+// ACTIVITY LOGS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/activity-logs/{log}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::delete('/activity-logs/{log}', [\App\Http\Controllers\ActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+});
+
+// ============================================================
+// BUDGETS
+// ============================================================
+Route::resource('budgets', \App\Http\Controllers\BudgetController::class)->middleware('auth');
+
+// ============================================================
+// RECEIPTS
+// ============================================================
+Route::resource('receipts', \App\Http\Controllers\ReceiptController::class)->middleware('auth');
+
+// ============================================================
+// PAYMENT VOUCHERS
+// ============================================================
+Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherController::class)->middleware('auth');
+
+// ============================================================
+// PAYROLL
+// ============================================================
+Route::resource('payroll', \App\Http\Controllers\PayrollController::class)->middleware('auth');
+
+// ============================================================
+// TRAININGS
+// ============================================================
+Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->middleware('auth');
+
+// ============================================================
+// DOCUMENTS
+// ============================================================
+Route::resource('documents', \App\Http\Controllers\DocumentController::class)->middleware('auth');
+
+// ============================================================
+// RECRUITMENT
+// ============================================================
+Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('auth');
+
+// ============================================================
+// PERFORMANCE REVIEWS
+// ============================================================
+Route::resource('performance-reviews', \App\Http\Controllers\PerformanceReviewController::class)->middleware('auth');
+
+// ============================================================
+// EXPENSE CLAIMS
+// ============================================================
+Route::resource('expense-claims', \App\Http\Controllers\ExpenseClaimController::class)->middleware('auth');
+
+// ============================================================
+// PROCUREMENT REQUESTS
+// ============================================================
+Route::resource('procurement-requests', \App\Http\Controllers\ProcurementRequestController::class)->middleware('auth');
+
+// ============================================================
+// AUDIT LOGS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/{log}', [\App\Http\Controllers\AuditLogController::class, 'show'])->name('audit-logs.show');
+});
+
+// ============================================================
+// LOCATION API
+// ============================================================
+Route::middleware(['auth'])->prefix('location')->name('location.')->group(function () {
+    Route::get('/regions', [\App\Http\Controllers\LocationController::class, 'regions'])->name('regions');
+    Route::get('/districts', [\App\Http\Controllers\LocationController::class, 'districts'])->name('districts');
+    Route::get('/wards', [\App\Http\Controllers\LocationController::class, 'wards'])->name('wards');
+});
+
+// ============================================================
+// COMMUNICATION
+// ============================================================
+Route::middleware(['auth'])->prefix('communication')->name('communication.')->group(function () {
+    Route::get('/inbox', [\App\Http\Controllers\CommunicationController::class, 'inbox'])->name('inbox');
+    Route::get('/sent', [\App\Http\Controllers\CommunicationController::class, 'sent'])->name('sent');
+    Route::get('/message/create', [\App\Http\Controllers\CommunicationController::class, 'create'])->name('message-create');
+    Route::post('/message', [\App\Http\Controllers\CommunicationController::class, 'store'])->name('message.store');
+    Route::get('/message/{message}', [\App\Http\Controllers\CommunicationController::class, 'show'])->name('message-show');
+});
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+});
+
+// ============================================================
+// MY WORK
+// ============================================================
+Route::middleware(['auth'])->prefix('my-work')->name('my-work.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\MyWorkController::class, 'index'])->name('index');
+    Route::get('/tasks', [\App\Http\Controllers\MyWorkController::class, 'tasks'])->name('tasks');
+    Route::get('/submissions', [\App\Http\Controllers\MyWorkController::class, 'submissions'])->name('submissions');
+    Route::get('/approvals', [\App\Http\Controllers\MyWorkController::class, 'approvals'])->name('approvals');
+    Route::get('/drafts', [\App\Http\Controllers\MyWorkController::class, 'drafts'])->name('drafts');
+});
+
+// ============================================================
+// MY PAYSLIPS
+// ============================================================
+Route::get('/my-payslips', [\App\Http\Controllers\PayrollController::class, 'myPayslips'])->middleware('auth')->name('my-payslips');
+
+// ============================================================
+// DEBUG: RESET PASSWORDS
+// ============================================================
+Route::get('/debug/reset-passwords', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+    ]);
+    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'users_updated' => $updated,
+        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
+    ]);
+})->name('debug.reset-passwords');
