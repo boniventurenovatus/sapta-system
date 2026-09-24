@@ -5,6 +5,17 @@
 
 @section('content')
 
+@if ($errors->any())
+    <div style="background:#fee2e2; border:1px solid #ef4444; border-radius:8px; padding:1rem; margin-bottom:1.5rem;">
+        <h4 style="color:#dc2626; font-weight:700; margin-bottom:0.5rem;">Kuna errors:</h4>
+        <ul style="margin:0; padding-left:1.5rem; color:#991b1b;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <style>
     .employee-edit-page {
         max-width: 1100px;
