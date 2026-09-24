@@ -284,3 +284,17 @@ Route::get('/debug/reset-passwords', function() {
         'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
     ]);
 })->name('debug.reset-passwords');
+// ============================================================
+// EMPLOYEE CREDENTIALS + RESET PASSWORD
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    // Credentials — Admin anaona
+    Route::get('employees/{employee}/credentials', [\App\Http\Controllers\EmployeeController::class, 'credentials'])
+        ->name('employees.credentials')
+        ->middleware('role:super_admin,admin,director,admin_director,hr_manager,hr_officer');
+    
+    // Reset Password — Admin
+    Route::post('employees/{employee}/reset-password', [\App\Http\Controllers\EmployeeController::class, 'resetPassword'])
+        ->name('employees.reset-password')
+        ->middleware('role:super_admin,admin,hr_manager,hr_officer');
+});
