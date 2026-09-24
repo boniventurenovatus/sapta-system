@@ -138,3 +138,21 @@ Route::get('/debug/reset-passwords', function() {
         'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
     ]);
 })->name('debug.reset-passwords');
+// ============================================================
+// RESET PASSWORDS
+// ============================================================
+Route::get('/debug/reset-passwords', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    $updated = \DB::table('users')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+    ]);
+    
+    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'users_updated' => $updated,
+        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
+    ]);
+})->name('debug.reset-passwords');
