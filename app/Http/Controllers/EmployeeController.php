@@ -132,7 +132,7 @@ class EmployeeController extends Controller
 
         return redirect()
             ->route('employees.index')
-            ->with('success', 'Employee ameundwa. Credentials zimetumwa kwa Internal Message & Email.');
+            ->with('success', 'Employee created successfully. Credentials sent via Internal Message & Email.');
     }public function show(Employee $employee): View
     {
         $employee->load([

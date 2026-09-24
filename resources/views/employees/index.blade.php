@@ -70,7 +70,7 @@
     @if (session('generated_credentials'))
         <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
             <h3 style="color: #166534; font-weight: 700; margin-bottom: 1rem;">
-                🎉 Employee Amefanikiwa Kuundwa — Credentials Zake:
+                🎉 Employee Created Successfully — Credentials:
             </h3>
             <div style="background: #ffffff; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 1rem;">
                 <div><strong>Username:</strong> {{ session('generated_credentials')['username'] }}</div>
@@ -82,7 +82,7 @@
                 <div><strong>Email:</strong> {{ session('generated_credentials')['email_sent'] ? 'SENT <i class="fas fa-check"></i>' : 'FAILED <i class="fas fa-times"></i>' }}</div>
             </div>
             <div style="margin-top: 1rem; color: #166534; font-size: 0.9rem;">
-                <i class="fas fa-ban"></i> Mpe Employee credentials hizi. Anaweza kubadilisha password kwa <strong>forgot-password</strong>.
+                <i class="fas fa-ban"></i> Give these credentials to the employee. They can change password via <strong>forgot-password</strong>.
             </div>
         </div>
     @endif
