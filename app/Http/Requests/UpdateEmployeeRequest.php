@@ -34,12 +34,12 @@ class UpdateEmployeeRequest extends FormRequest
                 Rule::unique('employees', 'employee_number')->ignore($employeeId),
             ],
             'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'gender' => ['required', 'string', 'max:30'],
             'date_of_birth' => ['required', 'date', 'before:today'],
-            'nationality' => ['required', 'string', 'max:100'],
-            'marital_status' => ['required', 'string', 'max:30'],
+            'nationality' => ['nullable', 'string', 'max:100'],
+            'marital_status' => ['nullable', 'string', 'max:30'],
 
             // ===== CONTACT =====
             'email' => [
@@ -47,7 +47,7 @@ class UpdateEmployeeRequest extends FormRequest
                 Rule::unique('employees', 'email')->ignore($employeeId),
             ],
             'phone' => ['required', 'string', 'max:20'],
-            'alternative_phone' => ['required', 'string', 'max:20'],
+            'alternative_phone' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:5000'],
             'city' => ['required', 'string', 'max:100'],
 
@@ -56,7 +56,7 @@ class UpdateEmployeeRequest extends FormRequest
             'job_title' => ['required', 'string', 'max:150'],
             'employment_status' => ['required', 'in:active,inactive,on_leave,suspended,terminated'],
             'employment_type' => ['required', 'in:full_time,part_time,contract,intern'],
-            'contract_type' => ['required', 'string', 'max:50'],
+            'contract_type' => ['nullable', 'string', 'max:50'],
 
             // ===== FINANCIAL =====
             'salary' => ['required', 'numeric', 'min:0'],
