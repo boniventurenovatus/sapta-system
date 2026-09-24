@@ -25,8 +25,8 @@ class UpdateEmployeeRequest extends FormRequest
             // ===== ORGANIZATION =====
             'organization_id' => ['required', 'integer', 'exists:organizations,id'],
             'department_id' => ['required', 'integer', 'exists:departments,id'],
-            'organizational_unit_id' => ['required', 'integer', 'exists:organizational_units,id'],
-            'position_id' => ['required', 'integer', 'exists:positions,id'],
+            'organizational_unit_id' => ['nullable', 'integer', 'exists:organizational_units,id'],
+            'position_id' => ['nullable', 'integer', 'exists:positions,id'],
 
             // ===== BASIC INFO =====
             'employee_number' => [
@@ -49,30 +49,30 @@ class UpdateEmployeeRequest extends FormRequest
             'phone' => ['required', 'string', 'max:20'],
             'alternative_phone' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:5000'],
-            'city' => ['required', 'string', 'max:100'],
+            'city' => ['nullable', 'string', 'max:100'],
 
             // ===== EMPLOYMENT =====
             'hire_date' => ['required', 'date'],
             'job_title' => ['required', 'string', 'max:150'],
             'employment_status' => ['required', 'in:active,inactive,on_leave,suspended,terminated'],
-            'employment_type' => ['required', 'in:full_time,part_time,contract,intern'],
+            'employment_type' => ['nullable', 'in:full_time,part_time,contract,intern'],
             'contract_type' => ['nullable', 'string', 'max:50'],
 
             // ===== FINANCIAL =====
-            'salary' => ['required', 'numeric', 'min:0'],
-            'bank_account' => ['required', 'string', 'max:50'],
-            'bank_name' => ['required', 'string', 'max:100'],
-            'tin_number' => ['required', 'string', 'max:50'],
-            'nssf_number' => ['required', 'string', 'max:50'],
-            'nhif_number' => ['required', 'string', 'max:50'],
+            'salary' => ['nullable', 'numeric', 'min:0'],
+            'bank_account' => ['nullable', 'string', 'max:50'],
+            'bank_name' => ['nullable', 'string', 'max:100'],
+            'tin_number' => ['nullable', 'string', 'max:50'],
+            'nssf_number' => ['nullable', 'string', 'max:50'],
+            'nhif_number' => ['nullable', 'string', 'max:50'],
 
             // ===== EMERGENCY =====
-            'emergency_contact_name' => ['required', 'string', 'max:255'],
-            'emergency_contact_phone' => ['required', 'string', 'max:20'],
-            'emergency_relationship' => ['required', 'string', 'max:50'],
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string', 'max:20'],
+            'emergency_relationship' => ['nullable', 'string', 'max:50'],
 
             // ===== OTHER =====
-            'profile_image' => ['required', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
+            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
             'notes' => ['required', 'string', 'max:5000'],
         ];
     }
