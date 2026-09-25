@@ -427,3 +427,29 @@ Route::get('/debug/clear-views', function() {
         'output' => \Artisan::output(),
     ]);
 })->name('debug.clear-views');
+Route::get('/debug/force-clear-views', function() {
+    $viewPath = storage_path('framework/views');
+    $files = glob($viewPath . '/*.php');
+    $deleted = 0;
+    foreach ($files as $f) {
+        if (@unlink($f)) $deleted++;
+    }
+    
+    // Pia futa cache ya bootstrap
+    $cachePath = base_path('bootstrap/cache');
+    $cacheFiles = glob($cachePath . '/*.php');
+    $cacheDeleted = 0;
+    foreach ($cacheFiles as $f) {
+        if (basename($f) !== 'packages.php' && basename($f) !== 'services.php') {
+            if (@unlink($f)) $cacheDeleted++;
+        }
+    }
+    
+    return response()->json([
+        'success' => true,
+        'views_deleted' => $deleted,
+        'cache_deleted' => $cacheDeleted,
+        'view_path' => $viewPath,
+        'files_remaining' => count(glob($viewPath . '/*.php')),
+    ]);
+})->name('debug.force-clear-views');
