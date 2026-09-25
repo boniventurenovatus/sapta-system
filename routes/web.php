@@ -123,39 +123,9 @@ Route::resource('projects', ProjectController::class)->middleware('auth');
 // ============================================================
 // RESET PASSWORDS — kwa kudumu
 // ============================================================
-Route::get('/debug/reset-passwords', function() {
-    $hashed = \Hash::make('Sapta@2025!');
-    $updated = \DB::table('users')->update([
-        'password_hash' => $hashed,
-        'account_status' => 'active',
-        'is_first_login' => false,
-    ]);
-    
-    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
-    return response()->json([
-        'success' => true,
-        'users_updated' => $updated,
-        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
-    ]);
-})->name('debug.reset-passwords');
 // ============================================================
 // RESET PASSWORDS
 // ============================================================
-Route::get('/debug/reset-passwords', function() {
-    $hashed = \Hash::make('Sapta@2025!');
-    $updated = \DB::table('users')->update([
-        'password_hash' => $hashed,
-        'account_status' => 'active',
-        'is_first_login' => false,
-    ]);
-    
-    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
-    return response()->json([
-        'success' => true,
-        'users_updated' => $updated,
-        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
-    ]);
-})->name('debug.reset-passwords');
 // ============================================================
 // ACTIVITY LOGS
 // ============================================================
@@ -268,22 +238,6 @@ Route::middleware(['auth'])->prefix('my-work')->name('my-work.')->group(function
 Route::get('/my-payslips', [\App\Http\Controllers\PayrollController::class, 'myPayslips'])->middleware('auth')->name('my-payslips');
 
 // ============================================================
-// DEBUG: RESET PASSWORDS
-// ============================================================
-Route::get('/debug/reset-passwords', function() {
-    $hashed = \Hash::make('Sapta@2025!');
-    $updated = \DB::table('users')->update([
-        'password_hash' => $hashed,
-        'account_status' => 'active',
-        'is_first_login' => false,
-    ]);
-    $superadmin = \DB::table('users')->where('username', 'superadmin')->first();
-    return response()->json([
-        'success' => true,
-        'users_updated' => $updated,
-        'verify' => \Hash::check('Sapta@2025!', $superadmin->password_hash),
-    ]);
-})->name('debug.reset-passwords');
 // ============================================================
 // EMPLOYEE CREDENTIALS + RESET PASSWORD
 // ============================================================
@@ -299,49 +253,4 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:super_admin,admin,hr_manager,hr_officer');
 });
 // ============================================================
-// DEBUG: CHECK SUPERADMIN
 // ============================================================
-Route::get('/debug/check-superadmin', function() {
-    $user = \DB::table('users')->where('username', 'superadmin')->first();
-    if (!$user) {
-        return response()->json(['success' => false, 'error' => 'superadmin haipo']);
-    }
-    return response()->json([
-        'id' => $user->id,
-        'username' => $user->username,
-        'email' => $user->email,
-        'account_status' => $user->account_status,
-        'is_first_login' => $user->is_first_login,
-        'credentials_expires_at' => $user->credentials_expires_at,
-        'hash_40' => substr($user->password_hash ?? 'NULL', 0, 40),
-        'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash ?? ''),
-    ]);
-})->name('debug.check-superadmin');
-// ============================================================
-// DEBUG: FORCE RESET SUPERADMIN — bypass setPasswordAttribute
-// ============================================================
-Route::get('/debug/force-reset-superadmin', function() {
-    // Unda hash MOJA tu
-    $hashed = \Hash::make('Sapta@2025!');
-    
-    // DB::table — inabypass setPasswordAttribute
-    \DB::table('users')->where('username', 'superadmin')->update([
-        'password_hash' => $hashed,
-        'account_status' => 'active',
-        'is_first_login' => false,
-        'credentials_expires_at' => now()->addDays(365),
-    ]);
-    
-    // Thibitisha
-    $user = \DB::table('users')->where('username', 'superadmin')->first();
-    return response()->json([
-        'success' => true,
-        'id' => $user->id,
-        'username' => $user->username,
-        'hash_40' => substr($user->password_hash, 0, 40),
-        'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash),
-        'account_status' => $user->account_status,
-        'is_first_login' => $user->is_first_login,
-        'credentials_expires_at' => $user->credentials_expires_at,
-    ]);
-})->name('debug.force-reset-superadmin');
