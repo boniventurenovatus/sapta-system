@@ -28,3 +28,6 @@ Thumbs.db
 *.sql
 *.sqlite
 users-export.json
+
+# Audit reports
+audit-report/

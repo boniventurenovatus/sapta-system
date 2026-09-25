@@ -12,31 +12,16 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        // ============================================================
-        // SECURITY HEADERS
-        // ============================================================
-
-        // Zuia MIME sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-
-        // Zuia clickjacking
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-
-        // XSS Protection
         $response->headers->set('X-XSS-Protection', '1; mode=block');
-
-        // Referrer Policy
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-        // Permissions Policy
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
-        // HSTS — kwa HTTPS pekee
         if ($request->secure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
-        // CSP — Content Security Policy
         $response->headers->set(
             'Content-Security-Policy',
             "default-src 'self'; " .
