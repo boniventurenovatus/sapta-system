@@ -698,6 +698,36 @@
         }
     }
 
+
+    /* ==================================================
+       LOGO CIRCLE
+    ================================================== */
+
+    .logo-circle-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+
+    .logo-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        box-shadow: 0 12px 35px rgba(21, 158, 210, 0.20), 0 0 0 5px rgba(21, 158, 210, 0.10);
+    }
+
+    .logo-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+        display: block;
+    }
 </style>
 ```
 
@@ -754,6 +784,12 @@
     <div class="right-side">
 
         <div class="form-container">
+
+        <div class="logo-circle-wrap">
+            <div class="logo-circle">
+                <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA Logo">
+            </div>
+        </div>
 
             <div class="eyebrow">
                 SAPTA ACCOUNT RECOVERY
