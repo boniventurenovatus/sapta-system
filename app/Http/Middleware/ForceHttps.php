@@ -10,7 +10,13 @@ class ForceHttps
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->secure() && app()->environment('production')) {
+        // Kama tayari ni HTTPS (kupitia proxy au moja kwa moja), endelea
+        if ($request->secure()) {
+            return $next($request);
+        }
+
+        // Kama ni production na si HTTPS, redirect
+        if (app()->environment('production')) {
             return redirect()->secure($request->getRequestUri());
         }
 
