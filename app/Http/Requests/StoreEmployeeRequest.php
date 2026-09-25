@@ -8,7 +8,7 @@ class StoreEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user()->can('create', \App\Models\Employee::class);
     }
 
     public function rules(): array
