@@ -351,3 +351,48 @@ Route::get('/debug/deep-auth', function() {
         ],
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.deep-auth');
+Route::get('/debug/test-login', function() {
+    $results = [];
+
+    // Test 1: Hash::check
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    $results['hash_check'] = \Hash::check('Sapta@2026!', $user->password_hash);
+
+    // Test 2: Auth::attempt
+    $results['auth_attempt'] = \Auth::attempt([
+        'username' => 'superadmin',
+        'password' => 'Sapta@2026!',
+    ]);
+
+    // Test 3: Auth::validate
+    $results['auth_validate'] = \Auth::validate([
+        'username' => 'superadmin',
+        'password' => 'Sapta@2026!',
+    ]);
+
+    // Test 4: Angalia kama user amefungwa
+    $results['locked_until'] = $user->locked_until;
+    $results['failed_login_attempts'] = $user->failed_login_attempts;
+    $results['account_status'] = $user->account_status;
+
+    // Test 5: RateLimiter
+    $key = 'login:superadmin|' . request()->ip();
+    $results['rate_limiter_key'] = $key;
+    $results['rate_limiter_attempts'] = \RateLimiter::attempts($key);
+    $results['rate_limiter_too_many'] = \RateLimiter::tooManyAttempts($key, 5);
+
+    // Test 6: Session config
+    $results['session_driver'] = config('session.driver');
+    $results['session_secure'] = config('session.secure');
+
+    // Test 7: AuthenticatedSessionController ilikuwa deployed?
+    $controllerPath = app_path('Http/Controllers/Auth/AuthenticatedSessionController.php');
+    $results['controller_exists'] = file_exists($controllerPath);
+    if (file_exists($controllerPath)) {
+        $content = file_get_contents($controllerPath);
+        $results['controller_has_rate_limiter'] = strpos($content, 'RateLimiter') !== false;
+        $results['controller_has_lockout'] = strpos($content, 'locked_until') !== false;
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.test-login');
