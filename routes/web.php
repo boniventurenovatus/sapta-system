@@ -276,3 +276,37 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 
 
+
+Route::get('/debug/check-auth', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+
+    if (!$user) {
+        return response()->json([
+            'error' => 'superadmin HAIPO kwenye database hii',
+            'db_name' => config('database.connections.mysql.database'),
+            'db_host' => config('database.connections.mysql.host'),
+        ]);
+    }
+
+    return response()->json([
+        'db_name' => config('database.connections.mysql.database'),
+        'db_host' => config('database.connections.mysql.host'),
+        'app_key_prefix' => substr(config('app.key'), 0, 30) . '...',
+        'app_env' => config('app.env'),
+        'app_debug' => config('app.debug'),
+        'session_driver' => config('session.driver'),
+        'session_secure' => config('session.secure'),
+        'user' => [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'account_status' => $user->account_status,
+            'is_first_login' => $user->is_first_login,
+            'first_password_expires_at' => $user->first_password_expires_at,
+            'failed_login_attempts' => $user->failed_login_attempts,
+            'locked_until' => $user->locked_until,
+            'password_hash_prefix' => substr($user->password_hash, 0, 20),
+            'hash_check_Sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash),
+        ],
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.check-auth');
