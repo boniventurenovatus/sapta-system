@@ -117,12 +117,21 @@ class DashboardController extends Controller
     // ============================================================
     public function finance()
     {
+        $totalBudget = $this->getBudgetSum();
+        $totalSpent = $this->getBudgetSpent();
+        $totalRemaining = $totalBudget - $totalSpent;
+        $utilization = $totalBudget > 0 ? round(($totalSpent / $totalBudget) * 100, 1) : 0;
+
         return view('dashboard.finance', [
             'kpis' => [
+                'total_budget' => $totalBudget,
+                'total_spent' => $totalSpent,
+                'total_remaining' => $totalRemaining,
+                'utilization' => $utilization,
                 'total_income' => 0,
-                'total_expenses' => 0,
+                'total_expenses' => $totalSpent,
+                'pending_vouchers' => $this->countWhere('payment_vouchers', 'status', 'pending'),
                 'pending_payments' => $this->countWhere('payment_vouchers', 'status', 'pending'),
-                'total_budget' => $this->getBudgetSum(),
             ],
             'charts' => $this->allCharts(),
             'recent_vouchers' => $this->has('payment_vouchers') ? DB::table('payment_vouchers')->orderByDesc('created_at')->limit(5)->get() : collect(),
@@ -342,6 +351,17 @@ class DashboardController extends Controller
     private function count(string $t): int { return $this->has($t) ? DB::table($t)->count() : 0; }
     private function countWhere(string $t, string $col, $val): int {
         return ($this->has($t) && Schema::hasColumn($t, $col)) ? DB::table($t)->where($col, $val)->count() : 0;
+    }
+
+    private function getBudgetSpent(): int
+    {
+        if (!$this->has('budgets')) return 0;
+        foreach (['spent_amount','spent','used_amount','used'] as $c) {
+            if (\Schema::hasColumn('budgets', $c)) {
+                return (int) \DB::table('budgets')->sum($c);
+            }
+        }
+        return 0;
     }
     private function getBudgetSum(): int {
         if (!$this->has('budgets')) return 0;
