@@ -33,6 +33,7 @@ class DashboardController extends Controller
         return view('dashboard.admin', [
             'kpis' => [
                 'total_users' => DB::table('users')->count(),
+                  'active_users' => DB::table('users')->where('account_status', 'active')->count(),
                 'total_roles' => DB::table('roles')->count(),
                 'total_permissions' => $this->count('permissions'),
                 'total_departments' => $this->count('departments'),
@@ -180,14 +181,18 @@ class DashboardController extends Controller
     // ============================================================
     // ICT
     // ============================================================
-    public function ict()
+        public function ict()
     {
         return view('dashboard.ict', [
             'kpis' => [
                 'total_users' => DB::table('users')->count(),
+                'active_users' => DB::table('users')->where('account_status', 'active')->count(),
+                'total_roles' => DB::table('roles')->count(),
+                'total_permissions' => 0,
+                'total_documents' => 0,
+                'total_audit_logs' => DB::table('audit_logs')->count(),
                 'active_sessions' => 0,
                 'system_health' => 95,
-                'total_logs' => $this->count('audit_logs'),
             ],
             'charts' => $this->allCharts(),
             'recent_users' => \App\Models\User::orderByDesc('created_at')->limit(5)->get(),
@@ -197,10 +202,17 @@ class DashboardController extends Controller
     // ============================================================
     // MEAL
     // ============================================================
-    public function meal()
+        public function meal()
     {
         return view('dashboard.meal', [
-            'kpis' => $this->kpisMeal(),
+            'kpis' => [
+                'total_projects' => 0,
+                'active_projects' => 0,
+                'total_indicators' => 0,
+                'total_reports' => 0,
+                'total_trainings' => 0,
+                'total_documents' => 0,
+            ],
             'charts' => $this->allCharts(),
             'recent_reports' => collect(),
         ]);
@@ -209,12 +221,19 @@ class DashboardController extends Controller
     // ============================================================
     // PROGRAM
     // ============================================================
-    public function program()
+        public function program()
     {
         return view('dashboard.program', [
-            'kpis' => array_merge($this->kpisProgram(), ['active_beneficiaries' => 500]),
+            'kpis' => [
+                'total_projects' => 0,
+                'active_projects' => 0,
+                'completed_projects' => 0,
+                'total_tasks' => 0,
+                'pending_tasks' => 0,
+                'total_budget' => 0,
+            ],
             'charts' => $this->allCharts(),
-            'recent_projects' => $this->has('projects') ? DB::table('projects')->orderByDesc('created_at')->limit(5)->get() : collect(),
+            'recent_projects' => collect(),
         ]);
     }
 
