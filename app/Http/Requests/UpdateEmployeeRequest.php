@@ -9,7 +9,16 @@ class UpdateEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        if (!auth()->check()) {
+            return false;
+        }
+
+        $employee = $this->route('employee');
+        if (!$employee) {
+            return false;
+        }
+
+        return auth()->user()->can('update', $employee);
     }
 
     public function rules(): array

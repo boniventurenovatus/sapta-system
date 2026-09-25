@@ -18,15 +18,19 @@ class User extends Authenticatable
         'username',
         'email',
         'profile_image',
+        'last_login_at',
+        'email_verified_at',
+    ];
+
+    protected $guarded = [
         'password_hash',
         'account_status',
         'is_first_login',
         'first_password_expires_at',
+        'credentials_expires_at',
         'failed_login_attempts',
         'locked_until',
-        'last_login_at',
         'password_changed_at',
-        'email_verified_at',
         'remember_token',
     ];
 
@@ -35,17 +39,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = [
-        'credentials_expires_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'is_first_login' => 'boolean',
-    ];
-
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'first_password_expires_at' => 'datetime',
+            'credentials_expires_at' => 'datetime',
             'locked_until' => 'datetime',
             'last_login_at' => 'datetime',
             'password_changed_at' => 'datetime',
@@ -87,6 +86,7 @@ class User extends Authenticatable
     public function hasRole(string $role): bool
     {
         return $this->roles()
+            ->where('status', 'active')
             ->where(function ($q) use ($role) {
                 $q->where('code', $role)
                   ->orWhere('name', $role);
@@ -100,6 +100,7 @@ class User extends Authenticatable
     public function hasAnyRole(array $roles): bool
     {
         return $this->roles()
+            ->where('status', 'active')
             ->where(function ($q) use ($roles) {
                 $q->whereIn('code', $roles)
                   ->orWhereIn('name', $roles);
@@ -116,8 +117,10 @@ class User extends Authenticatable
     public function hasPermission(string $permission): bool
     {
         return $this->roles()
+            ->where('status', 'active')
             ->whereHas('permissions', function ($query) use ($permission) {
-                $query->where('name', $permission);
+                $query->where('code', $permission)
+                      ->orWhere('name', $permission);
             })
             ->exists();
     }

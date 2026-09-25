@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -25,19 +26,57 @@ class AuthenticatedSessionController extends Controller
         $password = $request->validated('password');
         $remember = (bool) $request->validated('remember', false);
 
-        $user = User::query()
-            ->where('email', $login)->orWhere('username', $login)
-            ->first();
+        // ============================================================
+        // 1. RATE LIMITING — 5 attempts kwa dakika 1
+        // ============================================================
+        $key = 'login:' . strtolower($login) . '|' . $request->ip();
 
-        if (! $user) {
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
             return back()
-                ->withErrors([
-                    'email' => 'The email or password is incorrect.',
-                ])
+                ->withErrors(['email' => "Too many login attempts. Please try again in {$seconds} seconds."])
                 ->withInput($request->only('email'));
         }
 
-        // Check 1: user account_status
+        // ============================================================
+        // 2. TAFUTA USER
+        // ============================================================
+        $user = User::query()
+            ->where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
+
+        // ============================================================
+        // 3. USER HAIPO — usifichue
+        // ============================================================
+        if (! $user) {
+            RateLimiter::hit($key, 60);
+            return back()
+                ->withErrors(['email' => 'The email or password is incorrect.'])
+                ->withInput($request->only('email'));
+        }
+
+        // ============================================================
+        // 4. ACCOUNT LOCKOUT CHECK
+        // ============================================================
+        if ($user->locked_until && now()->lt($user->locked_until)) {
+            $minutes = now()->diffInMinutes($user->locked_until);
+            return back()
+                ->withErrors(['email' => "Account imefungwa. Jaribu tena baada ya dakika {$minutes}."])
+                ->withInput($request->only('email'));
+        }
+
+        // Kama lockout imeisha, clear
+        if ($user->locked_until && now()->gte($user->locked_until)) {
+            $user->forceFill([
+                'locked_until' => null,
+                'failed_login_attempts' => 0,
+            ])->save();
+        }
+
+        // ============================================================
+        // 5. ACCOUNT STATUS CHECK
+        // ============================================================
         if ($user->account_status !== 'active') {
             $statusMessage = match ($user->account_status) {
                 'inactive'   => 'Your account is inactive. Please contact the administrator.',
@@ -52,7 +91,9 @@ class AuthenticatedSessionController extends Controller
                 ->withInput($request->only('email'));
         }
 
-        // Check 2: employee employment_status
+        // ============================================================
+        // 6. EMPLOYEE STATUS CHECK
+        // ============================================================
         if ($user->employee && $user->employee->employment_status !== 'active') {
             $empStatus = $user->employee->employment_status;
 
@@ -69,29 +110,52 @@ class AuthenticatedSessionController extends Controller
                 ->withInput($request->only('email'));
         }
 
+        // ============================================================
+        // 7. PASSWORD CHECK
+        // ============================================================
         if (! Hash::check($password, $user->password_hash)) {
+            $user->increment('failed_login_attempts');
+            $user->refresh();
+
+            if ($user->failed_login_attempts >= 5) {
+                $user->forceFill(['locked_until' => now()->addMinutes(15)])->save();
+                UserActivityLog::log(
+                    action: 'account_locked',
+                    module: 'auth',
+                    description: "Account locked after {$user->failed_login_attempts} failed attempts"
+                );
+            }
+
+            RateLimiter::hit($key, 60);
+
             return back()
-                ->withErrors([
-                    'email' => 'The email or password is incorrect.',
-                ])
+                ->withErrors(['email' => 'The email or password is incorrect.'])
                 ->withInput($request->only('email'));
         }
+
         // ============================================================
-        // CHECK: Credentials Expiry
+        // 8. CREDENTIALS EXPIRY (first login)
         // ============================================================
-        if ($user->credentials_expires_at && \Carbon\Carbon::parse($user->credentials_expires_at)->isPast() && $user->is_first_login) {
+        if ($user->is_first_login && $user->first_password_expires_at && now()->gt($user->first_password_expires_at)) {
             return back()
-                ->withErrors([
-                    'email' => 'Credentials zako zime-expire. Tafadhali wasiliana na Admin.',
-                ])
+                ->withErrors(['email' => 'Credentials zako zime-expire. Tafadhali wasiliana na Admin.'])
                 ->withInput($request->only('email'));
         }
 
-
-
+        // ============================================================
+        // 9. LOGIN
+        // ============================================================
         Auth::login($user, $remember);
-
         $request->session()->regenerate();
+
+        // ============================================================
+        // 10. RESET FAILED ATTEMPTS + AUDIT LOG
+        // ============================================================
+        $user->forceFill([
+            'last_login_at' => now(),
+            'failed_login_attempts' => 0,
+            'locked_until' => null,
+        ])->save();
 
         UserActivityLog::log(
             action: 'login',
@@ -99,10 +163,7 @@ class AuthenticatedSessionController extends Controller
             description: 'User logged in'
         );
 
-        $user->forceFill([
-            'last_login_at' => now(),
-            'failed_login_attempts' => 0,
-        ])->save();
+        RateLimiter::clear($key);
 
         return redirect()->intended(route('dashboard'));
     }

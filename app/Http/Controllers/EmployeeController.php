@@ -28,6 +28,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', \App\Models\Employee::class);
         $query = Employee::with(['organization', 'department', 'position']);
 
         // Search
@@ -68,6 +69,7 @@ class EmployeeController extends Controller
         return view('employees.index', compact('employees', 'stats', 'departments'));
     }public function create(): View
     {
+        $this->authorize('create', \App\Models\Employee::class);
         // ===== LOCATIONS =====
         $regions = \App\Models\Region::orderBy('name')->get();
         $districts = \App\Models\District::orderBy('name')->get();
@@ -101,6 +103,7 @@ class EmployeeController extends Controller
         ));
     }public function store(StoreEmployeeRequest $request): RedirectResponse
     {
+        $this->authorize('create', \App\Models\Employee::class);
         $validated = $request->validated();
 
         $validated['employee_number'] = strtoupper(trim($validated['employee_number']));
@@ -135,6 +138,7 @@ class EmployeeController extends Controller
             ->with('success', 'Employee created successfully. Credentials sent via Internal Message & Email.');
     }public function show(Employee $employee): View
     {
+        $this->authorize('view', $employee);
         $employee->load([
             'organization',
             'department',
@@ -160,6 +164,7 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee): View
     {
+        $this->authorize('update', $employee);
         $organizations = Organization::query()
             ->orderBy('name')
             ->get();
@@ -195,6 +200,7 @@ class EmployeeController extends Controller
     */
 
     public function update(UpdateEmployeeRequest $request, Employee $employee): RedirectResponse {
+        $this->authorize('update', $employee);
 
         $validated = $request->validated();
 
@@ -265,6 +271,7 @@ class EmployeeController extends Controller
     public function destroy(
         Employee $employee
     ): RedirectResponse {
+        $this->authorize('delete', $employee);
 
         try {
 
@@ -330,6 +337,7 @@ class EmployeeController extends Controller
      */
     public function deactivate(Employee $employee): RedirectResponse
     {
+        $this->authorize('deactivate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'inactive']);
@@ -369,6 +377,7 @@ class EmployeeController extends Controller
      */
     public function terminate(Employee $employee): RedirectResponse
     {
+        $this->authorize('terminate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'terminated']);
@@ -408,6 +417,7 @@ class EmployeeController extends Controller
      */
     public function activate(Employee $employee): RedirectResponse
     {
+        $this->authorize('activate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'active']);
@@ -447,6 +457,7 @@ class EmployeeController extends Controller
      */
     public function suspend(Request $request, Employee $employee): RedirectResponse
     {
+        $this->authorize('suspend', $employee);
         $validated = $request->validate([
             'suspension_reason' => 'required|string|max:1000',
         ]);
@@ -581,72 +592,95 @@ class EmployeeController extends Controller
      */
     public function credentials(Employee $employee): View
     {
+        $this->authorize('viewCredentials', $employee);
         $user = $employee->user;
 
         if (!$user) {
             return view('employees.credentials', [
                 'employee' => $employee,
                 'user' => null,
-                'password' => null,
+                'roleName' => null,
                 'message' => null,
             ]);
-        }
-
-        // Chukua credentials kutoka kwenye messages
-        $credentialMessage = \DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('subject', 'LIKE', '%Credentials%')
-            ->orderBy('id', 'desc')
-            ->first();
-
-        // Extract password kutoka message body
-        $password = null;
-        if ($credentialMessage) {
-            if (preg_match('/Password:\s*([^\n\r]+)/i', $credentialMessage->body, $matches)) {
-                $password = trim($matches[1]);
-            }
-        }
-
-        // Kama password haipatikani — generate mpya
-        if (!$password) {
-            $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
-            $password = $lastNameCapitalized . '@Sapta.org';
         }
 
         // Role name
         $roleName = $user->roles()->first()?->name ?? 'No Role';
 
+        // ============================================================
+        // USIONYESHE PASSWORD — onyesha tu metadata
+        // ============================================================
+        $credentialInfo = [
+            'email' => $user->email,
+            'username' => $user->username,
+            'role' => $roleName,
+            'is_first_login' => $user->is_first_login,
+            'first_password_expires_at' => $user->first_password_expires_at,
+            'credentials_expires_at' => $user->credentials_expires_at,
+            'last_login_at' => $user->last_login_at,
+            'account_status' => $user->account_status,
+        ];
+
         return view('employees.credentials', [
             'employee' => $employee,
             'user' => $user,
-            'password' => $password,
             'roleName' => $roleName,
-            'message' => $credentialMessage,
+            'credentialInfo' => $credentialInfo,
+            'message' => null,
         ]);
     }public function resetPassword(Employee $employee): RedirectResponse
     {
+        $this->authorize('resetPassword', $employee);
         $user = $employee->user;
 
         if (!$user) {
             return back()->with('error', 'Employee does not have a User Account.');
         }
 
-        $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
-        $newPassword = $lastNameCapitalized . '@Sapta.org';
+        // ============================================================
+        // RANDOM PASSWORD — cryptographically secure
+        // ============================================================
+        $newPassword = \Illuminate\Support\Str::password(16);
 
         $expiryDays = (int) config('sapta.credentials_expiry_days', 7);
 
-        $user->update([
+        // ============================================================
+        // forceFill — kwa sababu fields ziko kwenye $guarded
+        // ============================================================
+        $user->forceFill([
             'password_hash' => \Hash::make($newPassword),
             'is_first_login' => true,
-            'credentials_sent_at' => now(),
+            'first_password_expires_at' => now()->addDays($expiryDays),
             'credentials_expires_at' => now()->addDays($expiryDays),
-            'credentials_channel' => 'internal_email',
-        ]);
+            'password_changed_at' => null,
+            'failed_login_attempts' => 0,
+            'locked_until' => null,
+        ])->save();
 
-        \App\Services\NotificationService::sendCredentials($user, $newPassword);
+        // ============================================================
+        // Tuma credentials kwa email — sio kwenye response
+        // ============================================================
+        try {
+            \App\Services\NotificationService::sendCredentials($user, $newPassword);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send credentials: ' . $e->getMessage());
+        }
 
-        return back()->with('success', "Password reset successfully. New password: {$newPassword}");
+        // ============================================================
+        // Audit log
+        // ============================================================
+        UserActivityLog::log(
+            action: 'password_reset',
+            module: 'employee',
+            description: 'Password reset for: ' . $employee->full_name,
+            subjectId: $employee->id,
+            subjectType: 'App\Models\Employee'
+        );
+
+        // ============================================================
+        // USIONYESHE PASSWORD KWENYE RESPONSE
+        // ============================================================
+        return back()->with('success', 'Password reset successfully. Credentials zimetumwa kwa ' . $user->email . '.');
     }
     /**
      * Unda employee_audit_logs table kama haipo
