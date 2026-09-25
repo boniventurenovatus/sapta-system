@@ -262,7 +262,8 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // DEBUG: TEST LOGIN FLOW
 // ============================================================
-
+Route::get('/debug/test-login-flow', function() {
+    $login = 'superadmin';
     $password = 'Sapta@2025!';
     
     // Hatua 1: Tafuta user
@@ -329,7 +330,9 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // DEBUG: RESET AND TEST
 // ============================================================
-
+Route::get('/debug/reset-and-test', function() {
+    // Unda hash MOJA
+    $hashed = \Hash::make('Sapta@2025!');
     
     // Update kwa DB::table — bypass setPasswordAttribute
     \DB::table('users')->where('username', 'superadmin')->update([
@@ -357,7 +360,8 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // DEBUG: CLEAR CACHE (futa baada ya kutumia!)
 // ============================================================
-
+Route::get('/debug/clear-cache', function() {
+    \Artisan::call('optimize:clear');
     \Artisan::call('cache:clear');
     \Artisan::call('config:clear');
     \Artisan::call('route:clear');
@@ -371,7 +375,8 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // DEBUG: TEST ICT DASHBOARD (futa baada ya kutumia!)
 // ============================================================
-
+Route::get('/debug/test-ict', function() {
+    $results = [];
     
     // Test 1: DB connection
     try {
@@ -413,7 +418,8 @@ Route::middleware(['auth'])->group(function () {
     
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.test-ict');
-
+Route::get('/debug/clear-views', function() {
+    \Artisan::call('view:clear');
     \Artisan::call('optimize:clear');
     return response()->json([
         'success' => true,
@@ -421,7 +427,8 @@ Route::middleware(['auth'])->group(function () {
         'output' => \Artisan::output(),
     ]);
 })->name('debug.clear-views');
-
+Route::get('/debug/force-clear-views', function() {
+    $viewPath = storage_path('framework/views');
     $files = glob($viewPath . '/*.php');
     $deleted = 0;
     foreach ($files as $f) {
