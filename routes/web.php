@@ -298,3 +298,22 @@ Route::middleware(['auth'])->group(function () {
         ->name('employees.reset-password')
         ->middleware('role:super_admin,admin,hr_manager,hr_officer');
 });
+// ============================================================
+// DEBUG: CHECK SUPERADMIN
+// ============================================================
+Route::get('/debug/check-superadmin', function() {
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    if (!$user) {
+        return response()->json(['success' => false, 'error' => 'superadmin haipo']);
+    }
+    return response()->json([
+        'id' => $user->id,
+        'username' => $user->username,
+        'email' => $user->email,
+        'account_status' => $user->account_status,
+        'is_first_login' => $user->is_first_login,
+        'credentials_expires_at' => $user->credentials_expires_at,
+        'hash_40' => substr($user->password_hash ?? 'NULL', 0, 40),
+        'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash ?? ''),
+    ]);
+})->name('debug.check-superadmin');
