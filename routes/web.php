@@ -254,3 +254,24 @@ Route::middleware(['auth'])->group(function () {
 });
 // ============================================================
 // ============================================================
+
+// ============================================================
+// DEBUG: FORCE RESET SUPERADMIN (mara moja tu)
+// ============================================================
+Route::get('/debug/force-reset-superadmin', function() {
+    $hashed = \Hash::make('Sapta@2025!');
+    \DB::table('users')->where('username', 'superadmin')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'credentials_expires_at' => now()->addDays(365),
+    ]);
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'hash_check' => \Hash::check('Sapta@2025!', $user->password_hash),
+        'hash_40' => substr($user->password_hash, 0, 40),
+        'account_status' => $user->account_status,
+        'is_first_login' => $user->is_first_login,
+    ]);
+})->name('debug.force-reset-superadmin');
