@@ -275,3 +275,71 @@ Route::get('/debug/force-reset-superadmin', function() {
         'is_first_login' => $user->is_first_login,
     ]);
 })->name('debug.force-reset-superadmin');
+// ============================================================
+// DEBUG: TEST LOGIN FLOW
+// ============================================================
+Route::get('/debug/test-login-flow', function() {
+    $login = 'superadmin';
+    $password = 'Sapta@2025!';
+    
+    // Hatua 1: Tafuta user
+    $user = \App\Models\User::where('email', $login)->orWhere('username', $login)->first();
+    
+    if (!$user) {
+        return response()->json([
+            'step' => 'find_user',
+            'success' => false,
+            'error' => 'User haipatikani',
+        ]);
+    }
+    
+    // Hatua 2: Angalia account_status
+    if ($user->account_status !== 'active') {
+        return response()->json([
+            'step' => 'account_status',
+            'success' => false,
+            'account_status' => $user->account_status,
+        ]);
+    }
+    
+    // Hatua 3: Angalia employee status
+    if ($user->employee && $user->employee->employment_status !== 'active') {
+        return response()->json([
+            'step' => 'employee_status',
+            'success' => false,
+            'employment_status' => $user->employee->employment_status,
+        ]);
+    }
+    
+    // Hatua 4: Hash::check
+    if (!\Hash::check($password, $user->password_hash)) {
+        return response()->json([
+            'step' => 'hash_check',
+            'success' => false,
+            'hash_check' => false,
+        ]);
+    }
+    
+    // Hatua 5: Credentials expiry
+    if ($user->credentials_expires_at && \Carbon\Carbon::parse($user->credentials_expires_at)->isPast() && $user->is_first_login) {
+        return response()->json([
+            'step' => 'credentials_expiry',
+            'success' => false,
+            'credentials_expires_at' => $user->credentials_expires_at,
+            'is_first_login' => $user->is_first_login,
+        ]);
+    }
+    
+    return response()->json([
+        'step' => 'all_checks',
+        'success' => true,
+        'user' => [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'account_status' => $user->account_status,
+            'is_first_login' => $user->is_first_login,
+            'credentials_expires_at' => $user->credentials_expires_at,
+        ],
+    ]);
+})->name('debug.test-login-flow');
