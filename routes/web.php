@@ -396,3 +396,9 @@ Route::get('/debug/test-login', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.test-login');
+Route::get('/debug/controller-code', function() {
+    $path = app_path('Http/Controllers/Auth/AuthenticatedSessionController.php');
+    $content = file_get_contents($path);
+
+    return response($content, 200, ['Content-Type' => 'text/plain']);
+})->name('debug.controller-code');
