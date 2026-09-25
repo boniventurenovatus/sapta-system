@@ -31,3 +31,7 @@ users-export.json
 
 # Audit reports
 audit-report/
+
+# Backup files
+*.backup
+*.backup2
