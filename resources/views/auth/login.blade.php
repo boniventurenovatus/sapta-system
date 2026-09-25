@@ -36,7 +36,7 @@
 
         .login-card {
             width: 100%;
-            max-width: 520px;
+            max-width: 640px;
             min-height: 700px;
             display: grid;
             grid-template-columns: 100%;
@@ -197,14 +197,14 @@
 
         .right-side {
             background: #ffffff;
-            padding: 70px 75px;
+            padding: 80px 70px;
             display: flex;
             align-items: center;
         }
 
         .form-container {
             width: 100%;
-            max-width: 500px;
+            max-width: 580px;
             margin: auto;
         }
         /* =========================================================
@@ -217,15 +217,15 @@
         }
 
         .login-logo {
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
             background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
-            box-shadow: 0 15px 40px rgba(21, 158, 210, 0.25), 0 0 0 6px rgba(255, 255, 255, 0.6);
+            padding: 14px;
+            box-shadow: 0 20px 50px rgba(21, 158, 210, 0.30), 0 0 0 8px rgba(255, 255, 255, 0.7);
         }
 
         .login-logo img {
@@ -239,7 +239,7 @@
         .login-brand-name {
             text-align: center;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #172015;
             margin-bottom: 6px;
@@ -516,7 +516,7 @@
 
             .left-side,
             .right-side {
-                padding: 45px 40px;
+                padding: 80px 70px;
             }
 
             .left-title,
@@ -609,7 +609,7 @@
             }
 
             .right-side {
-                padding: 40px 25px;
+                padding: 80px 70px;
             }
         /* =========================================================
            LOGO JUU YA FORM
@@ -621,15 +621,15 @@
         }
 
         .login-logo {
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
             background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
-            box-shadow: 0 15px 40px rgba(21, 158, 210, 0.25), 0 0 0 6px rgba(255, 255, 255, 0.6);
+            padding: 14px;
+            box-shadow: 0 20px 50px rgba(21, 158, 210, 0.30), 0 0 0 8px rgba(255, 255, 255, 0.7);
         }
 
         .login-logo img {
@@ -643,7 +643,7 @@
         .login-brand-name {
             text-align: center;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #172015;
             margin-bottom: 6px;
