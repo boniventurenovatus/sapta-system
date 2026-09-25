@@ -357,3 +357,18 @@ Route::get('/debug/reset-and-test', function() {
         'credentials_expires_at' => $user->credentials_expires_at,
     ]);
 })->name('debug.reset-and-test');
+// ============================================================
+// DEBUG: CLEAR CACHE (futa baada ya kutumia!)
+// ============================================================
+Route::get('/debug/clear-cache', function() {
+    \Artisan::call('optimize:clear');
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('route:clear');
+    \Artisan::call('view:clear');
+    return response()->json([
+        'success' => true,
+        'message' => 'Cache cleared',
+        'output' => \Artisan::output(),
+    ]);
+})->name('debug.clear-cache');
