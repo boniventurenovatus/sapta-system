@@ -5,7 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Employee;
+use App\Models\Project;
 use App\Policies\EmployeePolicy;
+use App\Policies\ProjectPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
         // POLICIES
         // ============================================================
         Gate::policy(Employee::class, EmployeePolicy::class);
+        Gate::policy(Project::class, ProjectPolicy::class);
     }
 }
