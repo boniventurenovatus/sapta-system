@@ -258,23 +258,7 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // DEBUG: FORCE RESET SUPERADMIN (mara moja tu)
 // ============================================================
-Route::get('/debug/force-reset-superadmin', function() {
-    $hashed = \Hash::make('Sapta@2025!');
-    \DB::table('users')->where('username', 'superadmin')->update([
-        'password_hash' => $hashed,
-        'account_status' => 'active',
-        'is_first_login' => false,
-        'credentials_expires_at' => now()->addDays(365),
-    ]);
-    $user = \DB::table('users')->where('username', 'superadmin')->first();
-    return response()->json([
-        'success' => true,
-        'hash_check' => \Hash::check('Sapta@2025!', $user->password_hash),
-        'hash_40' => substr($user->password_hash, 0, 40),
-        'account_status' => $user->account_status,
-        'is_first_login' => $user->is_first_login,
-    ]);
-})->name('debug.force-reset-superadmin');
+
 // ============================================================
 // DEBUG: TEST LOGIN FLOW
 // ============================================================
@@ -343,3 +327,33 @@ Route::get('/debug/test-login-flow', function() {
         ],
     ]);
 })->name('debug.test-login-flow');
+// ============================================================
+// DEBUG: RESET AND TEST
+// ============================================================
+Route::get('/debug/reset-and-test', function() {
+    // Unda hash MOJA
+    $hashed = \Hash::make('Sapta@2025!');
+    
+    // Update kwa DB::table — bypass setPasswordAttribute
+    \DB::table('users')->where('username', 'superadmin')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'credentials_expires_at' => now()->addDays(365),
+    ]);
+    
+    // Soma tena kutoka DB
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    
+    // Test Hash::check
+    $check = \Hash::check('Sapta@2025!', $user->password_hash);
+    
+    return response()->json([
+        'success' => true,
+        'hash_40' => substr($user->password_hash, 0, 40),
+        'hash_check' => $check,
+        'account_status' => $user->account_status,
+        'is_first_login' => $user->is_first_login,
+        'credentials_expires_at' => $user->credentials_expires_at,
+    ]);
+})->name('debug.reset-and-test');
