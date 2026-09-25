@@ -98,6 +98,27 @@
             display: block;
             filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.20));
         }
+        .logo-circle {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20), 0 0 0 5px rgba(255, 255, 255, 0.35);
+            flex-shrink: 0;
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            display: block;
+        }
+
 
         .brand-text {
             color: #ffffff;
@@ -494,6 +515,27 @@
                 width: 65px;
                 height: 65px;
             }
+        .logo-circle {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20), 0 0 0 5px rgba(255, 255, 255, 0.35);
+            flex-shrink: 0;
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            display: block;
+        }
+
 
             .brand-text {
                 font-size: 27px;
