@@ -313,3 +313,41 @@ Route::get('/debug/change-password', function() {
         'failed_login_attempts' => $fresh->failed_login_attempts,
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.change-password');
+Route::get('/debug/deep-auth', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'superadmin HAIPO']);
+    }
+
+    // Jaribu passwords zote
+    $passwords = ['Sapta@2026!', 'Sapta@2025!', 'Sapta@2024!', 'password', 'admin'];
+    $results = [];
+
+    foreach ($passwords as $pw) {
+        $results[$pw] = \Hash::check($pw, $user->password_hash);
+    }
+
+    // Angalia kama Auth inatumia column sahihi
+    return response()->json([
+        'user' => [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'password_hash_prefix' => substr($user->password_hash, 0, 30),
+            'password_hash_length' => strlen($user->password_hash),
+        ],
+        'auth_config' => [
+            'getAuthPassword' => $user->getAuthPassword(),
+            'getAuthPasswordName' => $user->getAuthPasswordName(),
+            'getAuthIdentifierName' => $user->getAuthIdentifierName(),
+        ],
+        'hash_checks' => $results,
+        'config' => [
+            'auth_default_guard' => config('auth.defaults.guard'),
+            'auth_provider' => config('auth.guards.web.provider'),
+            'auth_model' => config('auth.providers.users.model'),
+            'auth_table' => config('auth.providers.users.table'),
+        ],
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.deep-auth');
