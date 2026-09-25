@@ -418,3 +418,12 @@ Route::get('/debug/test-ict', function() {
     
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.test-ict');
+Route::get('/debug/clear-views', function() {
+    \Artisan::call('view:clear');
+    \Artisan::call('optimize:clear');
+    return response()->json([
+        'success' => true,
+        'message' => 'View cache cleared',
+        'output' => \Artisan::output(),
+    ]);
+})->name('debug.clear-views');
