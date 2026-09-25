@@ -317,3 +317,31 @@ Route::get('/debug/check-superadmin', function() {
         'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash ?? ''),
     ]);
 })->name('debug.check-superadmin');
+// ============================================================
+// DEBUG: FORCE RESET SUPERADMIN — bypass setPasswordAttribute
+// ============================================================
+Route::get('/debug/force-reset-superadmin', function() {
+    // Unda hash MOJA tu
+    $hashed = \Hash::make('Sapta@2025!');
+    
+    // DB::table — inabypass setPasswordAttribute
+    \DB::table('users')->where('username', 'superadmin')->update([
+        'password_hash' => $hashed,
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'credentials_expires_at' => now()->addDays(365),
+    ]);
+    
+    // Thibitisha
+    $user = \DB::table('users')->where('username', 'superadmin')->first();
+    return response()->json([
+        'success' => true,
+        'id' => $user->id,
+        'username' => $user->username,
+        'hash_40' => substr($user->password_hash, 0, 40),
+        'hash_check_sapta2025' => \Hash::check('Sapta@2025!', $user->password_hash),
+        'account_status' => $user->account_status,
+        'is_first_login' => $user->is_first_login,
+        'credentials_expires_at' => $user->credentials_expires_at,
+    ]);
+})->name('debug.force-reset-superadmin');
