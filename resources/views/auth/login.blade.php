@@ -36,10 +36,10 @@
 
         .login-card {
             width: 100%;
-            max-width: 1280px;
+            max-width: 520px;
             min-height: 700px;
             display: grid;
-            grid-template-columns: 50% 50%;
+            grid-template-columns: 100%;
             background: #ffffff;
             border-radius: 30px;
             overflow: hidden;
@@ -207,6 +207,55 @@
             max-width: 500px;
             margin: auto;
         }
+        /* =========================================================
+           LOGO JUU YA FORM
+        ========================================================= */
+        .login-logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            box-shadow: 0 15px 40px rgba(21, 158, 210, 0.25), 0 0 0 6px rgba(255, 255, 255, 0.6);
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .login-brand-name {
+            text-align: center;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #172015;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .login-brand-tagline {
+            text-align: center;
+            font-size: 13px;
+            color: #7c887b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+        }
+
 
         .eyebrow {
             color: #4e7f22;
@@ -562,6 +611,55 @@
             .right-side {
                 padding: 40px 25px;
             }
+        /* =========================================================
+           LOGO JUU YA FORM
+        ========================================================= */
+        .login-logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            box-shadow: 0 15px 40px rgba(21, 158, 210, 0.25), 0 0 0 6px rgba(255, 255, 255, 0.6);
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .login-brand-name {
+            text-align: center;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #172015;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .login-brand-tagline {
+            text-align: center;
+            font-size: 13px;
+            color: #7c887b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+        }
+
 
             .eyebrow {
                 font-size: 12px;
@@ -655,37 +753,6 @@
              LEFT SIDE
         ====================================================== -->
 
-        <section class="left-side">
-
-            <div class="sun"></div>
-
-            
-
-            <div class="left-content">
-
-                <h2 class="left-title">
-                    From farming,<br>
-                    to something more.
-                </h2>
-
-                <p class="left-description">
-                    Manage your agriculture operations with a
-                    system built for the whole season, start to
-                    harvest.
-                </p>
-
-            </div>
-
-            <div class="clouds" aria-hidden="true">
-                <div class="cloud"></div>
-                <div class="cloud"></div>
-                <div class="cloud"></div>
-                <div class="cloud"></div>
-            </div>
-
-        </section>
-
-
         <!-- =====================================================
              RIGHT SIDE
         ====================================================== -->
@@ -693,6 +760,15 @@
         <section class="right-side">
 
             <div class="form-container">
+
+                <div class="login-logo-wrap">
+                    <div class="login-logo">
+                        <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA Logo">
+                    </div>
+                </div>
+
+                <div class="login-brand-name">SAPTA</div>
+                <div class="login-brand-tagline">Quality Agriculture Work</div>
 
                 <div class="eyebrow">
                     QUALITY AGRICULTURE WORK
