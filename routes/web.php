@@ -310,3 +310,31 @@ Route::get('/debug/check-auth', function() {
         ],
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.check-auth');
+Route::get('/debug/reset-superadmin', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'superadmin HAIPO']);
+    }
+
+    $user->forceFill([
+        'password_hash' => \Hash::make('Sapta@2025!'),
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'first_password_expires_at' => null,
+        'credentials_expires_at' => null,
+        'failed_login_attempts' => 0,
+        'locked_until' => null,
+    ])->save();
+
+    $fresh = $user->fresh();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Password ya superadmin imereset',
+        'hash_check_Sapta2025' => \Hash::check('Sapta@2025!', $fresh->password_hash),
+        'account_status' => $fresh->account_status,
+        'failed_login_attempts' => $fresh->failed_login_attempts,
+        'locked_until' => $fresh->locked_until,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.reset-superadmin');
