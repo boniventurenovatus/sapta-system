@@ -765,21 +765,11 @@
                     <div class="login-logo">
                         <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA Logo">
                     </div>
-                </div>
-
-                <div class="login-brand-name">SAPTA</div>
-                <div class="login-brand-tagline">Quality Agriculture Work</div>
-
-                <div class="login-logo-wrap">
+                </div><div class="login-logo-wrap">
                     <div class="login-logo">
                         <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA Logo">
                     </div>
-                </div>
-
-                <div class="login-brand-name">SAPTA</div>
-                <div class="login-brand-tagline">Quality Agriculture Work</div>
-
-                <div class="eyebrow">
+                </div><div class="eyebrow">
                     QUALITY AGRICULTURE WORK
                 </div>
 
