@@ -372,3 +372,49 @@ Route::get('/debug/clear-cache', function() {
         'output' => \Artisan::output(),
     ]);
 })->name('debug.clear-cache');
+// ============================================================
+// DEBUG: TEST ICT DASHBOARD (futa baada ya kutumia!)
+// ============================================================
+Route::get('/debug/test-ict', function() {
+    $results = [];
+    
+    // Test 1: DB connection
+    try {
+        \DB::connection()->getPdo();
+        $results['db_connection'] = 'OK';
+    } catch (\Exception $e) {
+        $results['db_connection'] = 'FAIL: ' . $e->getMessage();
+    }
+    
+    // Test 2: tables
+    foreach (['users', 'audit_logs', 'employees', 'departments', 'projects', 'trainings'] as $t) {
+        $results['table_' . $t] = \Schema::hasTable($t) ? 'IPO' : 'HAIPO';
+    }
+    
+    // Test 3: count audit_logs
+    try {
+        $results['count_audit_logs'] = \DB::table('audit_logs')->count();
+    } catch (\Exception $e) {
+        $results['count_audit_logs'] = 'FAIL: ' . $e->getMessage();
+    }
+    
+    // Test 4: view exists
+    $results['view_ict'] = view()->exists('dashboard.ict') ? 'IPO' : 'HAIPO';
+    $results['view_meal'] = view()->exists('dashboard.meal') ? 'IPO' : 'HAIPO';
+    $results['view_program'] = view()->exists('dashboard.program') ? 'IPO' : 'HAIPO';
+    $results['view_hr'] = view()->exists('dashboard.hr') ? 'IPO' : 'HAIPO';
+    
+    // Test 5: jaribu ku-render view
+    try {
+        $html = view('dashboard.ict', [
+            'kpis' => ['total_users' => 0, 'active_sessions' => 0, 'system_health' => 95, 'total_logs' => 0],
+            'charts' => [],
+            'recent_users' => collect(),
+        ])->render();
+        $results['render_ict'] = 'OK (length: ' . strlen($html) . ')';
+    } catch (\Exception $e) {
+        $results['render_ict'] = 'FAIL: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+    }
+    
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.test-ict');
