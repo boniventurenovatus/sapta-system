@@ -15,18 +15,18 @@
 
     {{-- KPI CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees']) }}" icon="fa-users" color="blue" />
-        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects']) }}" icon="fa-folder-open" color="green" />
-        <x-kpi-card label="Budget Utilization" value="{{ $kpis['budget_utilization'] }}%" icon="fa-chart-pie" color="yellow" />
-        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['pending_tasks']) }}" icon="fa-list-check" color="red" />
+        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees'] ?? 0) }}" icon="fa-users" color="blue" />
+        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects'] ?? 0) }}" icon="fa-folder-open" color="green" />
+        <x-kpi-card label="Budget Utilization" value="{{ $kpis['budget_utilization'] ?? 0 }}%" icon="fa-chart-pie" color="yellow" />
+        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['pending_tasks'] ?? 0) }}" icon="fa-list-check" color="red" />
     </div>
 
     {{-- KPI CARDS 2 --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects']) }}" icon="fa-diagram-project" color="purple" />
-        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] / 1000000, 1) }}M" icon="fa-money-bill" color="indigo" />
-        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks']) }}" icon="fa-tasks" color="blue" />
-        <x-kpi-card label="Departments" value="{{ number_format($kpis['total_departments']) }}" icon="fa-sitemap" color="green" />
+        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects'] ?? 0) }}" icon="fa-diagram-project" color="purple" />
+        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] ?? 0 / 1000000, 1) }}M" icon="fa-money-bill" color="indigo" />
+        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks'] ?? 0) }}" icon="fa-tasks" color="blue" />
+        <x-kpi-card label="Departments" value="{{ number_format($kpis['total_departments'] ?? 0) }}" icon="fa-sitemap" color="green" />
     </div>
 
     {{-- CHARTS ROW 1 --}}

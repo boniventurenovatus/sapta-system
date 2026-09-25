@@ -14,15 +14,15 @@
 
     {{-- KPI CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects']) }}" icon="fa-folder-open" color="purple" />
-        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects']) }}" icon="fa-spinner" color="blue" />
-        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_projects']) }}" icon="fa-check-circle" color="green" />
-        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] / 1000000, 1) }}M" icon="fa-money-bill" color="yellow" />
+        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects'] ?? 0) }}" icon="fa-folder-open" color="purple" />
+        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects'] ?? 0) }}" icon="fa-spinner" color="blue" />
+        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_projects'] ?? 0) }}" icon="fa-check-circle" color="green" />
+        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] ?? 0 / 1000000, 1) }}M" icon="fa-money-bill" color="yellow" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks']) }}" icon="fa-tasks" color="indigo" />
-        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['pending_tasks']) }}" icon="fa-clock" color="red" />
+        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks'] ?? 0) }}" icon="fa-tasks" color="indigo" />
+        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['pending_tasks'] ?? 0) }}" icon="fa-clock" color="red" />
         <x-kpi-card label="Avg Progress" value="{{ \App\Models\Project::avg('progress') ? round(\App\Models\Project::avg('progress'), 1) : 0 }}%" icon="fa-percent" color="green" />
         <x-kpi-card label="Active Beneficiaries" value="500+" icon="fa-people-group" color="blue" />
     </div>

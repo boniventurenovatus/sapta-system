@@ -13,15 +13,15 @@
     />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Users" value="{{ number_format($kpis['total_users']) }}" icon="fa-users" color="blue" />
-        <x-kpi-card label="Active Users" value="{{ number_format($kpis['active_users']) }}" icon="fa-user-check" color="green" />
-        <x-kpi-card label="Roles" value="{{ number_format($kpis['total_roles']) }}" icon="fa-user-shield" color="purple" />
-        <x-kpi-card label="Permissions" value="{{ number_format($kpis['total_permissions']) }}" icon="fa-key" color="yellow" />
+        <x-kpi-card label="Total Users" value="{{ number_format($kpis['total_users'] ?? 0 ?? 0) }}" icon="fa-users" color="blue" />
+        <x-kpi-card label="Active Users" value="{{ number_format($kpis['active_users'] ?? 0 ?? 0) }}" icon="fa-user-check" color="green" />
+        <x-kpi-card label="Roles" value="{{ number_format($kpis['total_roles'] ?? 0 ?? 0) }}" icon="fa-user-shield" color="purple" />
+        <x-kpi-card label="Permissions" value="{{ number_format($kpis['total_permissions'] ?? 0 ?? 0) }}" icon="fa-key" color="yellow" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Documents" value="{{ number_format($kpis['total_documents']) }}" icon="fa-file-lines" color="indigo" />
-        <x-kpi-card label="Audit Logs" value="{{ number_format($kpis['total_audit_logs']) }}" icon="fa-history" color="red" />
+        <x-kpi-card label="Documents" value="{{ number_format($kpis['total_documents'] ?? 0 ?? 0) }}" icon="fa-file-lines" color="indigo" />
+        <x-kpi-card label="Audit Logs" value="{{ number_format($kpis['total_audit_logs'] ?? 0 ?? 0) }}" icon="fa-history" color="red" />
         <x-kpi-card label="Trainings" value="{{ \App\Models\Training::count() }}" icon="fa-graduation-cap" color="green" />
         <x-kpi-card label="System Health" value="95%" icon="fa-heart-pulse" color="blue" />
     </div>

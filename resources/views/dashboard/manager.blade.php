@@ -13,10 +13,10 @@
     />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Team Members" value="{{ number_format($kpis['team_members']) }}" icon="fa-users" color="blue" />
-        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks']) }}" icon="fa-tasks" color="purple" />
-        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_tasks']) }}" icon="fa-check-circle" color="green" />
-        <x-kpi-card label="Pending" value="{{ number_format($kpis['pending_tasks']) }}" icon="fa-clock" color="red" />
+        <x-kpi-card label="Team Members" value="{{ number_format($kpis['team_members'] ?? 0) }}" icon="fa-users" color="blue" />
+        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks'] ?? 0) }}" icon="fa-tasks" color="purple" />
+        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_tasks'] ?? 0) }}" icon="fa-check-circle" color="green" />
+        <x-kpi-card label="Pending" value="{{ number_format($kpis['pending_tasks'] ?? 0) }}" icon="fa-clock" color="red" />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

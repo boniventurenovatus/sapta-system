@@ -13,15 +13,15 @@
     />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects']) }}" icon="fa-folder-open" color="blue" />
-        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects']) }}" icon="fa-spinner" color="green" />
-        <x-kpi-card label="Total Trainings" value="{{ number_format($kpis['total_trainings']) }}" icon="fa-graduation-cap" color="purple" />
-        <x-kpi-card label="Total Documents" value="{{ number_format($kpis['total_documents']) }}" icon="fa-file-lines" color="yellow" />
+        <x-kpi-card label="Total Projects" value="{{ number_format($kpis['total_projects'] ?? 0) }}" icon="fa-folder-open" color="blue" />
+        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects'] ?? 0) }}" icon="fa-spinner" color="green" />
+        <x-kpi-card label="Total Trainings" value="{{ number_format($kpis['total_trainings'] ?? 0) }}" icon="fa-graduation-cap" color="purple" />
+        <x-kpi-card label="Total Documents" value="{{ number_format($kpis['total_documents'] ?? 0) }}" icon="fa-file-lines" color="yellow" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Reports" value="{{ number_format($kpis['total_reports']) }}" icon="fa-file-alt" color="indigo" />
-        <x-kpi-card label="Indicators Tracked" value="{{ number_format($kpis['total_indicators']) }}" icon="fa-chart-line" color="red" />
+        <x-kpi-card label="Reports" value="{{ number_format($kpis['total_reports'] ?? 0) }}" icon="fa-file-alt" color="indigo" />
+        <x-kpi-card label="Indicators Tracked" value="{{ number_format($kpis['total_indicators'] ?? 0) }}" icon="fa-chart-line" color="red" />
         <x-kpi-card label="Evaluations" value="{{ \App\Models\Training::count() }}" icon="fa-clipboard-check" color="green" />
         <x-kpi-card label="Data Collection" value="{{ \App\Models\Document::where('category', 'report')->count() }}" icon="fa-database" color="blue" />
     </div>

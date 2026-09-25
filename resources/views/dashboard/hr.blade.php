@@ -14,10 +14,10 @@
 
     {{-- KPI CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees']) }}" icon="fa-users" color="blue" />
-        <x-kpi-card label="Active Employees" value="{{ number_format($kpis['active_employees']) }}" icon="fa-user-check" color="green" />
-        <x-kpi-card label="Pending Leaves" value="{{ number_format($kpis['pending_leaves']) }}" icon="fa-calendar-check" color="yellow" />
-        <x-kpi-card label="Total Trainings" value="{{ number_format($kpis['total_trainings']) }}" icon="fa-graduation-cap" color="purple" />
+        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees'] ?? 0) }}" icon="fa-users" color="blue" />
+        <x-kpi-card label="Active Employees" value="{{ number_format($kpis['active_employees'] ?? 0) }}" icon="fa-user-check" color="green" />
+        <x-kpi-card label="Pending Leaves" value="{{ number_format($kpis['pending_leaves'] ?? 0) }}" icon="fa-calendar-check" color="yellow" />
+        <x-kpi-card label="Total Trainings" value="{{ number_format($kpis['total_trainings'] ?? 0) }}" icon="fa-graduation-cap" color="purple" />
     </div>
 
     {{-- CHARTS --}}

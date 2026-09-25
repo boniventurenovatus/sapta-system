@@ -14,17 +14,17 @@
 
     {{-- KPI CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees']) }}" icon="fa-users" color="blue" />
-        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects']) }}" icon="fa-folder-open" color="green" />
-        <x-kpi-card label="Pending Approvals" value="{{ number_format($kpis['pending_approvals']) }}" icon="fa-clock" color="yellow" />
-        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] / 1000000, 1) }}M" icon="fa-money-bill" color="purple" />
+        <x-kpi-card label="Total Employees" value="{{ number_format($kpis['total_employees'] ?? 0) }}" icon="fa-users" color="blue" />
+        <x-kpi-card label="Active Projects" value="{{ number_format($kpis['active_projects'] ?? 0) }}" icon="fa-folder-open" color="green" />
+        <x-kpi-card label="Pending Approvals" value="{{ number_format($kpis['pending_approvals'] ?? 0) }}" icon="fa-clock" color="yellow" />
+        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] ?? 0 / 1000000, 1) }}M" icon="fa-money-bill" color="purple" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks']) }}" icon="fa-tasks" color="indigo" />
-        <x-kpi-card label="Completed Tasks" value="{{ number_format($kpis['completed_tasks']) }}" icon="fa-check-circle" color="green" />
-        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['total_tasks'] - $kpis['completed_tasks']) }}" icon="fa-list-check" color="red" />
-        <x-kpi-card label="Completion Rate" value="{{ $kpis['total_tasks'] > 0 ? round(($kpis['completed_tasks'] / $kpis['total_tasks']) * 100, 1) : 0 }}%" icon="fa-percent" color="yellow" />
+        <x-kpi-card label="Total Tasks" value="{{ number_format($kpis['total_tasks'] ?? 0) }}" icon="fa-tasks" color="indigo" />
+        <x-kpi-card label="Completed Tasks" value="{{ number_format($kpis['completed_tasks'] ?? 0) }}" icon="fa-check-circle" color="green" />
+        <x-kpi-card label="Pending Tasks" value="{{ number_format($kpis['total_tasks'] ?? 0 - $kpis['completed_tasks'] ?? 0) }}" icon="fa-list-check" color="red" />
+        <x-kpi-card label="Completion Rate" value="{{ $kpis['total_tasks'] ?? 0 > 0 ? round(($kpis['completed_tasks'] ?? 0 / $kpis['total_tasks'] ?? 0) * 100, 1) : 0 }}%" icon="fa-percent" color="yellow" />
     </div>
 
     {{-- CHARTS --}}

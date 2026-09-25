@@ -14,15 +14,15 @@
 
     {{-- KPI CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] / 1000000, 1) }}M" icon="fa-chart-pie" color="green" />
-        <x-kpi-card label="Total Spent" value="TZS {{ number_format($kpis['total_spent'] / 1000000, 1) }}M" icon="fa-money-bill" color="yellow" />
-        <x-kpi-card label="Remaining" value="TZS {{ number_format($kpis['total_remaining'] / 1000000, 1) }}M" icon="fa-wallet" color="blue" />
-        <x-kpi-card label="Utilization" value="{{ $kpis['utilization'] }}%" icon="fa-percent" color="purple" />
+        <x-kpi-card label="Total Budget" value="TZS {{ number_format($kpis['total_budget'] ?? 0 / 1000000, 1) }}M" icon="fa-chart-pie" color="green" />
+        <x-kpi-card label="Total Spent" value="TZS {{ number_format($kpis['total_spent'] ?? 0 / 1000000, 1) }}M" icon="fa-money-bill" color="yellow" />
+        <x-kpi-card label="Remaining" value="TZS {{ number_format($kpis['total_remaining'] ?? 0 / 1000000, 1) }}M" icon="fa-wallet" color="blue" />
+        <x-kpi-card label="Utilization" value="{{ $kpis['utilization'] ?? 0 }}%" icon="fa-percent" color="purple" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="Pending Vouchers" value="{{ number_format($kpis['pending_vouchers']) }}" icon="fa-file-invoice" color="red" />
-        <x-kpi-card label="Total Expenses" value="TZS {{ number_format($kpis['total_expenses'] / 1000000, 1) }}M" icon="fa-receipt" color="indigo" />
+        <x-kpi-card label="Pending Vouchers" value="{{ number_format($kpis['pending_vouchers'] ?? 0) }}" icon="fa-file-invoice" color="red" />
+        <x-kpi-card label="Total Expenses" value="TZS {{ number_format($kpis['total_expenses'] ?? 0 / 1000000, 1) }}M" icon="fa-receipt" color="indigo" />
         <x-kpi-card label="Active Budgets" value="{{ \App\Models\Budget::count() }}" icon="fa-folder" color="blue" />
         <x-kpi-card label="Paid Vouchers" value="{{ \App\Models\PaymentVoucher::where('status', 'paid')->count() }}" icon="fa-check-circle" color="green" />
     </div>

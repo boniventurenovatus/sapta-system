@@ -13,10 +13,10 @@
     />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-kpi-card label="My Tasks" value="{{ number_format($kpis['my_tasks']) }}" icon="fa-tasks" color="blue" />
-        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_tasks']) }}" icon="fa-check-circle" color="green" />
-        <x-kpi-card label="Pending Leaves" value="{{ number_format($kpis['pending_leaves']) }}" icon="fa-calendar-check" color="yellow" />
-        <x-kpi-card label="Attendance (Month)" value="{{ number_format($kpis['my_attendance']) }}" icon="fa-clock" color="purple" />
+        <x-kpi-card label="My Tasks" value="{{ number_format($kpis['my_tasks'] ?? 0) }}" icon="fa-tasks" color="blue" />
+        <x-kpi-card label="Completed" value="{{ number_format($kpis['completed_tasks'] ?? 0) }}" icon="fa-check-circle" color="green" />
+        <x-kpi-card label="Pending Leaves" value="{{ number_format($kpis['pending_leaves'] ?? 0) }}" icon="fa-calendar-check" color="yellow" />
+        <x-kpi-card label="Attendance (Month)" value="{{ number_format($kpis['my_attendance'] ?? 0) }}" icon="fa-clock" color="purple" />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
