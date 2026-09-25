@@ -278,3 +278,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+
+// CHANGE PASSWORD
+Route::get('/profile/change-password', [ProfileController::class, 'showChangePassword'])->name('profile.change-password');
+Route::put('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');

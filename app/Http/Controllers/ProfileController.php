@@ -168,5 +168,65 @@ class ProfileController extends Controller
                 'Your profile photo has been removed successfully.'
             );
     }
+
+    /**
+     * Show the change password form.
+     */
+    public function showChangePassword(): View
+    {
+        return view('profile.change-password');
+    }
+
+    /**
+     * Update the authenticated user's password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.required' => 'Current password is required.',
+            'password.required' => 'New password is required.',
+            'password.min' => 'New password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
+
+        $user = Auth::user();
+
+        // Angalia kama current password ni sahihi
+        if (!\Hash::check($validated['current_password'], $user->password_hash)) {
+            return back()
+                ->withErrors(['current_password' => 'Current password is incorrect.'])
+                ->withInput();
+        }
+
+        // Angalia kama password mpya ni tofauti na ya zamani
+        if (\Hash::check($validated['password'], $user->password_hash)) {
+            return back()
+                ->withErrors(['password' => 'New password must be different from current password.'])
+                ->withInput();
+        }
+
+        // Update password
+        $user->forceFill([
+            'password_hash' => \Hash::make($validated['password']),
+            'password_changed_at' => now(),
+            'is_first_login' => false,
+            'first_password_expires_at' => null,
+            'credentials_expires_at' => null,
+        ])->save();
+
+        // Audit log
+        \App\Models\UserActivityLog::log(
+            action: 'password_changed',
+            module: 'profile',
+            description: 'User changed password',
+        );
+
+        return redirect()
+            ->route('profile.show')
+            ->with('success', 'Password imebadilishwa kikamilifu.');
+    }
 }
 

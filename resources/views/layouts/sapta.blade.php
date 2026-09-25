@@ -221,7 +221,7 @@
                                 <a href="{{ route('profile.show') }}"><i class="fas fa-user"></i> My Profile</a>
                                 <a href="{{ route('profile.edit') }}"><i class="fas fa-user-pen"></i> Edit Profile</a>
                                 <a href="{{ route('settings.index') }}"><i class="fas fa-gear"></i> Settings</a>
-                                <a href="{{ route('settings.index') }}"><i class="fas fa-key"></i> Change Password</a>
+                                <a href="{{ route('profile.change-password') }}"><i class="fas fa-key"></i> Change Password</a>
                                 <div class="tb-profile-divider"></div>
                                 <form method="POST" action="{{ route('logout') }}" style="margin:0;">
                                     @csrf
