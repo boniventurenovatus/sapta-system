@@ -28,6 +28,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', \App\Models\Employee::class);
         $query = Employee::with(['organization', 'department', 'position']);
 
         // Search
@@ -68,6 +69,7 @@ class EmployeeController extends Controller
         return view('employees.index', compact('employees', 'stats', 'departments'));
     }public function create(): View
     {
+        $this->authorize('create', \App\Models\Employee::class);
         // ===== LOCATIONS =====
         $regions = \App\Models\Region::orderBy('name')->get();
         $districts = \App\Models\District::orderBy('name')->get();
@@ -101,6 +103,7 @@ class EmployeeController extends Controller
         ));
     }public function store(StoreEmployeeRequest $request): RedirectResponse
     {
+        $this->authorize('create', \App\Models\Employee::class);
         $validated = $request->validated();
 
         $validated['employee_number'] = strtoupper(trim($validated['employee_number']));
@@ -135,6 +138,7 @@ class EmployeeController extends Controller
             ->with('success', 'Employee created successfully. Credentials sent via Internal Message & Email.');
     }public function show(Employee $employee): View
     {
+        $this->authorize('view', $employee);
         $employee->load([
             'organization',
             'department',
@@ -160,6 +164,7 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee): View
     {
+        $this->authorize('update', $employee);
         $organizations = Organization::query()
             ->orderBy('name')
             ->get();
@@ -195,6 +200,7 @@ class EmployeeController extends Controller
     */
 
     public function update(UpdateEmployeeRequest $request, Employee $employee): RedirectResponse {
+        $this->authorize('update', $employee);
 
         $validated = $request->validated();
 
@@ -265,6 +271,7 @@ class EmployeeController extends Controller
     public function destroy(
         Employee $employee
     ): RedirectResponse {
+        $this->authorize('delete', $employee);
 
         try {
 
@@ -330,6 +337,7 @@ class EmployeeController extends Controller
      */
     public function deactivate(Employee $employee): RedirectResponse
     {
+        $this->authorize('deactivate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'inactive']);
@@ -369,6 +377,7 @@ class EmployeeController extends Controller
      */
     public function terminate(Employee $employee): RedirectResponse
     {
+        $this->authorize('terminate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'terminated']);
@@ -408,6 +417,7 @@ class EmployeeController extends Controller
      */
     public function activate(Employee $employee): RedirectResponse
     {
+        $this->authorize('activate', $employee);
         $oldStatus = $employee->employment_status;
 
         $employee->update(['employment_status' => 'active']);
@@ -447,6 +457,7 @@ class EmployeeController extends Controller
      */
     public function suspend(Request $request, Employee $employee): RedirectResponse
     {
+        $this->authorize('suspend', $employee);
         $validated = $request->validate([
             'suspension_reason' => 'required|string|max:1000',
         ]);
@@ -581,6 +592,7 @@ class EmployeeController extends Controller
      */
     public function credentials(Employee $employee): View
     {
+        $this->authorize('viewCredentials', $employee);
         $user = $employee->user;
 
         if (!$user) {
@@ -618,6 +630,7 @@ class EmployeeController extends Controller
         ]);
     }public function resetPassword(Employee $employee): RedirectResponse
     {
+        $this->authorize('resetPassword', $employee);
         $user = $employee->user;
 
         if (!$user) {
