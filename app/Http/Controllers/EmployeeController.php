@@ -587,41 +587,34 @@ class EmployeeController extends Controller
             return view('employees.credentials', [
                 'employee' => $employee,
                 'user' => null,
-                'password' => null,
+                'roleName' => null,
                 'message' => null,
             ]);
-        }
-
-        // Chukua credentials kutoka kwenye messages
-        $credentialMessage = \DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('subject', 'LIKE', '%Credentials%')
-            ->orderBy('id', 'desc')
-            ->first();
-
-        // Extract password kutoka message body
-        $password = null;
-        if ($credentialMessage) {
-            if (preg_match('/Password:\s*([^\n\r]+)/i', $credentialMessage->body, $matches)) {
-                $password = trim($matches[1]);
-            }
-        }
-
-        // Kama password haipatikani — generate mpya
-        if (!$password) {
-            $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
-            $password = $lastNameCapitalized . '@Sapta.org';
         }
 
         // Role name
         $roleName = $user->roles()->first()?->name ?? 'No Role';
 
+        // ============================================================
+        // USIONYESHE PASSWORD — onyesha tu metadata
+        // ============================================================
+        $credentialInfo = [
+            'email' => $user->email,
+            'username' => $user->username,
+            'role' => $roleName,
+            'is_first_login' => $user->is_first_login,
+            'first_password_expires_at' => $user->first_password_expires_at,
+            'credentials_expires_at' => $user->credentials_expires_at,
+            'last_login_at' => $user->last_login_at,
+            'account_status' => $user->account_status,
+        ];
+
         return view('employees.credentials', [
             'employee' => $employee,
             'user' => $user,
-            'password' => $password,
             'roleName' => $roleName,
-            'message' => $credentialMessage,
+            'credentialInfo' => $credentialInfo,
+            'message' => null,
         ]);
     }public function resetPassword(Employee $employee): RedirectResponse
     {
@@ -631,22 +624,50 @@ class EmployeeController extends Controller
             return back()->with('error', 'Employee does not have a User Account.');
         }
 
-        $lastNameCapitalized = ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', $employee->last_name)));
-        $newPassword = $lastNameCapitalized . '@Sapta.org';
+        // ============================================================
+        // RANDOM PASSWORD — cryptographically secure
+        // ============================================================
+        $newPassword = \Illuminate\Support\Str::password(16);
 
         $expiryDays = (int) config('sapta.credentials_expiry_days', 7);
 
-        $user->update([
+        // ============================================================
+        // forceFill — kwa sababu fields ziko kwenye $guarded
+        // ============================================================
+        $user->forceFill([
             'password_hash' => \Hash::make($newPassword),
             'is_first_login' => true,
-            'credentials_sent_at' => now(),
+            'first_password_expires_at' => now()->addDays($expiryDays),
             'credentials_expires_at' => now()->addDays($expiryDays),
-            'credentials_channel' => 'internal_email',
-        ]);
+            'password_changed_at' => null,
+            'failed_login_attempts' => 0,
+            'locked_until' => null,
+        ])->save();
 
-        \App\Services\NotificationService::sendCredentials($user, $newPassword);
+        // ============================================================
+        // Tuma credentials kwa email — sio kwenye response
+        // ============================================================
+        try {
+            \App\Services\NotificationService::sendCredentials($user, $newPassword);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send credentials: ' . $e->getMessage());
+        }
 
-        return back()->with('success', "Password reset successfully. New password: {$newPassword}");
+        // ============================================================
+        // Audit log
+        // ============================================================
+        UserActivityLog::log(
+            action: 'password_reset',
+            module: 'employee',
+            description: 'Password reset for: ' . $employee->full_name,
+            subjectId: $employee->id,
+            subjectType: 'App\Models\Employee'
+        );
+
+        // ============================================================
+        // USIONYESHE PASSWORD KWENYE RESPONSE
+        // ============================================================
+        return back()->with('success', 'Password reset successfully. Credentials zimetumwa kwa ' . $user->email . '.');
     }
     /**
      * Unda employee_audit_logs table kama haipo
