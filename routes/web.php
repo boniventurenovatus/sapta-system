@@ -960,3 +960,100 @@ Route::get('/debug/test-check', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-check');
+Route::get('/debug/test-store-submit', function() {
+    try {
+        $data = [
+            'payment_date' => now()->format('Y-m-d'),
+            'trans_no' => 'PY' . rand(10000, 99999),
+            'batch' => '1/1',
+            'payee_name' => 'Test Payee',
+            'payee_type' => 'individual',
+            'payee_pobox' => 'P.O Box 123',
+            'payee_contact' => '0712345678',
+            'currency' => 'TZS',
+            'mode' => 'transfer',
+            'bank' => '1020',
+            'cheque_number' => '',
+            'prepared_by_id' => 1,
+            'prepared_at' => now()->format('Y-m-d'),
+            'checked_by_id' => null,
+            'checked_at' => null,
+            'authorized_by_id' => null,
+            'authorized_at' => null,
+            'received_by_name' => '',
+            'items' => [
+                [
+                    'account_invoice_no' => 'INV-001',
+                    'details' => 'Test item',
+                    'amount' => 100,
+                ],
+            ],
+            'amount' => 100,
+            'description' => '',
+            'notes' => '',
+            'action' => 'submit',
+        ];
+
+        // Validate
+        $validator = \Validator::make($data, (new \App\Http\Requests\StorePaymentVoucherRequest())->rules());
+        if ($validator->fails()) {
+            return response()->json([
+                'step' => 'validation',
+                'errors' => $validator->errors(),
+            ], 422, [], JSON_PRETTY_PRINT);
+        }
+
+        // Generate trans_no + batch
+        $svc = app(\App\Services\PaymentVoucherService::class);
+        $transNo = !empty($data['trans_no']) ? $data['trans_no'] : $svc->generateTransNo();
+        $batch = $svc->generateBatch();
+
+        // Create voucher
+        $action = $data['action'];
+        try {
+            $voucher = \App\Models\PaymentVoucher::create([
+                'voucher_number' => \App\Models\PaymentVoucher::generateVoucherNumber(),
+                'trans_no'       => $transNo,
+                'batch'          => $batch,
+                'payee_name'     => $data['payee_name'],
+                'payee_type'     => $data['payee_type'],
+                'payee_contact'  => $data['payee_contact'] ?? null,
+                'currency'       => $data['currency'],
+                'amount'         => 0,
+                'mode'           => $data['mode'] ?? null,
+                'payment_method' => $data['mode'] ?? null,
+                'payment_date'   => $data['payment_date'],
+                'created_by'     => 1,
+                'status'         => $action === 'submit' ? 'pending_approval' : 'draft',
+                'submitted_at'   => $action === 'submit' ? now() : null,
+                'payee_pobox'    => $data['payee_pobox'] ?? null,
+                'bank'           => $data['bank'] ?? null,
+                'cheque_number'  => $data['cheque_number'] ?? null,
+                'prepared_by_id' => $data['prepared_by_id'] ?? 1,
+                'prepared_at'    => $data['prepared_at'] ?? now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'voucher_id' => $voucher->id,
+                'status' => $voucher->status,
+                'message' => 'Store imefanikiwa',
+            ], 200, [], JSON_PRETTY_PRINT);
+        } catch (\Exception $e) {
+            return response()->json([
+                'step' => 'PaymentVoucher::create',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500, [], JSON_PRETTY_PRINT);
+        }
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'step' => 'general',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.test-store-submit');
