@@ -76,7 +76,7 @@
                                 <td class="py-3 px-4 font-mono text-sm text-blue-600 font-bold">{{ $voucher->voucher_number }}</td>
                                 <td class="py-3 px-4 font-semibold text-slate-900">{{ $voucher->payee_name }}</td>
                                 <td class="py-3 px-4 text-sm font-bold text-slate-900">{{ $voucher->currency }} {{ number_format($voucher->amount, 0) }}</td>
-                                <td class="py-3 px-4 text-sm text-slate-600">{{ $voucher->voucher_date ? \Carbon\Carbon::parse($voucher->voucher_date)->format('d M Y') : '-' }}</td>
+                                <td class="py-3 px-4 text-sm text-slate-600">{{ $voucher->payment_date ? \Carbon\Carbon::parse($voucher->payment_date)->format('d M Y') : '-' }}</td>
                                 <td class="py-3 px-4">
                                     @php
                                         $sc = match($voucher->status) {
