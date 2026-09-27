@@ -402,3 +402,36 @@ Route::get('/debug/controller-code', function() {
 
     return response($content, 200, ['Content-Type' => 'text/plain']);
 })->name('debug.controller-code');
+Route::get('/debug/superadmin-status', function() {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'superadmin HAIPO']);
+    }
+
+    // Jaribu passwords zote
+    $passwords = ['Sapta@2027!', 'Sapta@2026!', 'Sapta@2025!', 'Sapta@2024!', 'password', 'admin'];
+    $results = [];
+    foreach ($passwords as $pw) {
+        $results[$pw] = \Hash::check($pw, $user->password_hash);
+    }
+
+    return response()->json([
+        'user' => [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'account_status' => $user->account_status,
+            'is_first_login' => $user->is_first_login,
+            'first_password_expires_at' => $user->first_password_expires_at,
+            'failed_login_attempts' => $user->failed_login_attempts,
+            'locked_until' => $user->locked_until,
+            'password_hash_prefix' => substr($user->password_hash, 0, 30),
+        ],
+        'employee' => $user->employee ? [
+            'id' => $user->employee->id,
+            'employment_status' => $user->employee->employment_status,
+        ] : null,
+        'hash_checks' => $results,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.superadmin-status');
