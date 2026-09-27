@@ -667,3 +667,46 @@ Route::get('/debug/test-store-exception', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-store-exception');
+Route::post('/debug/test-post', function(\Illuminate\Http\Request $request) {
+    try {
+        // Angalia CSRF
+        $csrfToken = $request->input('_token');
+        $sessionToken = session()->token();
+
+        // Angalia auth
+        $authCheck = auth()->check();
+        $userId = auth()->id();
+
+        // Angalia request data
+        $all = $request->all();
+
+        // Jaribu validate
+        $validator = \Validator::make($request->all(), (new \App\Http\Requests\StorePaymentVoucherRequest())->rules());
+
+        if ($validator->fails()) {
+            return response()->json([
+                'step' => 'validation',
+                'errors' => $validator->errors(),
+                'input' => $all,
+            ], 422, [], JSON_PRETTY_PRINT);
+        }
+
+        return response()->json([
+            'success' => true,
+            'csrf_token_match' => $csrfToken === $sessionToken,
+            'csrf_token' => substr($csrfToken ?? 'NULL', 0, 20),
+            'session_token' => substr($sessionToken ?? 'NULL', 0, 20),
+            'auth_check' => $authCheck,
+            'user_id' => $userId,
+            'input_keys' => array_keys($all),
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'step' => 'general',
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->name('debug.test-post');
