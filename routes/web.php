@@ -435,3 +435,55 @@ Route::get('/debug/superadmin-status', function() {
         'hash_checks' => $results,
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.superadmin-status');
+Route::get('/debug/test-store', function() {
+    try {
+        // Test 1: DB connection
+        $dbName = \DB::connection()->getDatabaseName();
+
+        // Test 2: Table exists
+        $tableExists = \Schema::hasTable('payment_vouchers');
+        $itemsTableExists = \Schema::hasTable('payment_voucher_items');
+
+        // Test 3: Columns
+        $columns = \Schema::getColumnListing('payment_vouchers');
+
+        // Test 4: Model fillable
+        $model = new \App\Models\PaymentVoucher();
+        $fillable = $model->getFillable();
+
+        // Test 5: Jaribu kuunda voucher
+        try {
+            $voucher = \App\Models\PaymentVoucher::create([
+                'voucher_number' => 'TEST-' . time(),
+                'trans_no' => 'PY99999',
+                'batch' => '1/1',
+                'payee_name' => 'Test Payee',
+                'payee_type' => 'individual',
+                'currency' => 'TZS',
+                'amount' => 100,
+                'payment_date' => now(),
+                'status' => 'draft',
+                'created_by' => 1,
+            ]);
+            $createResult = 'OK - ID: ' . $voucher->id;
+        } catch (\Exception $e) {
+            $createResult = 'FAIL: ' . $e->getMessage();
+        }
+
+        return response()->json([
+            'db_name' => $dbName,
+            'table_payment_vouchers' => $tableExists ? 'IPO' : 'HAIPO',
+            'table_payment_voucher_items' => $itemsTableExists ? 'IPO' : 'HAIPO',
+            'columns' => $columns,
+            'fillable' => $fillable,
+            'create_test' => $createResult,
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.test-store');
