@@ -208,12 +208,12 @@
                 <tr class="border-b border-slate-200">
                     <td class="py-1 px-2 border-r border-slate-200">
                         <span class="font-bold text-xs">Prepared By:</span>
-                        <select name="prepared_by_id" class="w-full px-1 py-0.5 border-0 text-sm bg-transparent outline-none mt-0.5">
-                            <option value="">— Select —</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('prepared_by_id', $paymentVoucher->prepared_by_id ?? auth()->id()) == $user->id ? 'selected' : '' }}>{{ $user->username }}</option>
-                            @endforeach
-                        </select>
+                        <x-custom-dropdown
+                            name="prepared_by_id"
+                            :selected="old('prepared_by_id', $paymentVoucher->prepared_by_id ?? auth()->id())"
+                            :options="$users->map(fn($u) => ['value' => $u->id, 'label' => $u->username])->toArray()"
+                            placeholder="— Select —"
+                        />
                     </td>
                     <td class="py-1 px-2 border-r border-slate-200 text-center">
                         <div style="height:30px;"></div>
@@ -226,12 +226,12 @@
                 <tr class="border-b border-slate-200">
                     <td class="py-1 px-2 border-r border-slate-200">
                         <span class="font-bold text-xs">Checked By:</span>
-                        <select name="checked_by_id" class="w-full px-1 py-0.5 border-0 text-sm bg-transparent outline-none mt-0.5">
-                            <option value="">— Select —</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('checked_by_id', $paymentVoucher->checked_by_id ?? '') == $user->id ? 'selected' : '' }}>{{ $user->username }}</option>
-                            @endforeach
-                        </select>
+                        <x-custom-dropdown
+                            name="checked_by_id"
+                            :selected="old('checked_by_id', $paymentVoucher->checked_by_id ?? '')"
+                            :options="$users->map(fn($u) => ['value' => $u->id, 'label' => $u->username])->toArray()"
+                            placeholder="— Select —"
+                        />
                     </td>
                     <td class="py-1 px-2 border-r border-slate-200 text-center">
                         <div style="height:30px;"></div>
@@ -244,12 +244,12 @@
                 <tr>
                     <td class="py-1 px-2 border-r border-slate-200">
                         <span class="font-bold text-xs">Authorized By:</span>
-                        <select name="authorized_by_id" class="w-full px-1 py-0.5 border-0 text-sm bg-transparent outline-none mt-0.5">
-                            <option value="">— Select —</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('authorized_by_id', $paymentVoucher->authorized_by_id ?? '') == $user->id ? 'selected' : '' }}>{{ $user->username }}</option>
-                            @endforeach
-                        </select>
+                        <x-custom-dropdown
+                            name="authorized_by_id"
+                            :selected="old('authorized_by_id', $paymentVoucher->authorized_by_id ?? '')"
+                            :options="$users->map(fn($u) => ['value' => $u->id, 'label' => $u->username])->toArray()"
+                            placeholder="— Select —"
+                        />
                     </td>
                     <td class="py-1 px-2 border-r border-slate-200 text-center">
                         <div style="height:30px;"></div>
