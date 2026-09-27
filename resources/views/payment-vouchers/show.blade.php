@@ -34,7 +34,7 @@
         @endif
 
         {{-- AUTHORIZE (checked) --}}
-        @if($voucher->status === 'checked')
+        @if($voucher->status === 'checked' || $voucher->status === 'authorized')
             <form action="{{ route('payment-vouchers.authorize', $voucher->id) }}" method="POST" style="display:inline;">
                 @csrf
                 <button type="submit" style="padding:10px 20px; background:#059669; color:white; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer;">Authorize</button>
@@ -42,7 +42,7 @@
         @endif
 
         {{-- APPROVE + RETURN (pending_approval) --}}
-        @if($voucher->status === 'pending_approval')
+        @if($voucher->status === 'pending_approval' || $voucher->status === 'authorized')
             <form action="{{ route('payment-vouchers.approve', $voucher->id) }}" method="POST" style="display:inline;" onsubmit="SAPTA.confirm(this, {action: 'approve', item: 'Voucher {{ $voucher->voucher_number }}'})">
                 @csrf
                 <button type="submit" style="padding:10px 20px; background:#059669; color:white; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer;">Approve</button>
