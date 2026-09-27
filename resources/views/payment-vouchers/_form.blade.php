@@ -4,7 +4,7 @@
 
 
 
-<div class="bg-white border-2 border-slate-800 p-8 text-sm">
+<div class="bg-white border-2 border-slate-800 p-8 text-sm payment-voucher-form">
 
     {{-- HEADER --}}
     <div class="text-center border-b-2 border-slate-800 pb-4 mb-4">
