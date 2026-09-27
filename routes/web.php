@@ -874,3 +874,51 @@ Route::get('/debug/test-methods', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.test-methods');
+Route::get('/debug/test-check', function() {
+    try {
+        $voucher = \App\Models\PaymentVoucher::find(1);
+
+        // Test check()
+        try {
+            $controller = app(\App\Http\Controllers\PaymentVoucherController::class);
+            $request = \Illuminate\Http\Request::create('/payment-vouchers/1/check', 'POST');
+            $request->setUserResolver(function() { return auth()->user() ?? \App\Models\User::find(1); });
+
+            $result = $controller->check($request, $voucher);
+            $checkResult = 'OK';
+        } catch (\Exception $e) {
+            $checkResult = 'FAIL: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+        }
+
+        // Test downloadPdf()
+        try {
+            $controller = app(\App\Http\Controllers\PaymentVoucherController::class);
+            $result = $controller->downloadPdf($voucher);
+            $pdfResult = 'OK';
+        } catch (\Exception $e) {
+            $pdfResult = 'FAIL: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+        }
+
+        // Test print()
+        try {
+            $controller = app(\App\Http\Controllers\PaymentVoucherController::class);
+            $result = $controller->print($voucher);
+            $printResult = 'OK';
+        } catch (\Exception $e) {
+            $printResult = 'FAIL: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+        }
+
+        return response()->json([
+            'check' => $checkResult,
+            'downloadPdf' => $pdfResult,
+            'print' => $printResult,
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.test-check');
