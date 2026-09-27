@@ -803,3 +803,74 @@ Route::middleware(['auth'])->group(function () {
     Route::get('payment-vouchers/{payment_voucher}/pdf', [\App\Http\Controllers\PaymentVoucherController::class, 'downloadPdf'])
         ->name('payment-vouchers.pdf');
 });
+Route::get('/debug/test-methods', function() {
+    $results = [];
+
+    $voucher = \App\Models\PaymentVoucher::find(1);
+    if (!$voucher) {
+        return response()->json(['error' => 'Voucher 1 haipo']);
+    }
+
+    // Test check()
+    try {
+        $controller = app(\App\Http\Controllers\PaymentVoucherController::class);
+        $reflection = new \ReflectionMethod($controller, 'check');
+        $results['check'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['check'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test downloadPdf()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'downloadPdf');
+        $results['downloadPdf'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['downloadPdf'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test print()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'print');
+        $results['print'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['print'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test authorizeVoucher()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'authorizeVoucher');
+        $results['authorizeVoucher'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['authorizeVoucher'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test approve()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'approve');
+        $results['approve'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['approve'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test returnVoucher()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'returnVoucher');
+        $results['returnVoucher'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['returnVoucher'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test markPaid()
+    try {
+        $reflection = new \ReflectionMethod($controller, 'markPaid');
+        $results['markPaid'] = 'METHOD INAFANYA KAZI';
+    } catch (\Exception $e) {
+        $results['markPaid'] = 'FAIL: ' . $e->getMessage();
+    }
+
+    // Test view za print
+    $results['view_print'] = view()->exists('payment-vouchers.print') ? 'IPO' : 'HAIPO';
+    $results['view_pdf_single'] = view()->exists('payment-vouchers.pdf.single') ? 'IPO' : 'HAIPO';
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.test-methods');
