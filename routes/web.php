@@ -749,3 +749,13 @@ Route::get('/debug/test-show', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-show');
+// ============================================================
+// PAYMENT VOUCHER — PRINT & PDF
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('payment-vouchers/{payment_voucher}/print', [\App\Http\Controllers\PaymentVoucherController::class, 'print'])
+        ->name('payment-vouchers.print');
+
+    Route::get('payment-vouchers/{payment_voucher}/pdf', [\App\Http\Controllers\PaymentVoucherController::class, 'pdf'])
+        ->name('payment-vouchers.pdf');
+});
