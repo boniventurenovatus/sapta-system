@@ -11,7 +11,7 @@
                 <div class="company-addr">Kihonda-Kilimanjaro</div>
             </td>
             <td class="header-center">
-                @include('payment-vouchers._logo')
+                @include('payment-vouchers._logo', ['useBase64' => $useBase64 ?? false])
             </td>
             <td class="header-right">
                 <div class="field-row"><span class="lbl">Date:</span> <span class="val">{{ $voucher->payment_date ? \Carbon\Carbon::parse($voucher->payment_date)->format('d/m/Y') : '' }}</span></div>

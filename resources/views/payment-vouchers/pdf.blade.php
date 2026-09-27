@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <title>Payment Voucher - {{ $paymentVoucher->voucher_number ?? 'N/A' }}</title>
     <style>
+        /* CSS ya _voucher — inline kwa DomPDF */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
-            color: #000;
-            padding: 15px;
-        }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #000; padding: 15px; }
         .voucher-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
         .voucher-title {
             text-align: center;
@@ -70,9 +66,10 @@
         .received-table { margin-top: 10px; border: 1px solid #000; }
         .received-table td { border: 1px solid #999; padding: 8px; font-size: 10px; }
         .received-label { font-weight: bold; width: 30%; }
+        .logo { max-height: 80px; width: auto; }
     </style>
 </head>
 <body>
-    @include('payment-vouchers._voucher', ['voucher' => $paymentVoucher])
+    @include('payment-vouchers._voucher', ['voucher' => $paymentVoucher, 'useBase64' => true])
 </body>
 </html>
