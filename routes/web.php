@@ -759,3 +759,47 @@ Route::middleware(['auth'])->group(function () {
     Route::get('payment-vouchers/{payment_voucher}/pdf', [\App\Http\Controllers\PaymentVoucherController::class, 'pdf'])
         ->name('payment-vouchers.pdf');
 });
+// ============================================================
+// PAYMENT VOUCHER — WORKFLOW ACTIONS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::post('payment-vouchers/{payment_voucher}/check', [\App\Http\Controllers\PaymentVoucherController::class, 'check'])
+        ->name('payment-vouchers.check');
+
+    Route::post('payment-vouchers/{payment_voucher}/authorize', [\App\Http\Controllers\PaymentVoucherController::class, 'authorize'])
+        ->name('payment-vouchers.authorize');
+
+    Route::post('payment-vouchers/{payment_voucher}/approve', [\App\Http\Controllers\PaymentVoucherController::class, 'approve'])
+        ->name('payment-vouchers.approve');
+
+    Route::post('payment-vouchers/{payment_voucher}/return', [\App\Http\Controllers\PaymentVoucherController::class, 'returnVoucher'])
+        ->name('payment-vouchers.return');
+
+    Route::post('payment-vouchers/{payment_voucher}/paid', [\App\Http\Controllers\PaymentVoucherController::class, 'markAsPaid'])
+        ->name('payment-vouchers.paid');
+});
+// ============================================================
+// PAYMENT VOUCHER — WORKFLOW ACTIONS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::post('payment-vouchers/{payment_voucher}/check', [\App\Http\Controllers\PaymentVoucherController::class, 'check'])
+        ->name('payment-vouchers.check');
+
+    Route::post('payment-vouchers/{payment_voucher}/authorize', [\App\Http\Controllers\PaymentVoucherController::class, 'authorizeVoucher'])
+        ->name('payment-vouchers.authorize');
+
+    Route::post('payment-vouchers/{payment_voucher}/approve', [\App\Http\Controllers\PaymentVoucherController::class, 'approve'])
+        ->name('payment-vouchers.approve');
+
+    Route::post('payment-vouchers/{payment_voucher}/return', [\App\Http\Controllers\PaymentVoucherController::class, 'returnVoucher'])
+        ->name('payment-vouchers.return');
+
+    Route::post('payment-vouchers/{payment_voucher}/paid', [\App\Http\Controllers\PaymentVoucherController::class, 'markPaid'])
+        ->name('payment-vouchers.paid');
+
+    Route::get('payment-vouchers/{payment_voucher}/print', [\App\Http\Controllers\PaymentVoucherController::class, 'print'])
+        ->name('payment-vouchers.print');
+
+    Route::get('payment-vouchers/{payment_voucher}/pdf', [\App\Http\Controllers\PaymentVoucherController::class, 'downloadPdf'])
+        ->name('payment-vouchers.pdf');
+});
