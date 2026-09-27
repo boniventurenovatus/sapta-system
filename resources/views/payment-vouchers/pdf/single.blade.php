@@ -60,7 +60,7 @@
                 </tr>
                 <tr>
                     <td class="label">Voucher Date:</td>
-                    <td>{{ $paymentVoucher->voucher_date->format('F d, Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($paymentVoucher->payment_date)->format('F d, Y') }}</td>
                     <td class="label">Currency:</td>
                     <td>{{ $paymentVoucher->currency }}</td>
                 </tr>

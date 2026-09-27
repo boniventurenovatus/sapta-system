@@ -56,7 +56,7 @@
                     <tr>
                         <td><code>{{ $v->voucher_number ?? $v->id }}</code></td>
                         <td><strong>{{ $v->payee_name ?? '—' }}</strong></td>
-                        <td>{{ isset($v->voucher_date) ? \Carbon\Carbon::parse($v->voucher_date)->format('M d, Y') : '—' }}</td>
+                        <td>{{ isset($v->payment_date) ? \Carbon\Carbon::parse($v->payment_date)->format('M d, Y') : '—' }}</td>
                         <td><strong>{{ number_format($v->amount ?? 0, 0) }} {{ $v->currency ?? 'TZS' }}</strong></td>
                         <td><span class="rp-badge rp-badge-{{ $v->status ?? 'pending' }}">{{ ucfirst($v->status ?? 'pending') }}</span></td>
                     </tr>
