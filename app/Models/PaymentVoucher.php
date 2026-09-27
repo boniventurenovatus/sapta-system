@@ -155,4 +155,45 @@ class PaymentVoucher extends Model
     public function authorizedBy()
     {
         return $this->belongsTo(User::class, 'authorized_by_id');
-    }}
+    }
+
+    /**
+     * Organization relationship.
+     */
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
+
+    /**
+     * Department relationship.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    /**
+     * Department (alias).
+     */
+    public function departmentModel()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    /**
+     * Approved By user.
+     */
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Project relationship.
+     */
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'project_id');
+    }
+}
