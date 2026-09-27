@@ -23,46 +23,62 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('{{ $id }}');
-    if (!ctx) return;
+(function() {
+    function initChart() {
+        const canvas = document.getElementById('{{ $id }}');
+        if (!canvas) return;
 
-    new Chart(ctx, {
-        type: '{{ $type }}',
-        data: {
-            labels: {!! json_encode($labels) !!},
-            datasets: {!! json_encode($datasets) !!}
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: {{ count($datasets) > 1 ? 'true' : 'false' }},
-                    position: 'bottom',
-                    labels: { font: { size: 11, weight: '600' }, padding: 15, usePointStyle: true }
-                },
-                tooltip: {
-                    backgroundColor: '#0f172a',
-                    padding: 12,
-                    cornerRadius: 8,
-                    titleFont: { size: 12, weight: '700' },
-                    bodyFont: { size: 11 }
-                }
+        // ============================================================
+        // HAKIKISHA CHART YA AWALI IMEHARIBIWA
+        // ============================================================
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        new Chart(canvas, {
+            type: '{{ $type }}',
+            data: {
+                labels: {!! json_encode($labels) !!},
+                datasets: {!! json_encode($datasets) !!}
             },
-            scales: '{{ $type }}' === 'pie' || '{{ $type }}' === 'doughnut' ? {} : {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9' },
-                    ticks: { font: { size: 10, weight: '600' }, color: '#64748b' }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: {{ count($datasets) > 1 ? 'true' : 'false' }},
+                        position: 'bottom',
+                        labels: { font: { size: 11, weight: '600' }, padding: 15, usePointStyle: true }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 12, weight: '700' },
+                        bodyFont: { size: 11 }
+                    }
                 },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10, weight: '600' }, color: '#64748b' }
+                scales: '{{ $type }}' === 'pie' || '{{ $type }}' === 'doughnut' ? {} : {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9' },
+                        ticks: { font: { size: 10, weight: '600' }, color: '#64748b' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10, weight: '600' }, color: '#64748b' }
+                    }
                 }
             }
-        }
-    });
-});
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChart);
+    } else {
+        initChart();
+    }
+})();
 </script>
 @endpush
