@@ -710,3 +710,42 @@ Route::post('/debug/test-post', function(\Illuminate\Http\Request $request) {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->name('debug.test-post');
+Route::get('/debug/test-show', function() {
+    try {
+        $voucher = \App\Models\PaymentVoucher::with([
+            'items',
+            'creator',
+            'approver',
+            'preparedBy',
+            'checkedBy',
+            'authorizedBy',
+        ])->find(1);
+
+        if (!$voucher) {
+            return response()->json(['error' => 'Voucher 1 haipo']);
+        }
+
+        // Jaribu ku-render view
+        try {
+            $html = view('payment-vouchers.show', ['voucher' => $voucher])->render();
+            $viewResult = 'OK - Length: ' . strlen($html);
+        } catch (\Exception $e) {
+            $viewResult = 'FAIL: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+        }
+
+        return response()->json([
+            'success' => true,
+            'voucher' => $voucher->toArray(),
+            'view_render' => $viewResult,
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.test-show');
