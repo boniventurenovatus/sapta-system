@@ -1,0 +1,319 @@
+/* ============================================================
+   SAPTA SYSTEM — RESPONSIVE CSS
+   Inafanya mfumo kuwa responsive kwenye simu, tablet, desktop
+   ============================================================ */
+
+/* ============================================================
+   BASE — DESKTOP (default)
+   ============================================================ */
+
+/* Sidebar */
+.sapta-sidebar {
+    width: 260px;
+    transition: all 0.3s ease;
+}
+
+.sapta-main-area {
+    margin-left: 260px;
+    transition: all 0.3s ease;
+}
+
+/* ============================================================
+   TABLET — max-width: 1024px
+   ============================================================ */
+@media (max-width: 1024px) {
+    .sapta-sidebar {
+        width: 220px;
+    }
+
+    .sapta-main-area {
+        margin-left: 220px;
+    }
+
+    /* Grid — 2 columns */
+    .stats-grid,
+    .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Cards */
+    .card,
+    .tb-card {
+        padding: 16px !important;
+    }
+}
+
+/* ============================================================
+   MOBILE — max-width: 768px
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* ========== SIDEBAR ========== */
+    .sapta-sidebar {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0;
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 1000 !important;
+        transition: left 0.3s ease !important;
+        overflow-y: auto !important;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .sapta-sidebar.mobile-open {
+        left: 0 !important;
+    }
+
+    .sapta-main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Mobile overlay */
+    .sapta-mobile-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .sapta-mobile-overlay.show {
+        display: block;
+    }
+
+    /* ========== TOPBAR ========== */
+    .tb-topbar,
+    .topbar {
+        padding: 12px 16px !important;
+    }
+
+    .tb-search {
+        display: none !important;
+    }
+
+    .tb-page-title {
+        font-size: 18px !important;
+    }
+
+    .tb-page-subtitle {
+        font-size: 13px !important;
+    }
+
+    /* ========== GRID ========== */
+    .stats-grid,
+    .grid,
+    .cards-grid,
+    .row,
+    [class*="grid-cols"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* ========== CARD ========== */
+    .card,
+    .tb-card,
+    .stat-card,
+    .kpi-card {
+        padding: 14px !important;
+        border-radius: 12px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .card-title,
+    .stat-label {
+        font-size: 12px !important;
+    }
+
+    .card-value,
+    .stat-value {
+        font-size: 20px !important;
+    }
+
+    /* ========== TABLE ========== */
+    .table-responsive,
+    .tb-table-wrap,
+    table {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    table th,
+    table td {
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+    }
+
+    /* ========== FORM ========== */
+    .form-group,
+    .form-row,
+    .form-field {
+        margin-bottom: 16px !important;
+    }
+
+    .form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Zuia zoom kwenye iOS */
+        padding: 12px 14px !important;
+        width: 100% !important;
+    }
+
+    /* ========== BUTTON ========== */
+    .btn,
+    button[type="submit"],
+    .cp-btn {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .btn-group,
+    .actions,
+    .cp-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    /* ========== HEADER ========== */
+    .page-header,
+    .tb-page-header {
+        padding: 16px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .page-header h1,
+    .tb-page-title {
+        font-size: 20px !important;
+    }
+
+    /* ========== MODAL ========== */
+    .modal,
+    .modal-dialog {
+        width: 95% !important;
+        margin: 10px auto !important;
+    }
+
+    .modal-body {
+        padding: 16px !important;
+    }
+
+    /* ========== DROPDOWN ========== */
+    .tb-dropdown,
+    .dropdown-menu {
+        position: fixed !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+    }
+
+    /* ========== PROFILE ========== */
+    .profile-header {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    .profile-avatar {
+        margin: 0 auto 16px !important;
+    }
+
+    /* ========== CHANGE PASSWORD ========== */
+    .cp-container {
+        padding: 0 12px !important;
+    }
+
+    .cp-header {
+        padding: 20px !important;
+    }
+
+    .cp-header h1 {
+        font-size: 20px !important;
+    }
+
+    .cp-body {
+        padding: 20px !important;
+    }
+
+    /* ========== TYPOGRAPHY ========== */
+    h1 { font-size: 22px !important; }
+    h2 { font-size: 20px !important; }
+    h3 { font-size: 18px !important; }
+    h4 { font-size: 16px !important; }
+    p  { font-size: 14px !important; }
+
+    /* ========== SPACING ========== */
+    .container,
+    .content,
+    .main-content {
+        padding: 12px !important;
+    }
+
+    /* ========== CHARTS ========== */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* ============================================================
+   SMALL MOBILE — max-width: 480px
+   ============================================================ */
+@media (max-width: 480px) {
+    .sapta-sidebar {
+        width: 260px !important;
+    }
+
+    .tb-page-title {
+        font-size: 16px !important;
+    }
+
+    .card-value,
+    .stat-value {
+        font-size: 18px !important;
+    }
+
+    .btn,
+    button {
+        font-size: 14px !important;
+        padding: 12px 16px !important;
+    }
+
+    h1 { font-size: 20px !important; }
+    h2 { font-size: 18px !important; }
+    h3 { font-size: 16px !important; }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+    .sapta-sidebar,
+    .tb-topbar,
+    .sapta-sidebar-toggle,
+    .btn,
+    button,
+    .no-print,
+    nav,
+    header {
+        display: none !important;
+    }
+
+    .sapta-main-area {
+        margin-left: 0 !important;
+    }
+}
