@@ -520,6 +520,44 @@ Route::get('/debug/run-migrations', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.run-migrations');
+
+Route::get('/debug/fix-status-constraint', function() {
+    try {
+        $driver = \DB::connection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            \DB::statement("ALTER TABLE payment_vouchers DROP CONSTRAINT IF EXISTS payment_vouchers_status_check");
+            \DB::statement("ALTER TABLE payment_vouchers ADD CONSTRAINT payment_vouchers_status_check CHECK (status IN ('draft', 'pending_approval', 'checked', 'authorized', 'approved', 'returned', 'paid', 'cancelled', 'completed'))");
+
+            $constraints = \DB::select("
+                SELECT conname, pg_get_constraintdef(oid) as definition
+                FROM pg_constraint
+                WHERE conrelid = 'payment_vouchers'::regclass
+                AND contype = 'c'
+            ");
+
+            return response()->json([
+                'success' => true,
+                'driver' => $driver,
+                'message' => 'Check constraint imerekebishwa',
+                'constraints' => $constraints,
+            ], 200, [], JSON_PRETTY_PRINT);
+        } else {
+            return response()->json([
+                'success' => true,
+                'driver' => $driver,
+                'message' => 'MySQL — hakuna check constraint',
+            ]);
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.fix-status-constraint');
 Route::get('/debug/test-store-exception', function() {
     try {
         // Simulate form data
