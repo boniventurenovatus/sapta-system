@@ -7,6 +7,21 @@
 
     <x-page-header title="New Payment Voucher" subtitle="Create a new payment voucher" icon="fa-plus-circle" gradient="blue" />
 
+    {{-- ERROR BLOCK --}}
+    @if($errors->any())
+        <div class="bg-red-50 border-2 border-red-500 text-red-700 p-4 rounded-xl mb-4 mt-4">
+            <div class="font-bold mb-2 flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                Kuna makosa {{ $errors->count() }}:
+            </div>
+            <ul class="list-disc list-inside text-sm space-y-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Error block moved to _form.blade.php --}}
 
     {{-- FORM 1: Save as Draft --}}

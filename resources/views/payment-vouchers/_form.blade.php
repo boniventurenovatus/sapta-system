@@ -4,6 +4,21 @@
 
 
 
+{{-- ERROR BLOCK --}}
+@if($errors->any())
+    <div class="bg-red-50 border-2 border-red-500 text-red-700 p-4 rounded-xl mb-4">
+        <div class="font-bold mb-2 flex items-center gap-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Kuna makosa {{ $errors->count() }}:
+        </div>
+        <ul class="list-disc list-inside text-sm space-y-1">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="bg-white border-2 border-slate-800 p-8 text-sm payment-voucher-form">
 
     {{-- HEADER --}}
