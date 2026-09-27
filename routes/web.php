@@ -487,3 +487,36 @@ Route::get('/debug/test-store', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-store');
+Route::get('/debug/run-migrations', function() {
+    try {
+        // Endesha migrations
+        \Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = \Artisan::output();
+
+        // Angalia columns baada ya migration
+        $columns = \Schema::getColumnListing('payment_vouchers');
+
+        return response()->json([
+            'success' => true,
+            'migrate_output' => $migrateOutput,
+            'columns_after' => $columns,
+            'has_trans_no' => in_array('trans_no', $columns),
+            'has_batch' => in_array('batch', $columns),
+            'has_payee_pobox' => in_array('payee_pobox', $columns),
+            'has_payee_contact' => in_array('payee_contact', $columns),
+            'has_bank' => in_array('bank', $columns),
+            'has_cheque_number' => in_array('cheque_number', $columns),
+            'has_mode' => in_array('mode', $columns),
+            'has_prepared_by_id' => in_array('prepared_by_id', $columns),
+            'has_checked_by_id' => in_array('checked_by_id', $columns),
+            'has_authorized_by_id' => in_array('authorized_by_id', $columns),
+        ], 200, [], JSON_PRETTY_PRINT);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.run-migrations');
