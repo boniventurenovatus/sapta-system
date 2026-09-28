@@ -1205,3 +1205,42 @@ Route::get('/debug/deep-check', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.deep-check');
+Route::get('/debug/test-recruitment', function() {
+    try {
+        $controller = app(\App\Http\Controllers\RecruitmentController::class);
+        $reflection = new \ReflectionMethod($controller, 'index');
+        $params = $reflection->getParameters();
+
+        $result = [
+            'method_exists' => true,
+            'parameters' => [],
+        ];
+
+        foreach ($params as $param) {
+            $result['parameters'][] = [
+                'name' => $param->getName(),
+                'type' => $param->getType() ? $param->getType()->getName() : 'none',
+                'optional' => $param->isOptional(),
+            ];
+        }
+
+        // Jaribu ku-render view
+        try {
+            $html = view('recruitment.index')->render();
+            $result['view_render'] = 'OK - Length: ' . strlen($html);
+        } catch (\Exception $e) {
+            $result['view_render'] = 'FAIL: ' . $e->getMessage();
+            $result['view_file'] = $e->getFile();
+            $result['view_line'] = $e->getLine();
+        }
+
+        return response()->json($result, 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.test-recruitment');
