@@ -834,7 +834,7 @@ Route::middleware(['auth'])->group(function () {
 // NOTIFICATIONS — ACTIONS
 // ============================================================
 Route::middleware(['auth'])->group(function () {
-    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
         ->name('notifications.mark-all-read');
 
     Route::post('/notifications/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])
@@ -974,7 +974,7 @@ Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function
 // NOTIFICATIONS — ACTIONS
 // ============================================================
 Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
-    Route::post('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('mark-all-read');
+    Route::post('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
     Route::post('/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
     Route::delete('/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
@@ -995,4 +995,45 @@ Route::middleware(['auth'])->prefix('communication')->name('communication.')->gr
     Route::get('/inbox', [\App\Http\Controllers\CommunicationController::class, 'inbox'])->name('inbox');
     Route::get('/sent', [\App\Http\Controllers\CommunicationController::class, 'sent'])->name('sent');
     Route::get('/compose', [\App\Http\Controllers\CommunicationController::class, 'compose'])->name('compose');
+});
+// ============================================================
+// COMMUNICATION — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('communication')->name('communication.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CommunicationController::class, 'index'])->name('index');
+    Route::get('/inbox', [\App\Http\Controllers\CommunicationController::class, 'inbox'])->name('inbox');
+    Route::get('/sent', [\App\Http\Controllers\CommunicationController::class, 'sent'])->name('sent');
+    Route::get('/drafts', [\App\Http\Controllers\CommunicationController::class, 'drafts'])->name('drafts');
+    Route::get('/conversations', [\App\Http\Controllers\CommunicationController::class, 'conversations'])->name('conversations');
+
+    Route::get('/message/create', [\App\Http\Controllers\CommunicationController::class, 'createMessage'])->name('message-create');
+    Route::post('/message', [\App\Http\Controllers\CommunicationController::class, 'storeMessage'])->name('message-store');
+    Route::get('/message/{message}', [\App\Http\Controllers\CommunicationController::class, 'showMessage'])->name('message-show');
+    Route::post('/message/{message}/unread', [\App\Http\Controllers\CommunicationController::class, 'markUnread'])->name('message-unread');
+    Route::delete('/message/{message}', [\App\Http\Controllers\CommunicationController::class, 'destroyMessage'])->name('message-destroy');
+});
+
+// ============================================================
+// REPORTS — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+    Route::get('/employees', [\App\Http\Controllers\ReportController::class, 'employees'])->name('employees');
+    Route::get('/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('attendance');
+    Route::get('/projects', [\App\Http\Controllers\ReportController::class, 'projects'])->name('projects');
+    Route::get('/tasks', [\App\Http\Controllers\ReportController::class, 'tasks'])->name('tasks');
+    Route::get('/leaves', [\App\Http\Controllers\ReportController::class, 'leaves'])->name('leaves');
+    Route::get('/recruitment', [\App\Http\Controllers\ReportController::class, 'recruitment'])->name('recruitment');
+    Route::get('/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('trainings');
+    Route::get('/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])->name('budgets');
+});
+
+// ============================================================
+// NOTIFICATIONS — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+    Route::post('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    Route::post('/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
+    Route::delete('/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
