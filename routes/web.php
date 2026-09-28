@@ -607,3 +607,104 @@ Route::get('/debug/check-pages', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.check-pages');
+Route::get('/debug/check-pages-v2', function() {
+    $pages = [
+        'employees' => ['EmployeeController', 'index'],
+        'departments' => ['DepartmentController', 'index'],
+        'positions' => ['PositionController', 'index'],
+        'organizations' => ['OrganizationController', 'index'],
+        'attendances' => ['AttendanceController', 'index'],
+        'leave-requests' => ['LeaveRequestController', 'index'],
+        'trainings' => ['TrainingController', 'index'],
+        'recruitment' => ['RecruitmentController', 'index'],
+        'budgets' => ['BudgetController', 'index'],
+        'receipts' => ['ReceiptController', 'index'],
+        'payment-vouchers' => ['PaymentVoucherController', 'index'],
+        'payroll' => ['PayrollController', 'index'],
+        'projects' => ['ProjectController', 'index'],
+        'tasks' => ['TaskController', 'index'],
+        'users' => ['UserController', 'index'],
+        'roles' => ['RoleController', 'index'],
+        'permissions' => ['PermissionController', 'index'],
+        'reports' => ['ReportController', 'index'],
+        'settings' => ['SettingController', 'index'],
+        'activity-logs' => ['ActivityLogController', 'index'],
+        'audit-logs' => ['AuditLogController', 'index'],
+        'notifications' => ['NotificationController', 'index'],
+    ];
+
+    $results = [];
+
+    foreach ($pages as $route => $config) {
+        $controllerName = $config[0];
+        $method = $config[1];
+
+        // 1. Angalia kama controller ipo
+        $controllerClass = "App\\Http\\Controllers\\" . $controllerName;
+        if (!class_exists($controllerClass)) {
+            $results[$route] = [
+                'status' => 'FAIL',
+                'error' => "Controller $controllerName haipo",
+            ];
+            continue;
+        }
+
+        // 2. Angalia kama method ipo
+        try {
+            $controller = app($controllerClass);
+        } catch (\Exception $e) {
+            $results[$route] = [
+                'status' => 'FAIL',
+                'error' => "Controller $controllerName ina kosa: " . $e->getMessage(),
+            ];
+            continue;
+        }
+
+        if (!method_exists($controller, $method)) {
+            $results[$route] = [
+                'status' => 'FAIL',
+                'error' => "Method $method haipo kwenye $controllerName",
+            ];
+            continue;
+        }
+
+        // 3. Jaribu ku-render
+        try {
+            $reflection = new \ReflectionMethod($controller, $method);
+            $params = $reflection->getParameters();
+
+            if (count($params) > 0) {
+                $results[$route] = [
+                    'status' => 'SKIP',
+                    'message' => 'Inahitaji parameters',
+                ];
+                continue;
+            }
+
+            $response = $controller->$method();
+
+            if (is_object($response) && method_exists($response, 'render')) {
+                $html = $response->render();
+                $results[$route] = [
+                    'status' => 'OK',
+                    'length' => strlen($html),
+                ];
+            } else {
+                $results[$route] = [
+                    'status' => 'OK',
+                    'type' => gettype($response),
+                ];
+            }
+
+        } catch (\Exception $e) {
+            $results[$route] = [
+                'status' => 'FAIL',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ];
+        }
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.check-pages-v2');
