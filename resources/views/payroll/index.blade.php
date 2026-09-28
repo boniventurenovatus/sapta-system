@@ -44,7 +44,7 @@
             <a href="{{ route('payroll.salaries') }}" class="py-btn py-btn-secondary">
                 <i class="fas fa-money-bill"></i> Salary Structure
             </a>
-            <button type="button" class="py-btn py-btn-primary" onclick="document.getElementById('generateForm').style.display='block'">
+            <button type="button" class="py-btn py-btn-primary" onclick="toggleGenerateForm()">
                 <i class="fas fa-cogs"></i> Generate Payroll
             </button>
         </div>
@@ -174,7 +174,7 @@
                 </div>
                 <h3 style="font-size:1.1rem; color:#1e293b; margin:0 0 0.5rem;">No payslips yet</h3>
                 <p style="color:#64748b; margin:0 0 1.25rem;">Generate payroll to create payslips.</p>
-                <button type="button" class="py-btn py-btn-primary" onclick="document.getElementById('generateForm').style.display='block'">
+                <button type="button" class="py-btn py-btn-primary" onclick="toggleGenerateForm()">
                     <i class="fas fa-cogs"></i> Generate Payroll
                 </button>
             </div>
