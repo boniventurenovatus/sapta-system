@@ -138,7 +138,7 @@
                         <div class="flex-1">
                             <div class="text-sm text-slate-700">{{ $log->description ?? $log->action }}</div>
                         </div>
-                        <div class="text-xs text-slate-400">{{ $log->created_at->diffForHumans() }}</div>
+                        <div class="text-xs text-slate-400">{{ $log->created_at ? \Carbon\Carbon::parse($log->created_at)->diffForHumans() : "-" }}</div>
                     </div>
                 @endforeach
             </div>
