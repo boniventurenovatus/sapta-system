@@ -1055,3 +1055,61 @@ Route::get('/debug/list-routes', function() {
 
     return response()->json($result, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.list-routes');
+// ============================================================
+// RECRUITMENT
+// ============================================================
+Route::middleware(['auth'])->prefix('recruitment')->name('recruitment.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\RecruitmentController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\RecruitmentController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\RecruitmentController::class, 'store'])->name('store');
+    Route::get('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'show'])->name('show');
+    Route::get('/{recruitment}/edit', [\App\Http\Controllers\RecruitmentController::class, 'edit'])->name('edit');
+    Route::put('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'update'])->name('update');
+    Route::delete('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// TRAININGS
+// ============================================================
+Route::middleware(['auth'])->prefix('trainings')->name('trainings.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\TrainingController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\TrainingController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\TrainingController::class, 'store'])->name('store');
+    Route::get('/{training}', [\App\Http\Controllers\TrainingController::class, 'show'])->name('show');
+    Route::get('/{training}/edit', [\App\Http\Controllers\TrainingController::class, 'edit'])->name('edit');
+    Route::put('/{training}', [\App\Http\Controllers\TrainingController::class, 'update'])->name('update');
+    Route::delete('/{training}', [\App\Http\Controllers\TrainingController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// BUDGETS
+// ============================================================
+Route::middleware(['auth'])->prefix('budgets')->name('budgets.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\BudgetController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\BudgetController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\BudgetController::class, 'store'])->name('store');
+    Route::get('/{budget}', [\App\Http\Controllers\BudgetController::class, 'show'])->name('show');
+    Route::get('/{budget}/edit', [\App\Http\Controllers\BudgetController::class, 'edit'])->name('edit');
+    Route::put('/{budget}', [\App\Http\Controllers\BudgetController::class, 'update'])->name('update');
+    Route::delete('/{budget}', [\App\Http\Controllers\BudgetController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// RECEIPTS
+// ============================================================
+Route::middleware(['auth'])->prefix('receipts')->name('receipts.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReceiptController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\ReceiptController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\ReceiptController::class, 'store'])->name('store');
+    Route::get('/{receipt}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('show');
+    Route::get('/{receipt}/edit', [\App\Http\Controllers\ReceiptController::class, 'edit'])->name('edit');
+    Route::put('/{receipt}', [\App\Http\Controllers\ReceiptController::class, 'update'])->name('update');
+    Route::delete('/{receipt}', [\App\Http\Controllers\ReceiptController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// FINANCE — DASHBOARD
+// ============================================================
+Route::middleware(['auth'])->prefix('finance')->name('finance.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\DashboardController::class, 'finance'])->name('index');
+});
