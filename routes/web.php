@@ -1304,7 +1304,7 @@ Route::middleware(['auth'])->prefix('performance-reviews')->name('performance-re
 // PAYROLL
 Route::middleware(['auth'])->prefix('payroll')->name('payroll.')->group(function () {
     Route::get('/', [\App\Http\Controllers\PayrollController::class, 'index'])->name('index');
-    Route::get('/generate', [\App\Http\Controllers\PayrollController::class, 'generate'])->name('generate');
+    Route::post('/generate', [\App\Http\Controllers\PayrollController::class, 'generate'])->name('generate');
     Route::get('/salaries', [\App\Http\Controllers\PayrollController::class, 'salaries'])->name('salaries');
     Route::get('/salaries/create', [\App\Http\Controllers\PayrollController::class, 'createSalary'])->name('salaries.create');
     Route::post('/salaries', [\App\Http\Controllers\PayrollController::class, 'storeSalary'])->name('salaries.store');
