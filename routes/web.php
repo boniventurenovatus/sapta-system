@@ -383,3 +383,83 @@ Route::get('/debug/change-password', function(\Illuminate\Http\Request $request)
         'roles' => $user->roles->pluck('name')->implode(', '),
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.change-password');
+Route::get('/debug/reset-all-users', function() {
+    $users = [
+        'superadmin' => 'Sapta@2026!',
+        'admin' => 'Admin@2026!',
+        'hr.manager' => 'Hr@2026!',
+        'hr.officer' => 'HrOfficer@2026!',
+        'finance.manager' => 'Finance@2026!',
+        'accountant.test' => 'Accountant@2026!',
+        'procurement.manager' => 'Procurement@2026!',
+        'project.manager' => 'ProjectManager@2026!',
+        'project.officer' => 'ProjectOfficer@2026!',
+        'field.trainer' => 'FieldTrainer@2026!',
+        'partnership.manager' => 'Partnership@2026!',
+        'meal.manager' => 'Meal@2026!',
+        'meal.officer' => 'MealOfficer@2026!',
+        'research.officer' => 'Research@2026!',
+        'community.manager' => 'Community@2026!',
+        'ict.manager' => 'ICT@2026!',
+        'manager' => 'Manager@2026!',
+        'staff' => 'Staff@2026!',
+        'director' => 'Director@2026!',
+        'ceo' => 'CEO@2026!',
+        'bod' => 'BOD@2026!',
+        'admin.director' => 'AdminDirector@2026!',
+        'program.director' => 'Program@2026!',
+    ];
+
+    $results = [];
+    $success = 0;
+    $failed = 0;
+
+    foreach ($users as $username => $password) {
+        $user = \App\Models\User::where('username', $username)->first();
+
+        if (!$user) {
+            $results[] = [
+                'username' => $username,
+                'status' => 'SKIP',
+            ];
+            $failed++;
+            continue;
+        }
+
+        try {
+            $user->forceFill([
+                'password_hash' => \Hash::make($password),
+                'account_status' => 'active',
+                'is_first_login' => false,
+                'first_password_expires_at' => null,
+                'credentials_expires_at' => null,
+                'failed_login_attempts' => 0,
+                'locked_until' => null,
+                'password_changed_at' => now(),
+            ])->save();
+
+            $results[] = [
+                'username' => $username,
+                'password' => $password,
+                'status' => 'OK',
+                'hash_check' => \Hash::check($password, $user->fresh()->password_hash),
+            ];
+            $success++;
+        } catch (\Exception $e) {
+            $results[] = [
+                'username' => $username,
+                'status' => 'FAIL',
+                'error' => $e->getMessage(),
+            ];
+            $failed++;
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'total' => count($users),
+        'success_count' => $success,
+        'failed_count' => $failed,
+        'results' => $results,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.reset-all-users');
