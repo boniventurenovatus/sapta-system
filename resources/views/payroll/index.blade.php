@@ -182,4 +182,21 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+function toggleGenerateForm() {
+    const form = document.getElementById('generateForm');
+    if (!form) {
+        console.error('generateForm haipo!');
+        return;
+    }
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
+@endpush
 @endsection
