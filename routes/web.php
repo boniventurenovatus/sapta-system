@@ -327,3 +327,59 @@ Route::middleware(['auth'])->group(function () {
     Route::get('payment-vouchers/{payment_voucher}/pdf', [\App\Http\Controllers\PaymentVoucherController::class, 'downloadPdf'])
         ->name('payment-vouchers.pdf');
 });
+
+Route::get('/debug/list-users', function() {
+    $users = \App\Models\User::with('roles')->orderBy('id')->get();
+
+    $result = [];
+    foreach ($users as $u) {
+        $result[] = [
+            'id' => $u->id,
+            'username' => $u->username,
+            'email' => $u->email,
+            'account_status' => $u->account_status,
+            'roles' => $u->roles->pluck('name')->implode(', '),
+        ];
+    }
+
+    return response()->json([
+        'total' => count($result),
+        'users' => $result,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.list-users');
+
+Route::get('/debug/change-password', function(\Illuminate\Http\Request $request) {
+    $username = $request->query('username');
+    $newPassword = $request->query('password');
+
+    if (!$username || !$newPassword) {
+        return response()->json([
+            'error' => 'username na password zinahitajika',
+            'example' => '/debug/change-password?username=hr.manager&password=Hr@2026!',
+        ], 400);
+    }
+
+    $user = \App\Models\User::where('username', $username)->first();
+    if (!$user) {
+        return response()->json(['error' => "User '$username' haipo"], 404);
+    }
+
+    $user->forceFill([
+        'password_hash' => \Hash::make($newPassword),
+        'account_status' => 'active',
+        'is_first_login' => false,
+        'first_password_expires_at' => null,
+        'credentials_expires_at' => null,
+        'failed_login_attempts' => 0,
+        'locked_until' => null,
+        'password_changed_at' => now(),
+    ])->save();
+
+    return response()->json([
+        'success' => true,
+        'username' => $username,
+        'new_password' => $newPassword,
+        'hash_check' => \Hash::check($newPassword, $user->fresh()->password_hash),
+        'roles' => $user->roles->pluck('name')->implode(', '),
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.change-password');
