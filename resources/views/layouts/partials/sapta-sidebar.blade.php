@@ -195,16 +195,17 @@
                     <span class="sapta-nav-text">Payment Vouchers</span>
                 </a>
                 
-                <a href="{{ route('payroll.index') }}" class="sapta-nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('payroll.*') ? 'active' : '' }}" data-target="payroll-submenu">
                     <i class="fas fa-money-bill-wave"></i>
                     <span class="sapta-nav-text">Payroll</span>
+                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
                 </a>
-                <div class="sapta-nav-submenu">
-                    <a href="{{ route('payroll.index') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.index') ? 'active' : '' }}">
+                <div class="sapta-nav-submenu" id="payroll-submenu" style="display: none;">
+                    <a href="{{ route('payroll.index') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.index') && !request()->routeIs('payroll.salaries') && !request()->routeIs('payroll.salaries.create') ? 'active' : '' }}">
                         <i class="fas fa-chart-line"></i>
                         <span class="sapta-nav-text">Dashboard</span>
                     </a>
-                    <a href="{{ route('payroll.salaries') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.salaries') ? 'active' : '' }}">
+                    <a href="{{ route('payroll.salaries') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.salaries') && !request()->routeIs('payroll.salaries.create') ? 'active' : '' }}">
                         <i class="fas fa-money-bill"></i>
                         <span class="sapta-nav-text">Salaries</span>
                     </a>
@@ -356,4 +357,39 @@
         </form>
     </div>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Fungua/kufunga submenu kwa Payroll
+    document.querySelectorAll('.sapta-nav-toggle').forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('data-target');
+            var submenu = document.getElementById(targetId);
+            if (!submenu) return;
+            
+            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                submenu.style.display = 'block';
+                this.classList.add('open');
+            } else {
+                submenu.style.display = 'none';
+                this.classList.remove('open');
+            }
+        });
+    });
+    
+    // Kama tuko kwenye ukurasa wa Payroll, fungua submenu
+    if (window.location.pathname.startsWith('/payroll') || window.location.pathname.startsWith('/my-payslips')) {
+        var payrollSubmenu = document.getElementById('payroll-submenu');
+        if (payrollSubmenu) {
+            payrollSubmenu.style.display = 'block';
+            document.querySelectorAll('.sapta-nav-toggle').forEach(function (t) {
+                if (t.getAttribute('data-target') === 'payroll-submenu') {
+                    t.classList.add('open');
+                }
+            });
+        }
+    }
+});
+</script>
 </aside>
