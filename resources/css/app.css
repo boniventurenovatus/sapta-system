@@ -2195,3 +2195,15 @@ textarea {
         left: 20px;
     }
 }
+
+/* ============================================
+   SAPTA NAV SUBMENU (Payroll)
+   ============================================ */
+.sapta-nav-submenu {
+    margin-left: 2.5rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+}
+
+

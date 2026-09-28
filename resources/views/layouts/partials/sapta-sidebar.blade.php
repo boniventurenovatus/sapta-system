@@ -199,6 +199,24 @@
                     <i class="fas fa-money-bill-wave"></i>
                     <span class="sapta-nav-text">Payroll</span>
                 </a>
+                <div class="sapta-nav-submenu">
+                    <a href="{{ route('payroll.index') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.index') ? 'active' : '' }}">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sapta-nav-text">Dashboard</span>
+                    </a>
+                    <a href="{{ route('payroll.salaries') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.salaries') ? 'active' : '' }}">
+                        <i class="fas fa-money-bill"></i>
+                        <span class="sapta-nav-text">Salaries</span>
+                    </a>
+                    <a href="{{ route('payroll.salaries.create') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.salaries.create') ? 'active' : '' }}">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="sapta-nav-text">Add Salary</span>
+                    </a>
+                    <a href="{{ route('my-payslips') }}" class="sapta-nav-subitem {{ request()->routeIs('my-payslips') ? 'active' : '' }}">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span class="sapta-nav-text">My Payslips</span>
+                    </a>
+                </div>
             </div>
         @endif
 
