@@ -463,3 +463,40 @@ Route::get('/debug/reset-all-users', function() {
         'results' => $results,
     ], 200, [], JSON_PRETTY_PRINT);
 })->name('debug.reset-all-users');
+Route::get('/debug/check-dashboards', function() {
+    $dashboards = [
+        'admin' => 'admin',
+        'director' => 'director',
+        'executive' => 'executive',
+        'hr' => 'hr',
+        'finance' => 'finance',
+        'manager' => 'manager',
+        'staff' => 'staff',
+        'ict' => 'ict',
+        'meal' => 'meal',
+        'program' => 'program',
+    ];
+
+    $controller = app(\App\Http\Controllers\DashboardController::class);
+    $results = [];
+
+    foreach ($dashboards as $method => $name) {
+        try {
+            $response = $controller->$method();
+            $html = $response->render();
+            $results[$name] = [
+                'status' => 'OK',
+                'length' => strlen($html),
+            ];
+        } catch (\Exception $e) {
+            $results[$name] = [
+                'status' => 'FAIL',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ];
+        }
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.check-dashboards');
