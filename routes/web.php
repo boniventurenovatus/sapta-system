@@ -1378,3 +1378,14 @@ Route::middleware(['auth'])->prefix('communication/groups')->name('communication
     Route::get('/create', [\App\Http\Controllers\GroupController::class, 'create'])->name('create');
     Route::post('/', [\App\Http\Controllers\GroupController::class, 'store'])->name('store');
 });
+// ============================================================
+// TEMPORARY MIGRATION ROUTE — Ondoa baada ya kutumia
+// ============================================================
+Route::get('/run-migration-secret', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
