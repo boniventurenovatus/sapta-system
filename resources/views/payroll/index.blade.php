@@ -142,13 +142,13 @@
                                     <div class="actions">
                                         <a href="{{ route('payroll.show', $p) }}" class="action-btn view" title="View"><i class="fas fa-eye"></i></a>
                                         @if($p->status === 'draft')
-                                            <form action="{{ route('payroll.approve', $p) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('payroll.approve', $p) }}" method="POST" class="sapta-confirm-form" data-confirm="Approve this payslip?" style="display:inline;">
                                                 @csrf
                                                 <button type="submit" class="action-btn edit" title="Approve"><i class="fas fa-check"></i></button>
                                             </form>
                                         @endif
                                         @if($p->status === 'approved')
-                                            <form action="{{ route('payroll.paid', $p) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('payroll.paid', $p) }}" method="POST" class="sapta-confirm-form" data-confirm="Mark this payslip as paid?" style="display:inline;">
                                                 @csrf
                                                 <button type="submit" class="action-btn edit" title="Mark Paid"><i class="fas fa-money-bill"></i></button>
                                             </form>
