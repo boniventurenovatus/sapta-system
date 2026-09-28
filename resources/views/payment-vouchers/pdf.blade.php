@@ -6,11 +6,12 @@
     <style>
         body { font-family: Arial, sans-serif; font-size: 10px; color: #000; margin: 10px; }
         table { width: 100%; border-collapse: collapse; }
-        td { vertical-align: top; padding: 3px; }
-        .header-table td { padding: 3px; }
+        .header-table td { vertical-align: top; padding: 3px; }
         .company { font-weight: bold; font-size: 12px; }
-        .field-label { font-weight: bold; width: 90px; display: inline-block; }
-        .field-value { border-bottom: 1px dotted #666; display: inline-block; min-width: 150px; padding-left: 4px; }
+        .field-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .field-table td { padding: 3px 0; vertical-align: bottom; }
+        .field-label { font-weight: bold; width: 100px; }
+        .field-value { border-bottom: 1px dotted #666; padding-left: 4px; }
         .items-table { border: 1px solid #000; margin: 8px 0; }
         .items-table th { background: #e8e8e8; border: 1px solid #000; padding: 4px; font-size: 9px; text-align: left; }
         .items-table td { border: 1px solid #000; padding: 4px; font-size: 9px; }
@@ -31,6 +32,7 @@
 
 <div class="title">PAYMENT VOUCHER</div>
 
+{{-- HEADER --}}
 <table class="header-table">
     <tr>
         <td style="width: 35%;">
@@ -44,28 +46,63 @@
             @endif
         </td>
         <td style="width: 35%;">
-            <div><span class="field-label">Date:</span> <span class="field-value">{{ $pv->payment_date ? \Carbon\Carbon::parse($pv->payment_date)->format('d/m/Y') : '' }}</span></div>
-            <div><span class="field-label">Trans No:</span> <span class="field-value">{{ $pv->trans_no ?? $pv->voucher_number }}</span></div>
+            <table class="field-table">
+                <tr>
+                    <td class="field-label">Date:</td>
+                    <td class="field-value">{{ $pv->payment_date ? \Carbon\Carbon::parse($pv->payment_date)->format('d/m/Y') : '' }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">Trans No:</td>
+                    <td class="field-value">{{ $pv->trans_no ?? $pv->voucher_number }}</td>
+                </tr>
+            </table>
         </td>
     </tr>
 </table>
 
-<table style="margin: 10px 0;">
+{{-- INFO: Payee / Batch --}}
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
     <tr>
-        <td style="width: 50%;">
-            <div><span class="field-label">Name of Payee:</span> <span class="field-value">{{ $pv->payee_name }}</span></div>
-            <div><span class="field-label">P.O Box:</span> <span class="field-value">{{ $pv->payee_pobox ?? '' }}</span></div>
-            <div><span class="field-label">Mode:</span> <span class="field-value">{{ strtoupper($pv->mode ?? '') }}</span></div>
-            <div><span class="field-label">Cheque Number:</span> <span class="field-value">{{ $pv->cheque_number ?? '' }}</span></div>
+        <td style="width: 50%; padding-right: 15px;">
+            <table class="field-table">
+                <tr>
+                    <td class="field-label">Name of Payee:</td>
+                    <td class="field-value">{{ $pv->payee_name }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">P.O Box:</td>
+                    <td class="field-value">{{ $pv->payee_pobox ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">Mode:</td>
+                    <td class="field-value">{{ strtoupper($pv->mode ?? '') }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">Cheque Number:</td>
+                    <td class="field-value">{{ $pv->cheque_number ?? '' }}</td>
+                </tr>
+            </table>
         </td>
         <td style="width: 50%;">
-            <div><span class="field-label">Batch:</span> <span class="field-value">{{ $pv->batch ?? '' }}</span></div>
-            <div><span class="field-label">Bank:</span> <span class="field-value">{{ $pv->bank ?? '' }}</span></div>
-            <div><span class="field-label">Currency:</span> <span class="field-value">{{ $pv->currency ?? 'TZS' }}</span></div>
+            <table class="field-table">
+                <tr>
+                    <td class="field-label">Batch:</td>
+                    <td class="field-value">{{ $pv->batch ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">Bank:</td>
+                    <td class="field-value">{{ $pv->bank ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="field-label">Currency:</td>
+                    <td class="field-value">{{ $pv->currency ?? 'TZS' }}</td>
+                </tr>
+            </table>
         </td>
     </tr>
 </table>
 
+{{-- ITEMS --}}
 <table class="items-table">
     <thead>
         <tr>
@@ -101,6 +138,7 @@
     </tfoot>
 </table>
 
+{{-- SIGNATURES --}}
 <table class="signatures-table">
     <thead>
         <tr>
@@ -132,6 +170,7 @@
     </tbody>
 </table>
 
+{{-- RECEIVED --}}
 <table class="received-table" style="margin-top: 15px;">
     <tr>
         <td style="width: 40%; text-align: right; font-weight: bold; padding-right: 10px;">Received BY: Signature</td>
