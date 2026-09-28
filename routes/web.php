@@ -843,3 +843,121 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/notifications/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])
         ->name('notifications.destroy');
 });
+Route::get('/debug/check-pages-v4', function() {
+    $pages = [
+        // Communication
+        'communication.inbox' => ['CommunicationController', 'inbox'],
+        'notifications.index' => ['NotificationController', 'index'],
+        'my-work.index' => ['MyWorkController', 'index'],
+
+        // Reports
+        'reports.index' => ['ReportController', 'index'],
+        'reports.employees' => ['ReportController', 'employees'],
+        'reports.attendance' => ['ReportController', 'attendance'],
+        'reports.projects' => ['ReportController', 'projects'],
+        'reports.tasks' => ['ReportController', 'tasks'],
+        'reports.leaves' => ['ReportController', 'leaves'],
+        'reports.trainings' => ['ReportController', 'trainings'],
+        'reports.budgets' => ['ReportController', 'budgets'],
+
+        // Location
+        'location.regions' => ['LocationController', 'regions'],
+        'location.districts' => ['LocationController', 'districts'],
+        'location.wards' => ['LocationController', 'wards'],
+
+        // Organogram
+        'organogram.index' => ['OrganogramController', 'index'],
+
+        // Search
+        'search' => ['SearchController', 'index'],
+
+        // Settings
+        'settings.index' => ['SettingController', 'index'],
+
+        // Activity/Audit
+        'activity-logs.index' => ['ActivityLogController', 'index'],
+        'audit-logs.index' => ['AuditLogController', 'index'],
+    ];
+
+    $results = [];
+
+    foreach ($pages as $route => $config) {
+        $controllerName = $config[0];
+        $method = $config[1];
+
+        $controllerClass = "App\\Http\\Controllers\\" . $controllerName;
+
+        if (!class_exists($controllerClass)) {
+            $results[$route] = [
+                'step' => 'class_exists',
+                'status' => 'FAIL',
+                'error' => "Controller $controllerName haipo",
+            ];
+            continue;
+        }
+
+        try {
+            $controller = app($controllerClass);
+        } catch (\Throwable $e) {
+            $results[$route] = [
+                'step' => 'app_resolve',
+                'status' => 'FAIL',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ];
+            continue;
+        }
+
+        if (!method_exists($controller, $method)) {
+            $results[$route] = [
+                'step' => 'method_exists',
+                'status' => 'FAIL',
+                'error' => "Method $method haipo kwenye $controllerName",
+            ];
+            continue;
+        }
+
+        try {
+            $reflection = new \ReflectionMethod($controller, $method);
+            $params = $reflection->getParameters();
+
+            if (count($params) > 0) {
+                $results[$route] = [
+                    'step' => 'parameters',
+                    'status' => 'SKIP',
+                    'message' => 'Inahitaji parameters',
+                ];
+                continue;
+            }
+
+            $response = $controller->$method();
+
+            if (is_object($response) && method_exists($response, 'render')) {
+                $html = $response->render();
+                $results[$route] = [
+                    'step' => 'render',
+                    'status' => 'OK',
+                    'length' => strlen($html),
+                ];
+            } else {
+                $results[$route] = [
+                    'step' => 'response',
+                    'status' => 'OK',
+                    'type' => gettype($response),
+                ];
+            }
+
+        } catch (\Throwable $e) {
+            $results[$route] = [
+                'step' => 'render',
+                'status' => 'FAIL',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ];
+        }
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.check-pages-v4');
