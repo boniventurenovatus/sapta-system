@@ -1113,3 +1113,95 @@ Route::middleware(['auth'])->prefix('receipts')->name('receipts.')->group(functi
 Route::middleware(['auth'])->prefix('finance')->name('finance.')->group(function () {
     Route::get('/', [\App\Http\Controllers\DashboardController::class, 'finance'])->name('index');
 });
+Route::get('/debug/deep-check', function() {
+    $pages = [
+        'recruitment' => ['RecruitmentController', 'index'],
+        'trainings' => ['TrainingController', 'index'],
+        'budgets' => ['BudgetController', 'index'],
+        'receipts' => ['ReceiptController', 'index'],
+        'payment-vouchers' => ['PaymentVoucherController', 'index'],
+        'projects' => ['ProjectController', 'index'],
+        'reports' => ['ReportController', 'index'],
+        'communication' => ['CommunicationController', 'inbox'],
+        'notifications' => ['NotificationController', 'index'],
+    ];
+
+    $results = [];
+
+    foreach ($pages as $route => $config) {
+        $controllerName = $config[0];
+        $method = $config[1];
+
+        $results[$route] = [
+            'controller' => $controllerName,
+            'method' => $method,
+        ];
+
+        // 1. Angalia controller
+        $controllerClass = "App\\Http\\Controllers\\" . $controllerName;
+        if (!class_exists($controllerClass)) {
+            $results[$route]['step'] = 'class_exists';
+            $results[$route]['status'] = 'FAIL';
+            $results[$route]['error'] = "Controller $controllerName haipo";
+            continue;
+        }
+        $results[$route]['class'] = 'OK';
+
+        // 2. Resolve controller
+        try {
+            $controller = app($controllerClass);
+            $results[$route]['resolve'] = 'OK';
+        } catch (\Throwable $e) {
+            $results[$route]['step'] = 'app_resolve';
+            $results[$route]['status'] = 'FAIL';
+            $results[$route]['error'] = $e->getMessage();
+            $results[$route]['file'] = $e->getFile();
+            $results[$route]['line'] = $e->getLine();
+            continue;
+        }
+
+        // 3. Angalia method
+        if (!method_exists($controller, $method)) {
+            $results[$route]['step'] = 'method_exists';
+            $results[$route]['status'] = 'FAIL';
+            $results[$route]['error'] = "Method $method haipo";
+            continue;
+        }
+        $results[$route]['method_exists'] = 'OK';
+
+        // 4. Jaribu ku-render
+        try {
+            $reflection = new \ReflectionMethod($controller, $method);
+            $params = $reflection->getParameters();
+
+            if (count($params) > 0) {
+                $results[$route]['step'] = 'parameters';
+                $results[$route]['status'] = 'SKIP';
+                $results[$route]['params'] = count($params);
+                continue;
+            }
+
+            $response = $controller->$method();
+
+            if (is_object($response) && method_exists($response, 'render')) {
+                $html = $response->render();
+                $results[$route]['step'] = 'render';
+                $results[$route]['status'] = 'OK';
+                $results[$route]['length'] = strlen($html);
+            } else {
+                $results[$route]['step'] = 'response';
+                $results[$route]['status'] = 'OK';
+                $results[$route]['type'] = gettype($response);
+            }
+
+        } catch (\Throwable $e) {
+            $results[$route]['step'] = 'render';
+            $results[$route]['status'] = 'FAIL';
+            $results[$route]['error'] = $e->getMessage();
+            $results[$route]['file'] = $e->getFile();
+            $results[$route]['line'] = $e->getLine();
+        }
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.deep-check');
