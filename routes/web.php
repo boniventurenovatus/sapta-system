@@ -1037,3 +1037,21 @@ Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->gr
     Route::post('/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
     Route::delete('/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
+Route::get('/debug/list-routes', function() {
+    $routes = \Route::getRoutes();
+    $result = [];
+
+    foreach ($routes as $route) {
+        $uri = $route->uri();
+        if (strpos($uri, 'debug') !== false) continue;
+
+        $result[] = [
+            'method' => implode('|', $route->methods()),
+            'uri' => $uri,
+            'name' => $route->getName(),
+            'action' => $route->getActionName(),
+        ];
+    }
+
+    return response()->json($result, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.list-routes');
