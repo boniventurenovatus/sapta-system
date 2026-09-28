@@ -961,3 +961,38 @@ Route::get('/debug/check-pages-v4', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.check-pages-v4');
+// ============================================================
+// REPORTS — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function () {
+    Route::get('/recruitment', [\App\Http\Controllers\ReportController::class, 'recruitment'])->name('recruitment');
+    Route::get('/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('trainings');
+    Route::get('/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])->name('budgets');
+});
+
+// ============================================================
+// NOTIFICATIONS — ACTIONS
+// ============================================================
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
+    Route::post('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('mark-all-read');
+    Route::post('/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
+    Route::delete('/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// LOCATION — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('location')->name('location.')->group(function () {
+    Route::get('/regions', [\App\Http\Controllers\LocationController::class, 'regions'])->name('regions');
+    Route::get('/districts', [\App\Http\Controllers\LocationController::class, 'districts'])->name('districts');
+    Route::get('/wards', [\App\Http\Controllers\LocationController::class, 'wards'])->name('wards');
+});
+
+// ============================================================
+// COMMUNICATION — ZOTE
+// ============================================================
+Route::middleware(['auth'])->prefix('communication')->name('communication.')->group(function () {
+    Route::get('/inbox', [\App\Http\Controllers\CommunicationController::class, 'inbox'])->name('inbox');
+    Route::get('/sent', [\App\Http\Controllers\CommunicationController::class, 'sent'])->name('sent');
+    Route::get('/compose', [\App\Http\Controllers\CommunicationController::class, 'compose'])->name('compose');
+});
