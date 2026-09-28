@@ -19,13 +19,14 @@ class Payslip extends Model
         'ward_id', 'salary_id', 'payslip_number', 'month', 'year',
         'basic_salary', 'total_allowances', 'gross_salary', 'total_deductions',
         'net_salary', 'allowances_breakdown', 'deductions_breakdown',
-        'status', 'payment_date', 'notes',
+        'status', 'payment_date', 'notes', 'verification_token', 'token_expires_at',
     ];
 
     protected $casts = [
         'allowances_breakdown' => 'array',
         'deductions_breakdown' => 'array',
         'payment_date' => 'date',
+        'token_expires_at' => 'datetime',
     ];
 
     public function employee(): BelongsTo

@@ -103,6 +103,8 @@ class PayrollController extends Controller
                 'allowances_breakdown' => $allowances,
                 'deductions_breakdown' => $deductions,
                 'status' => 'draft',
+                  'verification_token' => \Str::random(64),
+                  'token_expires_at' => now()->addDays(30),
             ]);
 
             $generated++;
@@ -253,5 +255,60 @@ class PayrollController extends Controller
     public function exportCsv()
     {
         return response()->json(['message' => 'Export CSV — inatengenezwa'], 200);
+    }
+    /**
+     * Verify payslip kwa QR code token.
+     */
+    public function verify($token)
+    {
+        $payslip = Payslip::where('verification_token', $token)
+            ->where('token_expires_at', '>', now())
+            ->first();
+
+        if (!$payslip) {
+            abort(404, 'QR Code is invalid or expired.');
+        }
+
+        $user = auth()->user();
+        $canViewFull = false;
+
+        if ($user) {
+            if ($user->employee_id === $payslip->employee_id) {
+                $canViewFull = true;
+            } elseif (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'hr_manager', 'finance_manager'])) {
+                $canViewFull = true;
+            }
+        }
+
+        \Log::info('QR Code scanned', [
+            'payslip_id' => $payslip->id,
+            'user_id' => $user?->id,
+            'ip' => request()->ip(),
+            'can_view_full' => $canViewFull,
+        ]);
+
+        return view('payroll.verify', compact('payslip', 'canViewFull'));
+    }
+    /**
+     * Unda QR code Data URI kwa payslip.
+     */
+    public function generateQrCode($payslip)
+    {
+        try {
+            $url = route('payroll.verify', ['token' => $payslip->verification_token]);
+            
+            $builder = new \Endroid\QrCode\Builder\Builder(
+                writer: new \Endroid\QrCode\Writer\PngWriter(),
+                data: $url,
+                size: 200,
+                margin: 10,
+            );
+            
+            $result = $builder->build();
+            return $result->getDataUri();
+        } catch (\Exception $e) {
+            \Log::error('QR Code generation failed: ' . $e->getMessage());
+            return null;
+        }
     }
 }

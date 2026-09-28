@@ -33,8 +33,17 @@
 <div class="ps-page">
     <div class="ps-card">
         <div class="ps-hero">
+            <div style="margin-bottom:1rem;">
+                <img src="{{ asset('images/sapta-logo.png') }}" alt="SAPTA" style="height:120px; width:auto; display:block; margin:0 auto;">
+            </div>
             <h1>Payslip</h1>
             <span class="code">{{ $payslip->payslip_number }} ? {{ $payslip->period }}</span>
+            </div>
+            <div style="margin-top:1rem; display:flex; justify-content:center;">
+                <div style="background:#fff; padding:0.75rem; border-radius:0.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                    <img src="{{ app(\App\Http\Controllers\PayrollController::class)->generateQrCode($payslip) }}" alt="QR Code" style="width:140px; height:140px; display:block;">
+                    <p style="font-size:0.7rem; color:#64748b; margin:0.5rem 0 0; text-align:center; font-weight:600;">Scan to verify</p>
+                </div>
         </div>
 
         <div class="ps-body">
