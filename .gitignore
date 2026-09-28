@@ -35,3 +35,21 @@ audit-report/
 # Backup files
 *.backup
 *.backup2
+
+# Backup files
+resources/views/layouts/partials/backup-*
+
+# Temp route files
+routes_existing.json
+routes_existing.txt
+routes_in_views.txt
+sapta-system
+
+# Backup files
+resources/views/layouts/partials/backup-*
+
+# Temp route files
+routes_existing.json
+routes_existing.txt
+routes_in_views.txt
+sapta-system
