@@ -153,7 +153,7 @@ Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherControll
 // ============================================================
 // PAYROLL
 // ============================================================
-Route::resource('payroll', \App\Http\Controllers\PayrollController::class)->middleware('auth');
+// Route::resource('payroll', ...) imeondolewa kwa sababu inagongana na custom routes
 
 // ============================================================
 // TRAININGS
@@ -1308,6 +1308,9 @@ Route::middleware(['auth'])->prefix('payroll')->name('payroll.')->group(function
     Route::get('/salaries', [\App\Http\Controllers\PayrollController::class, 'salaries'])->name('salaries');
     Route::get('/salaries/create', [\App\Http\Controllers\PayrollController::class, 'createSalary'])->name('salaries.create');
     Route::post('/salaries', [\App\Http\Controllers\PayrollController::class, 'storeSalary'])->name('salaries.store');
+    Route::get('/salaries/{salary}/edit', [\App\Http\Controllers\PayrollController::class, 'editSalary'])->name('salaries.edit');
+    Route::put('/salaries/{salary}', [\App\Http\Controllers\PayrollController::class, 'updateSalary'])->name('salaries.update');
+    Route::delete('/salaries/{salary}', [\App\Http\Controllers\PayrollController::class, 'destroySalary'])->name('salaries.destroy');
     Route::get('/export/all-csv', [\App\Http\Controllers\PayrollController::class, 'exportCsv'])->name('export.all-csv');
 });
 
