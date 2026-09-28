@@ -18,7 +18,7 @@ class PaymentVoucherService
         // Pata trans_no ya mwisho
         $last = PaymentVoucher::withTrashed()
             ->where('trans_no', 'like', $prefix . '%')
-            ->orderByRaw('CAST(SUBSTRING(trans_no, 3) AS UNSIGNED) DESC')
+            ->orderByRaw('CAST(SUBSTRING(trans_no, 3) AS INTEGER) DESC')
             ->first();
 
         if ($last && $last->trans_no) {
@@ -58,7 +58,7 @@ class PaymentVoucherService
 
     /**
      * Convert amount to words.
-     * Mfano: 300000.00 → "THREE HUNDRED THOUSAND ONLY"
+     * Mfano: 300000.00 â†’ "THREE HUNDRED THOUSAND ONLY"
      */
     public function amountInWords(float $amount, string $currency = 'TZS'): string
     {
