@@ -820,3 +820,26 @@ Route::get('/debug/check-pages-v3', function() {
 
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.check-pages-v3');
+// ============================================================
+// REPORTS — ZAIDI
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reports/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])
+        ->name('reports.trainings');
+
+    Route::get('/reports/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])
+        ->name('reports.budgets');
+});
+// ============================================================
+// NOTIFICATIONS — ACTIONS
+// ============================================================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])
+        ->name('notifications.mark-all-read');
+
+    Route::post('/notifications/{notification}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])
+        ->name('notifications.mark-read');
+
+    Route::delete('/notifications/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
+});
