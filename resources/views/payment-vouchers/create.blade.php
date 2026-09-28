@@ -58,24 +58,9 @@
 <script>
 function submitForApproval() {
     const draftForm = document.getElementById('form-draft');
-    const submitForm = document.getElementById('form-submit');
-    
-    // Clear existing hidden inputs (except csrf + action)
-    submitForm.querySelectorAll('input:not([name="_token"]):not([name="action"])').forEach(el => el.remove());
-    
-    // Copy all form fields to submit form as hidden inputs
-    draftForm.querySelectorAll('input, select, textarea').forEach(field => {
-        if (field.name === '_token' || field.name === 'action') return;
-        
-        const newField = document.createElement('input');
-        newField.type = 'hidden';
-        newField.name = field.name;
-        newField.value = field.value;
-        submitForm.appendChild(newField);
-    });
-    
-    // Submit the form
-    submitForm.submit();
+    const actionInput = draftForm.querySelector('input[name="action"]');
+    actionInput.value = 'submit';
+    draftForm.submit();
 }
 </script>
 @endsection
