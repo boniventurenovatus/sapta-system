@@ -201,10 +201,7 @@
                     <i class="fas fa-chevron-down sapta-nav-chevron"></i>
                 </a>
                 <div class="sapta-nav-submenu" id="payroll-submenu" style="display: none;">
-                    <a href="{{ route('payroll.index') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.index') && !request()->routeIs('payroll.salaries') && !request()->routeIs('payroll.salaries.create') ? 'active' : '' }}">
-                        <i class="fas fa-chart-line"></i>
-                        <span class="sapta-nav-text">Dashboard</span>
-                    </a>
+
                     <a href="{{ route('payroll.salaries') }}" class="sapta-nav-subitem {{ request()->routeIs('payroll.salaries') && !request()->routeIs('payroll.salaries.create') ? 'active' : '' }}">
                         <i class="fas fa-money-bill"></i>
                         <span class="sapta-nav-text">Salaries</span>
