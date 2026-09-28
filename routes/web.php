@@ -464,3 +464,22 @@ Route::get('/debug/test-store-submit', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-store-submit');
+Route::get('/debug/list-users', function() {
+    $users = \App\Models\User::with('roles')->orderBy('id')->get();
+
+    $result = [];
+    foreach ($users as $u) {
+        $result[] = [
+            'id' => $u->id,
+            'username' => $u->username,
+            'email' => $u->email,
+            'account_status' => $u->account_status,
+            'roles' => $u->roles->pluck('name')->implode(', '),
+        ];
+    }
+
+    return response()->json([
+        'total' => count($result),
+        'users' => $result,
+    ], 200, [], JSON_PRETTY_PRINT);
+})->name('debug.list-users');
