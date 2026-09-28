@@ -1244,3 +1244,137 @@ Route::get('/debug/test-recruitment', function() {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 })->name('debug.test-recruitment');
+// ============================================================
+// EXPORT ROUTES — ZOTE
+// ============================================================
+
+// RECRUITMENT EXPORTS
+Route::middleware(['auth'])->prefix('recruitment')->name('recruitment.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\RecruitmentController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\RecruitmentController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\RecruitmentController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\RecruitmentController::class, 'exportCsv'])->name('export.all-csv');
+    Route::get('/export/csv', [\App\Http\Controllers\RecruitmentController::class, 'exportCsv'])->name('export.csv');
+});
+
+// TRAININGS EXPORTS
+Route::middleware(['auth'])->prefix('trainings')->name('trainings.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\TrainingController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\TrainingController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\TrainingController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\TrainingController::class, 'exportCsv'])->name('export.all-csv');
+    Route::get('/export/csv', [\App\Http\Controllers\TrainingController::class, 'exportCsv'])->name('export.csv');
+});
+
+// BUDGETS EXPORTS
+Route::middleware(['auth'])->prefix('budgets')->name('budgets.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\BudgetController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\BudgetController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\BudgetController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\BudgetController::class, 'exportCsv'])->name('export.all-csv');
+    Route::get('/export/all-excel', [\App\Http\Controllers\BudgetController::class, 'exportExcel'])->name('export.all-excel');
+});
+
+// RECEIPTS EXPORTS
+Route::middleware(['auth'])->prefix('receipts')->name('receipts.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReceiptController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\ReceiptController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\ReceiptController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\ReceiptController::class, 'exportCsv'])->name('export.all-csv');
+    Route::get('/export/all-excel', [\App\Http\Controllers\ReceiptController::class, 'exportExcel'])->name('export.all-excel');
+});
+
+// DOCUMENTS EXPORTS
+Route::middleware(['auth'])->prefix('documents')->name('documents.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\DocumentController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\DocumentController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\DocumentController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\DocumentController::class, 'exportCsv'])->name('export.all-csv');
+});
+
+// PERFORMANCE REVIEWS EXPORTS
+Route::middleware(['auth'])->prefix('performance-reviews')->name('performance-reviews.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\PerformanceReviewController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\PerformanceReviewController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\PerformanceReviewController::class, 'store'])->name('store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\PerformanceReviewController::class, 'exportCsv'])->name('export.all-csv');
+    Route::get('/export/all-excel', [\App\Http\Controllers\PerformanceReviewController::class, 'exportExcel'])->name('export.all-excel');
+});
+
+// PAYROLL
+Route::middleware(['auth'])->prefix('payroll')->name('payroll.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\PayrollController::class, 'index'])->name('index');
+    Route::get('/generate', [\App\Http\Controllers\PayrollController::class, 'generate'])->name('generate');
+    Route::get('/salaries', [\App\Http\Controllers\PayrollController::class, 'salaries'])->name('salaries');
+    Route::get('/salaries/create', [\App\Http\Controllers\PayrollController::class, 'createSalary'])->name('salaries.create');
+    Route::post('/salaries', [\App\Http\Controllers\PayrollController::class, 'storeSalary'])->name('salaries.store');
+    Route::get('/export/all-csv', [\App\Http\Controllers\PayrollController::class, 'exportCsv'])->name('export.all-csv');
+});
+
+// PROCUREMENT
+Route::middleware(['auth'])->prefix('procurement')->name('procurement.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ProcurementController::class, 'index'])->name('index');
+    Route::get('/requests', [\App\Http\Controllers\ProcurementController::class, 'requests'])->name('requests');
+    Route::get('/requests/create', [\App\Http\Controllers\ProcurementController::class, 'createRequest'])->name('requests.create');
+    Route::post('/requests', [\App\Http\Controllers\ProcurementController::class, 'storeRequest'])->name('requests.store');
+    Route::get('/orders', [\App\Http\Controllers\ProcurementController::class, 'orders'])->name('orders');
+    Route::get('/orders/create', [\App\Http\Controllers\ProcurementController::class, 'createOrder'])->name('orders.create');
+    Route::post('/orders', [\App\Http\Controllers\ProcurementController::class, 'storeOrder'])->name('orders.store');
+    Route::get('/suppliers', [\App\Http\Controllers\ProcurementController::class, 'suppliers'])->name('suppliers');
+    Route::get('/suppliers/create', [\App\Http\Controllers\ProcurementController::class, 'createSupplier'])->name('suppliers.create');
+    Route::post('/suppliers', [\App\Http\Controllers\ProcurementController::class, 'storeSupplier'])->name('suppliers.store');
+});
+
+// AUDIT LOGS
+Route::middleware(['auth'])->prefix('audit-logs')->name('audit-logs.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('index');
+    Route::get('/clear', [\App\Http\Controllers\AuditLogController::class, 'clear'])->name('clear');
+});
+
+// REPORTS — ZOTE
+Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+    Route::get('/employees', [\App\Http\Controllers\ReportController::class, 'employees'])->name('employees');
+    Route::get('/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('attendance');
+    Route::get('/leaves', [\App\Http\Controllers\ReportController::class, 'leaves'])->name('leaves');
+    Route::get('/projects', [\App\Http\Controllers\ReportController::class, 'projects'])->name('projects');
+    Route::get('/tasks', [\App\Http\Controllers\ReportController::class, 'tasks'])->name('tasks');
+    Route::get('/recruitment', [\App\Http\Controllers\ReportController::class, 'recruitment'])->name('recruitment');
+    Route::get('/trainings', [\App\Http\Controllers\ReportController::class, 'trainings'])->name('trainings');
+    Route::get('/budgets', [\App\Http\Controllers\ReportController::class, 'budgets'])->name('budgets');
+    Route::get('/payroll', [\App\Http\Controllers\ReportController::class, 'payroll'])->name('payroll');
+    Route::get('/performance', [\App\Http\Controllers\ReportController::class, 'performance'])->name('performance');
+    Route::get('/documents', [\App\Http\Controllers\ReportController::class, 'documents'])->name('documents');
+    Route::get('/location', [\App\Http\Controllers\ReportController::class, 'location'])->name('location');
+    Route::get('/payment-vouchers', [\App\Http\Controllers\ReportController::class, 'paymentVouchers'])->name('payment-vouchers');
+    Route::get('/receipts', [\App\Http\Controllers\ReportController::class, 'receipts'])->name('receipts');
+    Route::get('/employees-by-region', [\App\Http\Controllers\ReportController::class, 'employeesByRegion'])->name('employees-by-region');
+    Route::get('/attendance-by-region', [\App\Http\Controllers\ReportController::class, 'attendanceByRegion'])->name('attendance-by-region');
+    Route::get('/budgets-by-region', [\App\Http\Controllers\ReportController::class, 'budgetsByRegion'])->name('budgets-by-region');
+    Route::get('/projects-by-region', [\App\Http\Controllers\ReportController::class, 'projectsByRegion'])->name('projects-by-region');
+});
+
+// COMMUNICATION — ZOTE
+Route::middleware(['auth'])->prefix('communication')->name('communication.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CommunicationController::class, 'index'])->name('index');
+    Route::get('/inbox', [\App\Http\Controllers\CommunicationController::class, 'inbox'])->name('inbox');
+    Route::get('/sent', [\App\Http\Controllers\CommunicationController::class, 'sent'])->name('sent');
+    Route::get('/drafts', [\App\Http\Controllers\CommunicationController::class, 'drafts'])->name('drafts');
+    Route::get('/conversations', [\App\Http\Controllers\CommunicationController::class, 'conversations'])->name('conversations');
+    Route::get('/message/create', [\App\Http\Controllers\CommunicationController::class, 'createMessage'])->name('message-create');
+    Route::post('/message', [\App\Http\Controllers\CommunicationController::class, 'storeMessage'])->name('message-store');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\CommunicationController::class, 'markAllNotificationsRead'])->name('notifications-read-all');
+    Route::get('/announcements', [\App\Http\Controllers\CommunicationController::class, 'announcements'])->name('announcements');
+    Route::get('/announcements/create', [\App\Http\Controllers\CommunicationController::class, 'createAnnouncement'])->name('announcements-create');
+    Route::post('/announcements', [\App\Http\Controllers\CommunicationController::class, 'storeAnnouncement'])->name('announcements-store');
+    Route::get('/shared-files', [\App\Http\Controllers\CommunicationController::class, 'sharedFiles'])->name('shared-files');
+    Route::get('/shared-files/create', [\App\Http\Controllers\CommunicationController::class, 'createSharedFile'])->name('shared-files-create');
+    Route::post('/shared-files', [\App\Http\Controllers\CommunicationController::class, 'storeSharedFile'])->name('shared-files-store');
+});
+
+// COMMUNICATION GROUPS
+Route::middleware(['auth'])->prefix('communication/groups')->name('communication.groups.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\GroupController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\GroupController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\GroupController::class, 'store'])->name('store');
+});

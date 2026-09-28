@@ -250,4 +250,8 @@ class PayrollController extends Controller
 
         return view('payroll.my-payslips', compact('payslips', 'stats'));
     }
+    public function exportCsv()
+    {
+        return response()->json(['message' => 'Export CSV — inatengenezwa'], 200);
+    }
 }
