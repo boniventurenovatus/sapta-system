@@ -1445,7 +1445,7 @@ Route::get('/setup-sapta-live', function () {
         }
         
         // 5. Ondoa users wote (pamoja na waliofutwa)
-        \App\Models\User::withTrashed()->forceDelete();
+        \App\Models\User::query()->delete();
         
         // Rekebisha sequence kwa users
         \DB::statement("SELECT setval('users_id_seq', 1, false);");
