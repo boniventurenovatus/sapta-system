@@ -295,7 +295,7 @@ class PayrollController extends Controller
     public function generateQrCode($payslip)
     {
         try {
-            $url = route('payroll.verify', ['token' => $payslip->verification_token]);
+            $url = route('payroll.verify.public', ['token' => $payslip->verification_token]);
             
             $builder = new \Endroid\QrCode\Builder\Builder(
                 writer: new \Endroid\QrCode\Writer\PngWriter(),

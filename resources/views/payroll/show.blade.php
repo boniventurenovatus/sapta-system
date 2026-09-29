@@ -51,6 +51,21 @@
                 <span class="ps-label">Employee</span>
                 <span class="ps-value">{{ $payslip->employee->first_name ?? '—' }} {{ $payslip->employee->last_name ?? '' }}</span>
             </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Employee Number</span>
+                <span class="ps-value">{{ $payslip->employee->employee_number ?? '—' }}</span>
+            </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Department</span>
+                <span class="ps-value">{{ $payslip->employee->department->name ?? '—' }}</span>
+            </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Position</span>
+                <span class="ps-value">{{ $payslip->employee->position->name ?? '—' }}</span>
+            </div>
             <div class="ps-row">
                 <span class="ps-label">Status</span>
                 <span class="ps-value"><span class="ps-badge {{ $payslip->status }}">{{ $payslip->status }}</span></span>
