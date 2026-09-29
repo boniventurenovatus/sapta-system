@@ -1439,3 +1439,21 @@ Route::get('/token-debug/{token}', function ($token) {
         'now' => now(),
     ]);
 });
+Route::get('/tokens-list', function () {
+    $payslips = \App\Models\Payslip::whereNotNull('verification_token')->get();
+    
+    return response()->json([
+        'total' => $payslips->count(),
+        'tokens' => $payslips->map(function ($p) {
+            return [
+                'payslip_number' => $p->payslip_number,
+                'employee_id' => $p->employee_id,
+                'month' => $p->month,
+                'year' => $p->year,
+                'token' => $p->verification_token,
+                'token_expires_at' => $p->token_expires_at,
+                'verify_url' => url('/payroll/verify/' . $p->verification_token),
+            ];
+        })->toArray(),
+    ]);
+});
