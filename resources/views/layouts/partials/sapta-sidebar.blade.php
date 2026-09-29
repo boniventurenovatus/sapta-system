@@ -131,7 +131,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Executive</div>
                 
-                </a>
                 
                 <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
@@ -147,7 +146,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Management</div>
                 
-                </a>
                 
                 <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('departments.*') ? 'active' : '' }}" data-target="departments-submenu">
                       <i class="fas fa-sitemap"></i>
@@ -179,7 +177,6 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Human Resources</div>
                 
-                </a>
                 
                 <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
                     <i class="fas fa-sitemap"></i>
