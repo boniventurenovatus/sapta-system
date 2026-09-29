@@ -19,7 +19,7 @@ class Payslip extends Model
         'ward_id', 'salary_id', 'payslip_number', 'month', 'year',
         'basic_salary', 'total_allowances', 'gross_salary', 'total_deductions',
         'net_salary', 'allowances_breakdown', 'deductions_breakdown',
-        'status', 'payment_date', 'notes', 'verification_token', 'token_expires_at',
+        'status', 'payment_date', 'notes', 'verification_token', 'token_expires_at', 'approved_by', 'approved_at', 'generated_by', 'paid_by',
     ];
 
     protected $casts = [
@@ -27,11 +27,27 @@ class Payslip extends Model
         'deductions_breakdown' => 'array',
         'payment_date' => 'date',
         'token_expires_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'approved_by');
+    }
+
+    public function paidBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'paid_by');
+    }
+
+    public function generatedBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'generated_by');
     }
 
     public function salary(): BelongsTo

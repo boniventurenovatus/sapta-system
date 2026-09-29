@@ -105,6 +105,7 @@ class PayrollController extends Controller
                 'status' => 'draft',
                   'verification_token' => \Str::random(64),
                   'token_expires_at' => now()->addDays(30),
+                'generated_by' => auth()->id(),
             ]);
 
             $generated++;
@@ -122,13 +123,21 @@ class PayrollController extends Controller
 
     public function approve(Payslip $payslip)
     {
-        $payslip->update(['status' => 'approved']);
+        $payslip->update([
+            'status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
         return back()->with('success', 'Payslip approved.');
     }
 
     public function markAsPaid(Payslip $payslip)
     {
-        $payslip->update(['status' => 'paid', 'payment_date' => now()]);
+        $payslip->update([
+            'status' => 'paid',
+            'payment_date' => now(),
+            'paid_by' => auth()->id(),
+        ]);
         return back()->with('success', 'Payslip marked as paid.');
     }
 
