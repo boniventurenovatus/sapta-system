@@ -1412,7 +1412,7 @@ Route::get('/setup-sapta-live', function () {
         $log[] = "Data zote za demo zimeondolewa";
         
         // 2. Ondoa organizations za zamani
-        \App\Models\Organization::query()->delete();
+        \App\Models\Organization::withTrashed()->forceDelete();
         $log[] = "Organizations zimeondolewa";
         
         // Rekebisha sequence kwa PostgreSQL
