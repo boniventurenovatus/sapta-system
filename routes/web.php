@@ -1417,3 +1417,25 @@ Route::get('/verify-test', function () {
         })->values()->toArray(),
     ]);
 });
+Route::get('/token-debug/{token}', function ($token) {
+    $payslip = \App\Models\Payslip::where('verification_token', $token)->first();
+    
+    if (!$payslip) {
+        return response()->json([
+            'found' => false,
+            'token' => $token,
+            'message' => 'Token haipatikani kwenye database ya Render',
+            'total_payslips' => \App\Models\Payslip::count(),
+            'payslips_with_tokens' => \App\Models\Payslip::whereNotNull('verification_token')->count(),
+        ]);
+    }
+    
+    return response()->json([
+        'found' => true,
+        'payslip_number' => $payslip->payslip_number,
+        'employee_id' => $payslip->employee_id,
+        'token_expires_at' => $payslip->token_expires_at,
+        'is_expired' => $payslip->token_expires_at < now(),
+        'now' => now(),
+    ]);
+});
