@@ -2207,3 +2207,22 @@ textarea {
 }
 
 
+
+/* ============================================
+   SAPTA NAV ARROW (Submenus zote)
+   ============================================ */
+.sapta-nav-arrow {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.25s ease;
+    color: #6b7280;
+}
+
+.sapta-nav-toggle.open .sapta-nav-arrow {
+    transform: rotate(90deg);
+    color: #93c5fd;
+}
+
+.sapta-nav-toggle:hover .sapta-nav-arrow {
+    color: #93c5fd;
+}

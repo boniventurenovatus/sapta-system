@@ -63,15 +63,37 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Administration</div>
                 
-                <a href="{{ route('employees.index') }}" class="sapta-nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span class="sapta-nav-text">Employees</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('employees.*') ? 'active' : '' }}" data-target="employees-submenu">
+                      <i class="fas fa-users"></i>
+                      <span class="sapta-nav-text">Employees</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="employees-submenu" style="display:none;">
+                      <a href="{{ route('employees.index') }}" class="sapta-nav-subitem {{ request()->routeIs('employees.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Employee List</span>
+                      </a>
+                      <a href="{{ route('employees.create') }}" class="sapta-nav-subitem {{ request()->routeIs('employees.create') ? 'active' : '' }}">
+                          <i class="fas fa-user-plus"></i>
+                          <span class="sapta-nav-text">Add Employee</span>
+                      </a>
+                  </div>
                 
-                <a href="{{ route('users.index') }}" class="sapta-nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-gear"></i>
-                    <span class="sapta-nav-text">System Users</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('users.*') ? 'active' : '' }}" data-target="users-submenu">
+                      <i class="fas fa-user-gear"></i>
+                      <span class="sapta-nav-text">System Users</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="users-submenu" style="display:none;">
+                      <a href="{{ route('users.index') }}" class="sapta-nav-subitem {{ request()->routeIs('users.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">User List</span>
+                      </a>
+                      <a href="{{ route('users.create') }}" class="sapta-nav-subitem {{ request()->routeIs('users.create') ? 'active' : '' }}">
+                          <i class="fas fa-user-plus"></i>
+                          <span class="sapta-nav-text">Add User</span>
+                      </a>
+                  </div>
                 
                 <a href="{{ route('roles.index') }}" class="sapta-nav-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
                     <i class="fas fa-shield-halved"></i>
@@ -88,10 +110,17 @@
                     <span class="sapta-nav-text">Activity Logs</span>
                 </a>
                 
-                <a href="{{ route('settings.index') }}" class="sapta-nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
-                    <i class="fas fa-gear"></i>
-                    <span class="sapta-nav-text">Settings</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('settings.*') ? 'active' : '' }}" data-target="settings-submenu">
+                      <i class="fas fa-gear"></i>
+                      <span class="sapta-nav-text">Settings</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="settings-submenu" style="display:none;">
+                      <a href="{{ route('settings.index') }}" class="sapta-nav-subitem {{ request()->routeIs('settings.index') ? 'active' : '' }}">
+                          <i class="fas fa-sliders"></i>
+                          <span class="sapta-nav-text">General Settings</span>
+                      </a>
+                  </div>
             </div>
         @endif
 
@@ -166,10 +195,21 @@
                     <span class="sapta-nav-text">Trainings</span>
                 </a>
                 
-                <a href="{{ route('recruitment.index') }}" class="sapta-nav-item {{ request()->routeIs('recruitment.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-plus"></i>
-                    <span class="sapta-nav-text">Recruitment</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('recruitment.*') ? 'active' : '' }}" data-target="recruitment-submenu">
+                      <i class="fas fa-user-plus"></i>
+                      <span class="sapta-nav-text">Recruitment</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="recruitment-submenu" style="display:none;">
+                      <a href="{{ route('recruitment.index') }}" class="sapta-nav-subitem {{ request()->routeIs('recruitment.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Job Postings</span>
+                      </a>
+                      <a href="{{ route('recruitment.create') }}" class="sapta-nav-subitem {{ request()->routeIs('recruitment.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Job</span>
+                      </a>
+                  </div>
             </div>
         @endif
 
@@ -225,10 +265,21 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Projects & Programs</div>
                 
-                <a href="{{ route('projects.index') }}" class="sapta-nav-item {{ request()->routeIs('projects.*') ? 'active' : '' }}">
-                    <i class="fas fa-diagram-project"></i>
-                    <span class="sapta-nav-text">Projects</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('projects.*') ? 'active' : '' }}" data-target="projects-submenu">
+                      <i class="fas fa-diagram-project"></i>
+                      <span class="sapta-nav-text">Projects</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="projects-submenu" style="display:none;">
+                      <a href="{{ route('projects.index') }}" class="sapta-nav-subitem {{ request()->routeIs('projects.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Project List</span>
+                      </a>
+                      <a href="{{ route('projects.create') }}" class="sapta-nav-subitem {{ request()->routeIs('projects.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Project</span>
+                      </a>
+                  </div>
                 
                 <a href="{{ route('tasks.index') }}" class="sapta-nav-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
                     <i class="fas fa-list-check"></i>
@@ -357,7 +408,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Fungua/kufunga submenu kwa Payroll
+    // Fungua/kufunga submenu zote
     document.querySelectorAll('.sapta-nav-toggle').forEach(function (toggle) {
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
@@ -375,18 +426,31 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Kama tuko kwenye ukurasa wa Payroll, fungua submenu
-    if (window.location.pathname.startsWith('/payroll') || window.location.pathname.startsWith('/my-payslips')) {
-        var payrollSubmenu = document.getElementById('payroll-submenu');
-        if (payrollSubmenu) {
-            payrollSubmenu.style.display = 'block';
-            document.querySelectorAll('.sapta-nav-toggle').forEach(function (t) {
-                if (t.getAttribute('data-target') === 'payroll-submenu') {
-                    t.classList.add('open');
-                }
-            });
+    // Fungua submenu inayohusiana na ukurasa wa sasa
+    var path = window.location.pathname;
+    var submenuMap = {
+        '/employees': 'employees-submenu',
+        '/users': 'users-submenu',
+        '/settings': 'settings-submenu',
+        '/recruitment': 'recruitment-submenu',
+        '/projects': 'projects-submenu',
+        '/payroll': 'payroll-submenu',
+        '/my-payslips': 'payroll-submenu'
+    };
+    
+    Object.keys(submenuMap).forEach(function (prefix) {
+        if (path.startsWith(prefix)) {
+            var submenu = document.getElementById(submenuMap[prefix]);
+            if (submenu) {
+                submenu.style.display = 'block';
+                document.querySelectorAll('.sapta-nav-toggle').forEach(function (t) {
+                    if (t.getAttribute('data-target') === submenuMap[prefix]) {
+                        t.classList.add('open');
+                    }
+                });
+            }
         }
-    }
+    });
 });
 </script>
 </aside>
