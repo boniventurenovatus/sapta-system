@@ -1390,3 +1390,16 @@ Route::middleware(['auth'])->prefix('communication/groups')->name('communication
     Route::get('/create', [\App\Http\Controllers\GroupController::class, 'create'])->name('create');
     Route::post('/', [\App\Http\Controllers\GroupController::class, 'store'])->name('store');
 });
+Route::get('/routes-debug', function () {
+    $routes = collect(\Route::getRoutes())->map(function ($route) {
+        return [
+            'uri' => $route->uri(),
+            'name' => $route->getName(),
+            'methods' => implode('|', $route->methods()),
+        ];
+    })->filter(function ($r) {
+        return strpos($r['uri'], 'payroll') !== false || strpos($r['uri'], 'verify') !== false;
+    })->values()->toArray();
+    
+    return response()->json($routes);
+});
