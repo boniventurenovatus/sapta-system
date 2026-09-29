@@ -1411,8 +1411,13 @@ Route::get('/setup-sapta-live', function () {
         // Hakuna foreign key checks
         $log[] = "Data zote za demo zimeondolewa";
         
-        // 2. Ondoa organizations za zamani
-        \App\Models\Organization::withTrashed()->forceDelete();
+        // 2. Ondoa organizations za zamani — lakini tuache departments
+        // (departments zinahusiana na organization — tutazirekebisha)
+        $oldOrg = \App\Models\Organization::withTrashed()->first();
+        if ($oldOrg) {
+            \App\Models\Department::where('organization_id', $oldOrg->id)->update(['organization_id' => null]);
+            \App\Models\Organization::withTrashed()->forceDelete();
+        }
         $log[] = "Organizations zimeondolewa";
         
         // Rekebisha sequence kwa PostgreSQL
@@ -1543,9 +1548,9 @@ Route::get('/seed-sapta-departments', function () {
     $log = [];
     
     try {
-        $org = \App\Models\Organization::where('code', 'SAPTA')->first();
+        $org = \App\Models\Organization::first();
         if (!$org) {
-            return '<pre>Organization SAPTA haipo. Endesha /setup-sapta-live kwanza.</pre>';
+            return '<pre>Hakuna organization. Endesha /setup-sapta-live kwanza.</pre>';
         }
         
         $departments = [
