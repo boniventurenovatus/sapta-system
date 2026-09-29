@@ -1391,12 +1391,3 @@ Route::middleware(['auth'])->prefix('communication/groups')->name('communication
     Route::post('/', [\App\Http\Controllers\GroupController::class, 'store'])->name('store');
 });
 
-Route::get("/reset-passwords-secret", function () {
-    $count = 0;
-    \App\Models\User::each(function ($u) use (&$count) {
-        $u->password_hash = bcrypt("Sapta@2025!");
-        $u->save();
-        $count++;
-    });
-    return "Updated: {$count} users with password Sapta@2025!";
-});
