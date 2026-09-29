@@ -1395,3 +1395,15 @@ Route::middleware(['auth'])->prefix('communication/groups')->name('communication
 // ============================================================
 // TEMPORARY: Setup SAPTA Live Database — Ondoa baada ya kutumia
 // ============================================================
+
+// ============================================================
+// TEMPORARY: Run sapta:setup kwenye Render
+// ============================================================
+Route::get('/run-sapta-setup', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('sapta:setup');
+        return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
