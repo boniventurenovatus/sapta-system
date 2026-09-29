@@ -1532,3 +1532,10 @@ Route::get('/debug-organizations', function () {
         'count' => $orgs->count(),
     ]);
 });
+Route::get('/debug-org-data', function () {
+    return response()->json([
+        'departments' => \App\Models\Department::get(['id', 'name', 'organization_id']),
+        'positions' => \App\Models\Position::get(['id', 'title', 'department_id']),
+        'organizations' => \App\Models\Organization::get(['id', 'name', 'code']),
+    ]);
+});
