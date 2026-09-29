@@ -56,11 +56,12 @@ class SaptaSetup extends Command
             $this->info('6. Rekebisha sequence...');
             $driver = DB::connection()->getDriverName();
             if ($driver === 'pgsql') {
-                DB::statement("SELECT setval('organizations_id_seq', 1, false);");
-                DB::statement("SELECT setval('departments_id_seq', 1, false);");
-                DB::statement("SELECT setval('positions_id_seq', 1, false);");
-                DB::statement("SELECT setval('employees_id_seq', 1, false);");
-                DB::statement("SELECT setval('users_id_seq', 1, false);");
+                // Tumia TRUNCATE ... RESTART IDENTITY kwa PostgreSQL
+                DB::statement('TRUNCATE TABLE organizations RESTART IDENTITY CASCADE;');
+                DB::statement('TRUNCATE TABLE departments RESTART IDENTITY CASCADE;');
+                DB::statement('TRUNCATE TABLE positions RESTART IDENTITY CASCADE;');
+                DB::statement('TRUNCATE TABLE employees RESTART IDENTITY CASCADE;');
+                DB::statement('TRUNCATE TABLE users RESTART IDENTITY CASCADE;');
             } elseif ($driver === 'mysql') {
                 DB::statement('SET FOREIGN_KEY_CHECKS=0;');
                 DB::statement('TRUNCATE TABLE organizations;');
