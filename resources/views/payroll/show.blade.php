@@ -89,7 +89,7 @@
             <div class="ps-section-title">Earnings</div>
             <div class="ps-row">
                 <span class="ps-label">Basic Salary</span>
-                <span class="ps-value">{{ number_format($payslip->basic_salary, 2) }}</span>
+                <span class="ps-value">{{ number_format($payslip->basic_salary, 2) }} {{ \App\Models\Setting::get('currency', 'TZS') }}</span>
             </div>
             @if($payslip->allowances_breakdown)
                 @foreach($payslip->allowances_breakdown as $key => $val)
@@ -174,7 +174,14 @@
                     </div>
         </div>
 
-        <div class="ps-actions">
+        <div class="ps-footer" style="margin-top:1.5rem; padding-top:1.5rem; border-top:2px solid #e2e8f0; text-align:center; font-size:0.75rem; color:#64748b;">
+                <p style="font-weight:800; color:#0f172a; margin:0 0 0.25rem; text-transform:uppercase; letter-spacing:0.05em;">SOIL-ANIMALS' POWER TANZANIA</p>
+                <p style="margin:0 0 0.25rem;">P.O Box 149, Morogoro, Tanzania</p>
+                <p style="margin:0 0 0.25rem;">Kihonda-Kilimanjaro</p>
+                <p style="margin:0.5rem 0 0; font-size:0.65rem; color:#94a3b8;">© {{ date('Y') }} SAPTA. All rights reserved.</p>
+            </div>
+
+            <div class="ps-actions">
             @if($payslip->status === 'draft')
                 <form action="{{ route('payroll.approve', $payslip) }}" method="POST">
                     @csrf
