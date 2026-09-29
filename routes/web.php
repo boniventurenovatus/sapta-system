@@ -1403,3 +1403,17 @@ Route::get('/routes-debug', function () {
     
     return response()->json($routes);
 });
+Route::get('/verify-test', function () {
+    return response()->json([
+        'message' => 'Route ya verify-test inafanya kazi',
+        'routes' => collect(\Route::getRoutes())->filter(function ($route) {
+            return strpos($route->uri(), 'verify') !== false;
+        })->map(function ($route) {
+            return [
+                'uri' => $route->uri(),
+                'name' => $route->getName(),
+                'methods' => implode('|', $route->methods()),
+            ];
+        })->values()->toArray(),
+    ]);
+});
