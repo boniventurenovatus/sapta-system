@@ -1422,3 +1422,13 @@ Route::get('/qr-debug', function () {
     
     return '<pre>' . implode("\n", $output) . '</pre>';
 });
+Route::get('/fill-tokens', function () {
+    $count = 0;
+    \App\Models\Payslip::whereNull('verification_token')->each(function ($p) use (&$count) {
+        $p->verification_token = \Str::random(64);
+        $p->token_expires_at = now()->addDays(30);
+        $p->save();
+        $count++;
+    });
+    return "Updated: {$count} payslips with tokens";
+});
