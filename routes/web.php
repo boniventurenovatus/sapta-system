@@ -1418,7 +1418,7 @@ Route::get('/setup-sapta-live', function () {
         // Rekebisha sequence kwa PostgreSQL
         $driver = \DB::connection()->getDriverName();
         if ($driver === 'pgsql') {
-            \DB::statement('ALTER SEQUENCE organizations_id_seq RESTART WITH 1;');
+            \DB::statement("SELECT setval('organizations_id_seq', COALESCE((SELECT MAX(id) FROM organizations), 0) + 1, false);");
         }
         
         // 3. Unda organization halisi
@@ -1436,12 +1436,12 @@ Route::get('/setup-sapta-live', function () {
         
         // Rekebisha sequence kwa users
         if ($driver === 'pgsql') {
-            \DB::statement('ALTER SEQUENCE users_id_seq RESTART WITH 1;');
+            \DB::statement("SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 0) + 1, false);");
         }
         
         // Rekebisha sequence kwa employees
         if ($driver === 'pgsql') {
-            \DB::statement('ALTER SEQUENCE employees_id_seq RESTART WITH 1;');
+            \DB::statement("SELECT setval('employees_id_seq', COALESCE((SELECT MAX(id) FROM employees), 0) + 1, false);");
         }
         
         // 5. Update username za superadmin na admin
