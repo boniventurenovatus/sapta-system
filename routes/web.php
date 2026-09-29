@@ -1539,3 +1539,70 @@ Route::get('/debug-org-data', function () {
         'organizations' => \App\Models\Organization::get(['id', 'name', 'code']),
     ]);
 });
+Route::get('/seed-sapta-departments', function () {
+    $log = [];
+    
+    try {
+        $org = \App\Models\Organization::where('code', 'SAPTA')->first();
+        if (!$org) {
+            return '<pre>Organization SAPTA haipo. Endesha /setup-sapta-live kwanza.</pre>';
+        }
+        
+        $departments = [
+            ['name' => 'Human Resource', 'code' => 'HR', 'organization_id' => $org->id],
+            ['name' => 'Board of Directors', 'code' => 'BOD', 'organization_id' => $org->id],
+            ['name' => 'Chief Executive Officer', 'code' => 'CEO', 'organization_id' => $org->id],
+            ['name' => 'Administrative and Operations Department', 'code' => 'ADMIN', 'organization_id' => $org->id],
+            ['name' => 'Program and Technical Department', 'code' => 'PROG', 'organization_id' => $org->id],
+            ['name' => 'Monitoring, Evaluation, Accountability and Learning Department', 'code' => 'MEAL', 'organization_id' => $org->id],
+            ['name' => 'Communications & ICT / Digital Innovation Department', 'code' => 'ICT', 'organization_id' => $org->id],
+        ];
+        
+        foreach ($departments as $dept) {
+            $d = \App\Models\Department::firstOrCreate(
+                ['name' => $dept['name']],
+                $dept
+            );
+            $log[] = "Department: " . $d->name . " (ID: " . $d->id . ")";
+        }
+        
+        // Unganisha positions na departments
+        $deptMap = [
+            'Board of Directors' => 'Board of Directors',
+            'Chief Executive Officer (CEO)' => 'Chief Executive Officer',
+            'Administrative Director' => 'Administrative and Operations Department',
+            'Human Resource Management & Administration Manager' => 'Human Resource',
+            'Procurement & Logistics Manager' => 'Administrative and Operations Department',
+            'Finance Manager' => 'Administrative and Operations Department',
+            'Accountant' => 'Administrative and Operations Department',
+            'Program & Technical Director' => 'Program and Technical Department',
+            'Project Manager' => 'Program and Technical Department',
+            'Project Officers' => 'Program and Technical Department',
+            'Field Trainer' => 'Program and Technical Department',
+            'Partnerships and Resource Mobilization Manager' => 'Program and Technical Department',
+            'MEAL Manager' => 'Monitoring, Evaluation, Accountability and Learning Department',
+            'MEAL Officer' => 'Monitoring, Evaluation, Accountability and Learning Department',
+            'Research and Innovation Officer' => 'Monitoring, Evaluation, Accountability and Learning Department',
+            'Community Knowledge Manager' => 'Monitoring, Evaluation, Accountability and Learning Department',
+            'ICT & Digital Innovation Manager' => 'Communications & ICT / Digital Innovation Department',
+        ];
+        
+        foreach ($deptMap as $posTitle => $deptName) {
+            $dept = \App\Models\Department::where('name', $deptName)->first();
+            if ($dept) {
+                $pos = \App\Models\Position::where('title', $posTitle)->first();
+                if ($pos) {
+                    $pos->update(['department_id' => $dept->id]);
+                    $log[] = "Position: " . $pos->title . " → " . $dept->name;
+                }
+            }
+        }
+        
+        $log[] = "=== DEPARTMENTS NA POSITIONS ZIMEUNDWA ===";
+        
+    } catch (\Exception $e) {
+        $log[] = "ERROR: " . $e->getMessage();
+    }
+    
+    return '<pre>' . implode("\n", $log) . '</pre>';
+});
