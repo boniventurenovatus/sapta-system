@@ -118,7 +118,11 @@ class PayrollController extends Controller
     public function show(Payslip $payslip)
     {
         $payslip->load(['employee', 'salary']);
-        return view('payroll.show', compact('payslip'));
+        
+        $ytd = $this->getYtdTotals($payslip->employee_id);
+        $leave = $this->getLeaveBalance($payslip->employee_id);
+        
+        return view('payroll.show', compact('payslip', 'ytd', 'leave'));
     }
 
     public function approve(Payslip $payslip)
@@ -319,5 +323,52 @@ class PayrollController extends Controller
             \Log::error('QR Code generation failed: ' . $e->getMessage());
             return null;
         }
+    }
+
+
+    /**
+     * Hesabu YTD totals kwa mfanyakazi.
+     */
+    public function getYtdTotals($employeeId)
+    {
+        $year = date('Y');
+        
+        return [
+            'basic_salary' => Payslip::where('employee_id', $employeeId)
+                ->where('year', $year)
+                ->sum('basic_salary'),
+            'gross_salary' => Payslip::where('employee_id', $employeeId)
+                ->where('year', $year)
+                ->sum('gross_salary'),
+            'total_deductions' => Payslip::where('employee_id', $employeeId)
+                ->where('year', $year)
+                ->sum('total_deductions'),
+            'net_salary' => Payslip::where('employee_id', $employeeId)
+                ->where('year', $year)
+                ->sum('net_salary'),
+        ];
+    }
+
+    /**
+     * Hesabu leave balance kwa mfanyakazi.
+     */
+    public function getLeaveBalance($employeeId)
+    {
+        $year = date('Y');
+        
+        $approved = \App\Models\LeaveRequest::where('employee_id', $employeeId)
+            ->where('status', 'approved')
+            ->whereYear('start_date', $year)
+            ->sum('total_days');
+        
+        $pending = \App\Models\LeaveRequest::where('employee_id', $employeeId)
+            ->where('status', 'pending')
+            ->whereYear('start_date', $year)
+            ->sum('total_days');
+        
+        return [
+            'approved' => $approved,
+            'pending' => $pending,
+        ];
     }
 }
