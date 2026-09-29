@@ -63,8 +63,8 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 
 // MANAGEMENT
 Route::resource('employees', EmployeeController::class)->middleware('role:super_admin,admin,director,admin_director,program_director,hr_manager,hr_officer,ceo,bod,manager');
-Route::resource('organizations', OrganizationController::class)->middleware('auth');
-Route::resource('departments', DepartmentController::class)->middleware('auth');
+Route::resource('organizations', OrganizationController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
+Route::resource('departments', DepartmentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
 Route::resource('positions', PositionController::class)->middleware('role:super_admin,admin,director,admin_director,hr_manager,hr_officer,ceo,bod,manager');
 Route::resource('employee-positions', EmployeePositionController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
 
@@ -108,7 +108,7 @@ Route::get('/search', [SearchController::class, 'index'])->middleware('auth')->n
 Route::get('/search/live', [SearchController::class, 'search'])->middleware('auth')->name('search.live');
 
 // REPORTS
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('auth');
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:super_admin,admin,director,manager,finance_manager,hr_manager');
 Route::get('/reports/employees', [ReportController::class, 'employees'])->name('reports.employees')->middleware('role:super_admin,admin,director,manager,finance_manager');
 Route::get('/reports/attendance', [ReportController::class, 'attendance'])->name('reports.attendance')->middleware('role:super_admin,admin,director,manager,finance_manager');
 Route::get('/reports/projects', [ReportController::class, 'projects'])->name('reports.projects')->middleware('role:super_admin,admin,director,manager,finance_manager');
@@ -116,10 +116,10 @@ Route::get('/reports/tasks', [ReportController::class, 'tasks'])->name('reports.
 Route::get('/reports/leaves', [ReportController::class, 'leaves'])->name('reports.leaves')->middleware('role:super_admin,admin,director,manager,finance_manager');
 
 // TASKS
-Route::resource('tasks', TaskController::class)->middleware('auth');
+Route::resource('tasks', TaskController::class)->middleware('role:super_admin,admin,program_director,project_manager,project_officer,manager,staff');
 
 // PROJECTS
-Route::resource('projects', ProjectController::class)->middleware('auth');
+Route::resource('projects', ProjectController::class)->middleware('role:super_admin,admin,program_director,project_manager,project_officer');
 // ============================================================
 // RESET PASSWORDS — kwa kudumu
 // ============================================================
@@ -138,17 +138,17 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // BUDGETS
 // ============================================================
-Route::resource('budgets', \App\Http\Controllers\BudgetController::class)->middleware('auth');
+Route::resource('budgets', \App\Http\Controllers\BudgetController::class)->middleware('role:super_admin,admin,finance_manager,accountant,procurement_manager');
 
 // ============================================================
 // RECEIPTS
 // ============================================================
-Route::resource('receipts', \App\Http\Controllers\ReceiptController::class)->middleware('auth');
+Route::resource('receipts', \App\Http\Controllers\ReceiptController::class)->middleware('role:super_admin,admin,finance_manager,accountant');
 
 // ============================================================
 // PAYMENT VOUCHERS
 // ============================================================
-Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherController::class)->middleware('auth');
+Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherController::class)->middleware('role:super_admin,admin,finance_manager,accountant,procurement_manager');
 
 // ============================================================
 // PAYROLL
@@ -158,32 +158,32 @@ Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherControll
 // ============================================================
 // TRAININGS
 // ============================================================
-Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->middleware('auth');
+Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
 
 // ============================================================
 // DOCUMENTS
 // ============================================================
-Route::resource('documents', \App\Http\Controllers\DocumentController::class)->middleware('auth');
+Route::resource('documents', \App\Http\Controllers\DocumentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,manager,staff');
 
 // ============================================================
 // RECRUITMENT
 // ============================================================
-Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('auth');
+Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
 
 // ============================================================
 // PERFORMANCE REVIEWS
 // ============================================================
-Route::resource('performance-reviews', \App\Http\Controllers\PerformanceReviewController::class)->middleware('auth');
+Route::resource('performance-reviews', \App\Http\Controllers\PerformanceReviewController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,manager');
 
 // ============================================================
 // EXPENSE CLAIMS
 // ============================================================
-Route::resource('expense-claims', \App\Http\Controllers\ExpenseClaimController::class)->middleware('auth');
+Route::resource('expense-claims', \App\Http\Controllers\ExpenseClaimController::class)->middleware('role:super_admin,admin,finance_manager,accountant');
 
 // ============================================================
 // PROCUREMENT REQUESTS
 // ============================================================
-Route::resource('procurement-requests', \App\Http\Controllers\ProcurementRequestController::class)->middleware('auth');
+Route::resource('procurement-requests', \App\Http\Controllers\ProcurementRequestController::class)->middleware('role:super_admin,admin,finance_manager,procurement_manager');
 
 // ============================================================
 // AUDIT LOGS
