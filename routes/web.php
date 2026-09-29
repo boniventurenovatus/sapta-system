@@ -1444,7 +1444,13 @@ Route::get('/setup-sapta-live', function () {
             \DB::statement("SELECT setval('employees_id_seq', COALESCE((SELECT MAX(id) FROM employees), 0) + 1, false);");
         }
         
-        // 5. Update username za superadmin na admin
+        // 5. Ondoa users wote (pamoja na waliofutwa)
+        \App\Models\User::withTrashed()->forceDelete();
+        
+        // Rekebisha sequence kwa users
+        \DB::statement("SELECT setval('users_id_seq', 1, false);");
+        
+        // 6. Unda superadmin na admin mpya
         \App\Models\User::where('username', 'superadmin')->orWhere('username', 'admin')->delete();
         
         $super = \App\Models\User::create([
@@ -1467,7 +1473,7 @@ Route::get('/setup-sapta-live', function () {
         $admin->roles()->sync([\App\Models\Role::where('code', 'admin')->first()->id]);
         $log[] = "Admin ameundwa: ayusto.mwangalo";
         
-        // 6. Pata department na position kwa jina
+        // 7. Pata department na position kwa jina
         $adminDept = \App\Models\Department::where('name', 'Administrative and Operations Department')->first();
         $adminPos = \App\Models\Position::where('title', 'Administrative Director')->first();
         
@@ -1478,7 +1484,7 @@ Route::get('/setup-sapta-live', function () {
             $adminPos = \App\Models\Position::first();
         }
         
-        // 7. Unda employees 2
+        // 8. Unda employees 2
         $emp1 = \App\Models\Employee::create([
             'employee_number' => 'EMP001',
             'first_name' => 'Novatus',
