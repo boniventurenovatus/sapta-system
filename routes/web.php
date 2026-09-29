@@ -1391,3 +1391,102 @@ Route::middleware(['auth'])->prefix('communication/groups')->name('communication
     Route::post('/', [\App\Http\Controllers\GroupController::class, 'store'])->name('store');
 });
 
+
+// ============================================================
+// TEMPORARY: Setup SAPTA Live Database — Ondoa baada ya kutumia
+// ============================================================
+Route::get('/setup-sapta-live', function () {
+    $log = [];
+    
+    try {
+        // 1. Ondoa data zote za demo
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \App\Models\Payslip::query()->delete();
+        \App\Models\LeaveRequest::query()->delete();
+        \App\Models\Attendance::query()->delete();
+        \App\Models\EmployeePosition::query()->delete();
+        \App\Models\TrainingEnrollment::query()->delete();
+        \App\Models\Employee::withTrashed()->forceDelete();
+        \App\Models\User::whereNotIn('username', ['novatus.boniventure', 'ayusto.mwangalo', 'superadmin', 'admin'])->delete();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $log[] = "Data zote za demo zimeondolewa";
+        
+        // 2. Ondoa organizations za zamani
+        \App\Models\Organization::query()->delete();
+        $log[] = "Organizations zimeondolewa";
+        
+        // 3. Unda organization halisi
+        $org = \App\Models\Organization::create([
+            'name' => 'Soil-Animals Power Tanzania',
+            'code' => 'SAPTA',
+            'type' => 'headquarters',
+            'is_active' => true,
+        ]);
+        $log[] = "Organization imeundwa: " . $org->name;
+        
+        // 4. Unganisha departments
+        \App\Models\Department::query()->update(['organization_id' => $org->id]);
+        $log[] = "Departments 7 zimeunganishwa";
+        
+        // 5. Update username za superadmin na admin
+        \App\Models\User::where('username', 'superadmin')->orWhere('username', 'admin')->delete();
+        
+        $super = \App\Models\User::create([
+            'username' => 'novatus.boniventure',
+            'email' => 'boniventurenovatus@gmail.com',
+            'password_hash' => \Hash::make('Sapta@2026!'),
+            'account_status' => 'active',
+            'is_first_login' => false,
+        ]);
+        $super->roles()->sync([\App\Models\Role::where('code', 'super_admin')->first()->id]);
+        $log[] = "Superadmin ameundwa: novatus.boniventure";
+        
+        $admin = \App\Models\User::create([
+            'username' => 'ayusto.mwangalo',
+            'email' => 'ayustomwangalo@gmail.com',
+            'password_hash' => \Hash::make('Sapta@2026!'),
+            'account_status' => 'active',
+            'is_first_login' => false,
+        ]);
+        $admin->roles()->sync([\App\Models\Role::where('code', 'admin')->first()->id]);
+        $log[] = "Admin ameundwa: ayusto.mwangalo";
+        
+        // 6. Unda employees 2
+        $emp1 = \App\Models\Employee::create([
+            'employee_number' => 'EMP001',
+            'first_name' => 'Novatus',
+            'last_name' => 'Boniventure',
+            'email' => 'boniventurenovatus@gmail.com',
+            'organization_id' => $org->id,
+            'department_id' => 4,
+            'position_id' => 5,
+            'employment_status' => 'active',
+            'hire_date' => now(),
+            'job_title' => 'Administrative Director',
+        ]);
+        $super->update(['employee_id' => $emp1->id]);
+        $log[] = "Employee: Novatus Boniventure (EMP001)";
+        
+        $emp2 = \App\Models\Employee::create([
+            'employee_number' => 'EMP002',
+            'first_name' => 'Ayusto',
+            'last_name' => 'Mwangalo',
+            'email' => 'ayustomwangalo@gmail.com',
+            'organization_id' => $org->id,
+            'department_id' => 4,
+            'position_id' => 5,
+            'employment_status' => 'active',
+            'hire_date' => now(),
+            'job_title' => 'Administrative Director',
+        ]);
+        $admin->update(['employee_id' => $emp2->id]);
+        $log[] = "Employee: Ayusto Mwangalo (EMP002)";
+        
+        $log[] = "=== SETUP IMEKAMILIKA ===";
+        
+    } catch (\Exception $e) {
+        $log[] = "ERROR: " . $e->getMessage();
+    }
+    
+    return '<pre>' . implode("\n", $log) . '</pre>';
+});
