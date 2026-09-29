@@ -149,10 +149,21 @@
                 
                 </a>
                 
-                <a href="{{ route('departments.index') }}" class="sapta-nav-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
-                    <i class="fas fa-sitemap"></i>
-                    <span class="sapta-nav-text">Departments</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('departments.*') ? 'active' : '' }}" data-target="departments-submenu">
+                      <i class="fas fa-sitemap"></i>
+                      <span class="sapta-nav-text">Departments</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="departments-submenu" style="display:none;">
+                      <a href="{{ route('departments.index') }}" class="sapta-nav-subitem {{ request()->routeIs('departments.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Department List</span>
+                      </a>
+                      <a href="{{ route('departments.create') }}" class="sapta-nav-subitem {{ request()->routeIs('departments.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Department</span>
+                      </a>
+                  </div>
                 
                 <a href="{{ route('reports.index') }}" class="sapta-nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
@@ -180,15 +191,37 @@
                     <span class="sapta-nav-text">Positions</span>
                 </a>
                 
-                <a href="{{ route('attendances.index') }}" class="sapta-nav-item {{ request()->routeIs('attendances.*') ? 'active' : '' }}">
-                    <i class="fas fa-clock"></i>
-                    <span class="sapta-nav-text">Attendance</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('attendances.*') ? 'active' : '' }}" data-target="attendances-submenu">
+                      <i class="fas fa-clock"></i>
+                      <span class="sapta-nav-text">Attendance</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="attendances-submenu" style="display:none;">
+                      <a href="{{ route('attendances.index') }}" class="sapta-nav-subitem {{ request()->routeIs('attendances.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Attendance List</span>
+                      </a>
+                      <a href="{{ route('attendances.create') }}" class="sapta-nav-subitem {{ request()->routeIs('attendances.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Attendance</span>
+                      </a>
+                  </div>
                 
-                <a href="{{ route('leave-requests.index') }}" class="sapta-nav-item {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-check"></i>
-                    <span class="sapta-nav-text">Leave Requests</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}" data-target="leave-requests-submenu">
+                      <i class="fas fa-calendar-check"></i>
+                      <span class="sapta-nav-text">Leave Requests</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="leave-requests-submenu" style="display:none;">
+                      <a href="{{ route('leave-requests.index') }}" class="sapta-nav-subitem {{ request()->routeIs('leave-requests.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Leave List</span>
+                      </a>
+                      <a href="{{ route('leave-requests.create') }}" class="sapta-nav-subitem {{ request()->routeIs('leave-requests.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Apply Leave</span>
+                      </a>
+                  </div>
                 
                 <a href="{{ route('trainings.index') }}" class="sapta-nav-item {{ request()->routeIs('trainings.*') ? 'active' : '' }}">
                     <i class="fas fa-graduation-cap"></i>
@@ -220,20 +253,42 @@
             <div class="sapta-nav-section">
                 <div class="sapta-nav-section-title">Finance</div>
                 
-                <a href="{{ route('budgets.index') }}" class="sapta-nav-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
-                    <i class="fas fa-wallet"></i>
-                    <span class="sapta-nav-text">Budgets</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('budgets.*') ? 'active' : '' }}" data-target="budgets-submenu">
+                      <i class="fas fa-wallet"></i>
+                      <span class="sapta-nav-text">Budgets</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="budgets-submenu" style="display:none;">
+                      <a href="{{ route('budgets.index') }}" class="sapta-nav-subitem {{ request()->routeIs('budgets.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Budget List</span>
+                      </a>
+                      <a href="{{ route('budgets.create') }}" class="sapta-nav-subitem {{ request()->routeIs('budgets.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Budget</span>
+                      </a>
+                  </div>
                 
                 <a href="{{ route('receipts.index') }}" class="sapta-nav-item {{ request()->routeIs('receipts.*') ? 'active' : '' }}">
                     <i class="fas fa-receipt"></i>
                     <span class="sapta-nav-text">Receipts</span>
                 </a>
                 
-                <a href="{{ route('payment-vouchers.index') }}" class="sapta-nav-item {{ request()->routeIs('payment-vouchers.*') ? 'active' : '' }}">
-                    <i class="fas fa-money-check"></i>
-                    <span class="sapta-nav-text">Payment Vouchers</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('payment-vouchers.*') ? 'active' : '' }}" data-target="payment-vouchers-submenu">
+                      <i class="fas fa-money-check"></i>
+                      <span class="sapta-nav-text">Payment Vouchers</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="payment-vouchers-submenu" style="display:none;">
+                      <a href="{{ route('payment-vouchers.index') }}" class="sapta-nav-subitem {{ request()->routeIs('payment-vouchers.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Voucher List</span>
+                      </a>
+                      <a href="{{ route('payment-vouchers.create') }}" class="sapta-nav-subitem {{ request()->routeIs('payment-vouchers.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Add Voucher</span>
+                      </a>
+                  </div>
                 
                 <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('payroll.*') ? 'active' : '' }}" data-target="payroll-submenu">
                     <i class="fas fa-money-bill-wave"></i>
@@ -286,10 +341,21 @@
                     <span class="sapta-nav-text">Tasks</span>
                 </a>
                 
-                <a href="{{ route('documents.index') }}" class="sapta-nav-item {{ request()->routeIs('documents.*') ? 'active' : '' }}">
-                    <i class="fas fa-folder"></i>
-                    <span class="sapta-nav-text">Documents</span>
-                </a>
+                <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('documents.*') ? 'active' : '' }}" data-target="documents-submenu">
+                      <i class="fas fa-folder"></i>
+                      <span class="sapta-nav-text">Documents</span>
+                      <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
+                  </a>
+                  <div class="sapta-nav-submenu" id="documents-submenu" style="display:none;">
+                      <a href="{{ route('documents.index') }}" class="sapta-nav-subitem {{ request()->routeIs('documents.index') ? 'active' : '' }}">
+                          <i class="fas fa-list"></i>
+                          <span class="sapta-nav-text">Document List</span>
+                      </a>
+                      <a href="{{ route('documents.create') }}" class="sapta-nav-subitem {{ request()->routeIs('documents.create') ? 'active' : '' }}">
+                          <i class="fas fa-plus"></i>
+                          <span class="sapta-nav-text">Upload Document</span>
+                      </a>
+                  </div>
             </div>
         @endif
 
@@ -408,7 +474,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Fungua/kufunga submenu zote
     document.querySelectorAll('.sapta-nav-toggle').forEach(function (toggle) {
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
@@ -426,7 +491,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Fungua submenu inayohusiana na ukurasa wa sasa
     var path = window.location.pathname;
     var submenuMap = {
         '/employees': 'employees-submenu',
@@ -435,7 +499,13 @@ document.addEventListener('DOMContentLoaded', function () {
         '/recruitment': 'recruitment-submenu',
         '/projects': 'projects-submenu',
         '/payroll': 'payroll-submenu',
-        '/my-payslips': 'payroll-submenu'
+        '/my-payslips': 'payroll-submenu',
+        '/departments': 'departments-submenu',
+        '/attendances': 'attendances-submenu',
+        '/leave-requests': 'leave-requests-submenu',
+        '/budgets': 'budgets-submenu',
+        '/payment-vouchers': 'payment-vouchers-submenu',
+        '/documents': 'documents-submenu'
     };
     
     Object.keys(submenuMap).forEach(function (prefix) {
