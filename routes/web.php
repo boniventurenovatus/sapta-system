@@ -1474,13 +1474,41 @@ Route::get('/setup-sapta-live', function () {
         $log[] = "Admin ameundwa: ayusto.mwangalo";
         
         // 7. Pata department na position kwa jina
-        // Tafuta department na position kwa njia rahisi
-        $adminDept = \App\Models\Department::first();
+        // 5. Unda departments kama hazipo
+        $departments = [
+            ['name' => 'Human Resource', 'code' => 'HR'],
+            ['name' => 'Board of Directors', 'code' => 'BOD'],
+            ['name' => 'Chief Executive Officer', 'code' => 'CEO'],
+            ['name' => 'Administrative and Operations Department', 'code' => 'ADMIN'],
+            ['name' => 'Program and Technical Department', 'code' => 'PROG'],
+            ['name' => 'Monitoring, Evaluation, Accountability and Learning Department', 'code' => 'MEAL'],
+            ['name' => 'Communications & ICT / Digital Innovation Department', 'code' => 'ICT'],
+        ];
+        
+        foreach ($departments as $dept) {
+            \App\Models\Department::firstOrCreate(
+                ['name' => $dept['name']],
+                ['name' => $dept['name'], 'code' => $dept['code'], 'organization_id' => $org->id]
+            );
+        }
+        $log[] = 'Departments 7 zimeundwa';
+        
+        // Pata department na position
+        $adminDept = \App\Models\Department::where('code', 'ADMIN')->first();
         $adminPos = \App\Models\Position::first();
         
-        if (!$adminDept || !$adminPos) {
-            $log[] = 'ERROR: Hakuna department au position';
-            return '<pre>' . implode("\n", $log) . '</pre>';
+        if (!$adminDept) {
+            $adminDept = \App\Models\Department::first();
+        }
+        
+        if (!$adminPos) {
+            // Unda position kama haipo
+            $adminPos = \App\Models\Position::create([
+                'title' => 'Administrative Director',
+                'code' => 'admin_director',
+                'department_id' => $adminDept->id,
+                'status' => 'active',
+            ]);
         }
         
         $log[] = 'Tumia Department: ' . $adminDept->name . ' (ID: ' . $adminDept->id . ')';
