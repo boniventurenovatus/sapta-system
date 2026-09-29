@@ -1400,13 +1400,7 @@ Route::get('/setup-sapta-live', function () {
     
     try {
         // 1. Ondoa data zote za demo
-        // Disable foreign key checks — database-agnostic
-        $driver = \DB::connection()->getDriverName();
-        if ($driver === 'mysql') {
-            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        } elseif ($driver === 'pgsql') {
-            \DB::statement('SET session_replication_role = replica;');
-        }
+        // Hakuna foreign key checks — tutaondoa kwa mpangilio sahihi
         \App\Models\Payslip::query()->delete();
         \App\Models\LeaveRequest::query()->delete();
         \App\Models\Attendance::query()->delete();
@@ -1414,12 +1408,7 @@ Route::get('/setup-sapta-live', function () {
         \App\Models\TrainingEnrollment::query()->delete();
         \App\Models\Employee::withTrashed()->forceDelete();
         \App\Models\User::whereNotIn('username', ['novatus.boniventure', 'ayusto.mwangalo', 'superadmin', 'admin'])->delete();
-        // Enable foreign key checks
-        if ($driver === 'mysql') {
-            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        } elseif ($driver === 'pgsql') {
-            \DB::statement('SET session_replication_role = DEFAULT;');
-        }
+        // Hakuna foreign key checks
         $log[] = "Data zote za demo zimeondolewa";
         
         // 2. Ondoa organizations za zamani
