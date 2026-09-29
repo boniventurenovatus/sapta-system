@@ -1467,15 +1467,26 @@ Route::get('/setup-sapta-live', function () {
         $admin->roles()->sync([\App\Models\Role::where('code', 'admin')->first()->id]);
         $log[] = "Admin ameundwa: ayusto.mwangalo";
         
-        // 6. Unda employees 2
+        // 6. Pata department na position kwa jina
+        $adminDept = \App\Models\Department::where('name', 'Administrative and Operations Department')->first();
+        $adminPos = \App\Models\Position::where('title', 'Administrative Director')->first();
+        
+        if (!$adminDept) {
+            $adminDept = \App\Models\Department::first();
+        }
+        if (!$adminPos) {
+            $adminPos = \App\Models\Position::first();
+        }
+        
+        // 7. Unda employees 2
         $emp1 = \App\Models\Employee::create([
             'employee_number' => 'EMP001',
             'first_name' => 'Novatus',
             'last_name' => 'Boniventure',
             'email' => 'boniventurenovatus@gmail.com',
             'organization_id' => $org->id,
-            'department_id' => 4,
-            'position_id' => 5,
+            'department_id' => $adminDept->id,
+            'position_id' => $adminPos->id,
             'employment_status' => 'active',
             'hire_date' => now(),
             'job_title' => 'Administrative Director',
