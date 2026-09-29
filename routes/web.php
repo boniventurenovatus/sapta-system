@@ -1474,15 +1474,17 @@ Route::get('/setup-sapta-live', function () {
         $log[] = "Admin ameundwa: ayusto.mwangalo";
         
         // 7. Pata department na position kwa jina
-        $adminDept = \App\Models\Department::where('name', 'Administrative and Operations Department')->first();
-        $adminPos = \App\Models\Position::where('title', 'Administrative Director')->first();
+        // Tafuta department na position kwa njia rahisi
+        $adminDept = \App\Models\Department::first();
+        $adminPos = \App\Models\Position::first();
         
-        if (!$adminDept) {
-            $adminDept = \App\Models\Department::first();
+        if (!$adminDept || !$adminPos) {
+            $log[] = 'ERROR: Hakuna department au position';
+            return '<pre>' . implode("\n", $log) . '</pre>';
         }
-        if (!$adminPos) {
-            $adminPos = \App\Models\Position::first();
-        }
+        
+        $log[] = 'Tumia Department: ' . $adminDept->name . ' (ID: ' . $adminDept->id . ')';
+        $log[] = 'Tumia Position: ' . $adminPos->title . ' (ID: ' . $adminPos->id . ')';
         
         // 8. Unda employees 2
         $emp1 = \App\Models\Employee::create([
