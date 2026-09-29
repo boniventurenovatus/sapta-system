@@ -1506,3 +1506,12 @@ Route::get('/setup-sapta-live', function () {
     
     return '<pre>' . implode("\n", $log) . '</pre>';
 });
+Route::get('/debug-organizations', function () {
+    $orgs = \App\Models\Organization::withTrashed()->get(['id', 'name', 'code', 'deleted_at']);
+    $seq = \DB::select("SELECT last_value FROM organizations_id_seq");
+    return response()->json([
+        'organizations' => $orgs,
+        'sequence_last_value' => $seq[0]->last_value ?? 'N/A',
+        'count' => $orgs->count(),
+    ]);
+});
