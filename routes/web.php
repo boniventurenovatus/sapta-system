@@ -1397,3 +1397,28 @@ Route::get('/run-migration-secret', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
+Route::get('/qr-debug', function () {
+    $output = [];
+    $output[] = "PHP Version: " . phpversion();
+    $output[] = "GD Extension: " . (extension_loaded('gd') ? 'YES' : 'NO');
+    $output[] = "Endroid Class: " . (class_exists('Endroid\\QrCode\\Builder\\Builder') ? 'YES' : 'NO');
+    $output[] = "Composer Autoload: " . (file_exists(base_path('vendor/autoload.php')) ? 'YES' : 'NO');
+    
+    if (class_exists('Endroid\\QrCode\\Builder\\Builder')) {
+        try {
+            $builder = new \Endroid\QrCode\Builder\Builder(
+                writer: new \Endroid\QrCode\Writer\PngWriter(),
+                data: 'https://test.com',
+                size: 200,
+            );
+            $result = $builder->build();
+            $dataUri = $result->getDataUri();
+            $output[] = "QR Code Length: " . strlen($dataUri);
+            $output[] = "QR Code Prefix: " . substr($dataUri, 0, 50);
+        } catch (\Exception $e) {
+            $output[] = "QR Error: " . $e->getMessage();
+        }
+    }
+    
+    return '<pre>' . implode("\n", $output) . '</pre>';
+});
