@@ -238,7 +238,7 @@
                 <a href="javascript:void(0)" class="sapta-nav-item sapta-nav-toggle {{ request()->routeIs('payroll.*') ? 'active' : '' }}" data-target="payroll-submenu">
                     <i class="fas fa-money-bill-wave"></i>
                     <span class="sapta-nav-text">Payroll</span>
-                    <i class="fas fa-chevron-down sapta-nav-chevron"></i>
+                    <i class="fas fa-angle-right sapta-nav-arrow" style="margin-left:auto; font-size:0.75rem; transition:transform 0.2s;"></i>
                 </a>
                 <div class="sapta-nav-submenu" id="payroll-submenu" style="display: none;">
 
