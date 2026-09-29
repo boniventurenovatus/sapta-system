@@ -20,10 +20,10 @@ class User extends Authenticatable
         'profile_image',
         'last_login_at',
         'email_verified_at',
+        'password_hash',
     ];
 
     protected $guarded = [
-        'password_hash',
         'account_status',
         'is_first_login',
         'first_password_expires_at',

@@ -489,4 +489,28 @@ class Employee extends Model
     public function suspendedBy()
     {
         return $this->belongsTo(User::class, 'suspended_by');
-    }}
+    }
+    /**
+     * Unda employee number ya kipekee — EMP001 hadi EMP999.
+     */
+    public static function generateEmployeeNumber(): string
+    {
+        // Pata employee wote — pamoja na soft-deleted
+        $employees = static::withTrashed()->get(['employee_number']);
+        
+        $maxNumber = 0;
+        foreach ($employees as $emp) {
+            if ($emp->employee_number) {
+                $number = (int) preg_replace('/[^0-9]/', '', $emp->employee_number);
+                if ($number > $maxNumber) {
+                    $maxNumber = $number;
+                }
+            }
+        }
+        
+        $next = $maxNumber + 1;
+        
+        return 'EMP' . str_pad($next, 3, '0', STR_PAD_LEFT);
+    }
+
+}

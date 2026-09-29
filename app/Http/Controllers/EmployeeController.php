@@ -106,7 +106,8 @@ class EmployeeController extends Controller
         $this->authorize('create', \App\Models\Employee::class);
         $validated = $request->validated();
 
-        $validated['employee_number'] = strtoupper(trim($validated['employee_number']));
+        // Autogenerate employee number — EMP001 hadi EMP999
+          $validated['employee_number'] = Employee::generateEmployeeNumber();
 
         if ($request->hasFile('profile_image')) {
             $validated['profile_image'] = $request->file('profile_image')->store('employees', 'public');

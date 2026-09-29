@@ -99,7 +99,7 @@
 
         <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid #e5e7eb;">Personal Information</h3>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:2rem;">
-            <div><label>Employee Number *</label><input type="text" name="employee_number" value="{{ old('employee_number') }}" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;"></div>
+            <div><label>Employee Number</label><input type="text" value="Auto-generated (EMP001, EMP002, ...)" readonly style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px; background:#f3f4f6; color:#6b7280; cursor:not-allowed;"></div>
             <div><label>First Name *</label><input type="text" name="first_name" value="{{ old('first_name') }}" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;"></div>
             <div><label>Middle Name</label><input type="text" name="middle_name" value="{{ old('middle_name') }}" style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;"></div>
             <div><label>Last Name *</label><input type="text" name="last_name" value="{{ old('last_name') }}" required style="width:100%; padding:0.6rem; border:1px solid #d1d5db; border-radius:6px;"></div>

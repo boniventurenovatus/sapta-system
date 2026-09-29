@@ -60,6 +60,11 @@ class AuthenticatedSessionController extends Controller
             description: 'User logged in'
         );
 
+        // Kama ni mara ya kwanza — mpeleke kubadilisha password
+        if ($user->is_first_login) {
+            return redirect()->route('profile.change-password');
+        }
+
         return redirect()->intended(route('dashboard'));
     }
 
