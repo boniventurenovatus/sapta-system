@@ -1415,6 +1415,12 @@ Route::get('/setup-sapta-live', function () {
         \App\Models\Organization::query()->delete();
         $log[] = "Organizations zimeondolewa";
         
+        // Rekebisha sequence kwa PostgreSQL
+        $driver = \DB::connection()->getDriverName();
+        if ($driver === 'pgsql') {
+            \DB::statement('ALTER SEQUENCE organizations_id_seq RESTART WITH 1;');
+        }
+        
         // 3. Unda organization halisi
         $org = \App\Models\Organization::create([
             'name' => 'Soil-Animals Power Tanzania',
@@ -1427,6 +1433,16 @@ Route::get('/setup-sapta-live', function () {
         // 4. Unganisha departments
         \App\Models\Department::query()->update(['organization_id' => $org->id]);
         $log[] = "Departments 7 zimeunganishwa";
+        
+        // Rekebisha sequence kwa users
+        if ($driver === 'pgsql') {
+            \DB::statement('ALTER SEQUENCE users_id_seq RESTART WITH 1;');
+        }
+        
+        // Rekebisha sequence kwa employees
+        if ($driver === 'pgsql') {
+            \DB::statement('ALTER SEQUENCE employees_id_seq RESTART WITH 1;');
+        }
         
         // 5. Update username za superadmin na admin
         \App\Models\User::where('username', 'superadmin')->orWhere('username', 'admin')->delete();
