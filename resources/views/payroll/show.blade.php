@@ -66,6 +66,21 @@
                 <span class="ps-label">Position</span>
                 <span class="ps-value">{{ $payslip->employee->position->name ?? '—' }}</span>
             </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Bank Name</span>
+                <span class="ps-value">{{ $payslip->employee->bank_name ?? '—' }}</span>
+            </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Bank Account</span>
+                <span class="ps-value">{{ $payslip->employee->bank_account ?? '—' }}</span>
+            </div>
+
+            <div class="ps-row">
+                <span class="ps-label">Payment Date</span>
+                <span class="ps-value">{{ $payslip->payment_date ? $payslip->payment_date->format('d M Y') : 'Not paid yet' }}</span>
+            </div>
             <div class="ps-row">
                 <span class="ps-label">Status</span>
                 <span class="ps-value"><span class="ps-badge {{ $payslip->status }}">{{ $payslip->status }}</span></span>
