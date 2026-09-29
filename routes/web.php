@@ -193,6 +193,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/audit-logs/{log}', [\App\Http\Controllers\AuditLogController::class, 'show'])->name('audit-logs.show');
 });
 
+// PAYROLL VERIFICATION (bila auth — QR code inaweza kufikiwa na mtu yeyote)
+Route::get('/payroll/verify/{token}', [\App\Http\Controllers\PayrollController::class, 'verify'])->name('payroll.verify.public');
+
+
 // ============================================================
 // LOCATION API
 // ============================================================
@@ -1312,7 +1316,7 @@ Route::middleware(['auth'])->prefix('payroll')->name('payroll.')->group(function
     Route::put('/salaries/{salary}', [\App\Http\Controllers\PayrollController::class, 'updateSalary'])->name('salaries.update');
     Route::delete('/salaries/{salary}', [\App\Http\Controllers\PayrollController::class, 'destroySalary'])->name('salaries.destroy');
     Route::get('/export/all-csv', [\App\Http\Controllers\PayrollController::class, 'exportCsv'])->name('export.all-csv');
-        Route::get('/verify/{token}', [\App\Http\Controllers\PayrollController::class, 'verify'])->name('verify');
+
       Route::get('/{payslip}', [\App\Http\Controllers\PayrollController::class, 'show'])->name('show');
       Route::post('/{payslip}/approve', [\App\Http\Controllers\PayrollController::class, 'approve'])->name('approve');
       Route::post('/{payslip}/paid', [\App\Http\Controllers\PayrollController::class, 'markAsPaid'])->name('paid');
