@@ -32,4 +32,5 @@ CMD php artisan config:clear 2>&1 ; \
     php artisan db:seed --class=OrganizationalUnitsAndPositionsSeeder --force 2>&1 || echo "OrganizationalUnitsAndPositionsSeeder failed" ; \
     php artisan db:seed --class=RoleUsersSeeder --force 2>&1 || echo "RoleUsersSeeder failed" ; \
     php artisan config:cache 2>&1 ; \
+    php artisan route:cache 2>&1 ; \
     php artisan serve --host=0.0.0.0 --port=10000
