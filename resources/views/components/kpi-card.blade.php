@@ -23,7 +23,7 @@
     <div class="flex items-start justify-between">
         <div class="flex-1 min-w-0">
             <div class="text-xs text-slate-500 font-extrabold uppercase tracking-wider">{{ $label }}</div>
-            <div class="text-3xl font-extrabold text-slate-900 mt-2">{{ $value }}</div>
+            <div class="text-2xl font-extrabold text-slate-900 mt-2 break-words">{{ $value }}</div>
         </div>
         <div class="w-12 h-12 rounded-xl {{ $colorClass }} flex items-center justify-center flex-shrink-0">
             <i class="fas {{ $icon }} text-lg"></i>
