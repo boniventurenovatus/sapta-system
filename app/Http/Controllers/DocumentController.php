@@ -273,7 +273,68 @@ class DocumentController extends Controller
         }
 
         $filePath = storage_path('app/public/' . $document->file_path);
-        return response()->file($filePath);
+        $mimeType = $document->file_type ?? Storage::disk('public')->mimeType($document->file_path);
+        $fileName = $document->file_name ?? basename($document->file_path);
+
+        // Aina za files zinazoweza ku-display inline
+        $inlineTypes = [
+            'application/pdf',
+            'image/jpeg', 'image/jpg', 'image/png',
+            'image/gif', 'image/webp', 'image/svg+xml',
+            'text/plain', 'text/html',
+        ];
+
+        // Aina za files zinazohitaji external viewer
+        $officeTypes = [
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ];
+
+        // Kama ni PDF/image — display inline
+        if (in_array($mimeType, $inlineTypes)) {
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+            ]);
+        }
+
+        // Kama ni Office file — tumia Google Docs Viewer
+        if (in_array($mimeType, $officeTypes)) {
+            // Unda signed URL ya muda mfupi
+            $publicUrl = \URL::temporarySignedRoute(
+                'documents.raw',
+                now()->addMinutes(30),
+                ['document' => $document->id]
+            );
+            
+            $googleViewerUrl = 'https://docs.google.com/viewer?url=' . urlencode($publicUrl) . '&embedded=true';
+            
+            return view('documents.preview-office', compact('document', 'googleViewerUrl'));
+        }
+
+        // Aina nyingine — download
+        return response()->download($filePath, $fileName);
+    }
+
+    /**
+     * Serve raw document (for Google Docs Viewer)
+     */
+    public function raw(Document $document)
+    {
+        if (!Storage::disk('public')->exists($document->file_path)) {
+            abort(404);
+        }
+
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        return response()->file($filePath, [
+            'Content-Type' => $document->file_type,
+            'Content-Disposition' => 'inline; filename="' . $document->file_name . '"',
+        ]);
     }
 
     /**
