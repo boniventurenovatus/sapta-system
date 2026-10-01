@@ -1419,3 +1419,24 @@ Route::get('/run-sapta-setup', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
+// ⚠️ TEMPORARY DEBUG — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-doc-schema-9x7k', function () {
+    try {
+        $cols = \Illuminate\Support\Facades\Schema::getColumnListing('documents');
+        echo "<h2>Documents Table Columns (Render):</h2><pre>" . implode("\n", $cols) . "</pre>";
+        
+        echo "<h2>Total Documents:</h2>";
+        echo \App\Models\Document::count();
+        
+        echo "<h2>Migrations Run:</h2>";
+        $migrations = \DB::table('migrations')->orderBy('id', 'desc')->limit(10)->get();
+        echo "<ul>";
+        foreach ($migrations as $m) {
+            echo "<li>{$m->migration} (batch {$m->batch})</li>";
+        }
+        echo "</ul>";
+        
+    } catch (\Exception $e) {
+        echo "ERROR: " . $e->getMessage();
+    }
+});
