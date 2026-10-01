@@ -37,6 +37,19 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'b2' => [
+            'driver' => 's3',
+            'key' => env('B2_KEY_ID'),
+            'secret' => env('B2_APPLICATION_KEY'),
+            'region' => env('B2_REGION'),
+            'bucket' => env('B2_BUCKET_NAME'),
+            'endpoint' => env('B2_ENDPOINT'),
+            'url' => env('B2_PUBLIC_URL'),
+            'use_path_style_endpoint' => false,
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
 
         'public' => [
             'driver' => 'local',
