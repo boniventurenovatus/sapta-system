@@ -166,6 +166,18 @@ Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->m
 Route::resource('documents', \App\Http\Controllers\DocumentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,manager,staff');
 
 // ============================================================
+// DOCUMENTS — CUSTOM ROUTES
+// ============================================================
+Route::middleware(['auth'])->prefix('documents')->name('documents.')->group(function () {
+    Route::get('/{document}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('download');
+    Route::get('/{document}/preview', [\App\Http\Controllers\DocumentController::class, 'preview'])->name('preview');
+    Route::post('/{document}/replace', [\App\Http\Controllers\DocumentController::class, 'replace'])->name('replace');
+    Route::post('/{document}/approve', [\App\Http\Controllers\DocumentController::class, 'approve'])->name('approve');
+    Route::post('/{document}/archive', [\App\Http\Controllers\DocumentController::class, 'archive'])->name('archive');
+    Route::get('/export/all-csv', [\App\Http\Controllers\DocumentController::class, 'exportCsv'])->name('export.all-csv');
+});
+
+// ============================================================
 // RECRUITMENT
 // ============================================================
 Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer');
