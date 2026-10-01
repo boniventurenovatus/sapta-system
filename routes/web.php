@@ -1407,33 +1407,3 @@ Route::get('/run-sapta-setup', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
-// ⚠️ TEMPORARY DEBUG ROUTES — ONDOA BAADA YA KUTUMIA!
-Route::get('/debug-users-9x7k', function () {
-    try {
-        $cols = \Illuminate\Support\Facades\Schema::getColumnListing('users');
-        echo "<h2>Columns:</h2><pre>" . implode(', ', $cols) . "</pre>";
-        $users = \App\Models\User::all();
-        echo "<h2>Users (" . $users->count() . "):</h2>";
-        echo "<table border='1' cellpadding='8'>";
-        echo "<tr><th>ID</th><th>Username</th><th>Email</th><th>Status</th></tr>";
-        foreach ($users as $u) {
-            echo "<tr><td>{$u->id}</td><td>{$u->username}</td><td>{$u->email}</td><td>{$u->account_status}</td></tr>";
-        }
-        echo "</table>";
-        echo "<p><a href='/debug-reset-9x7k'>RESET password ya users wote kuwa: sapta2026</a></p>";
-    } catch (\Exception $e) {
-        echo "ERROR: " . $e->getMessage();
-    }
-});
-
-Route::get('/debug-reset-9x7k', function () {
-    foreach (\App\Models\User::all() as $u) {
-        $u->password_hash = \Hash::make('sapta2026');
-        $u->account_status = 'active';
-        $u->is_first_login = false;
-        $u->failed_login_attempts = 0;
-        $u->locked_until = null;
-        $u->save();
-    }
-    return "✅ Password ya users wote imebadilishwa kuwa: <b>sapta2026</b><br><br><a href='/login'>Nenda Login →</a>";
-});
