@@ -102,9 +102,9 @@
                     <tr style="border-top:1px solid #f1f5f9;">
                         <td style="padding:12px 20px;">
                             @if($log->user_id)
-                                <a href="{{ route('users.activity', $log->user_id) }}" style="text-decoration:none; color:#1a5276; font-weight:600;">
+                                <span style="color:#1a5276; font-weight:600;">
                                     {{ $log->user?->username ?? 'User #' . $log->user_id }}
-                                </a>
+                                </span>
                             @else
                                 <span style="color:#94a3b8;">System</span>
                             @endif
