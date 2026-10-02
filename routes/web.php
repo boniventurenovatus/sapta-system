@@ -1462,3 +1462,42 @@ Route::get('/debug-reset-pw-9x7k', function () {
     
     return $output;
 });
+// ⚠️ TEMPORARY DEBUG — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-b2-test-9x7k', function () {
+    $output = "<h2>B2 Configuration Test</h2>";
+    
+    // 1. Angalia config
+    $output .= "<h3>Config:</h3>";
+    $output .= "Default disk: <b>" . config('filesystems.default') . "</b><br>";
+    $output .= "B2 key: " . (env('B2_KEY_ID') ? 'SET' : 'MISSING') . "<br>";
+    $output .= "B2 secret: " . (env('B2_APPLICATION_KEY') ? 'SET' : 'MISSING') . "<br>";
+    $output .= "B2 bucket: " . env('B2_BUCKET_NAME', 'MISSING') . "<br>";
+    $output .= "B2 endpoint: " . env('B2_ENDPOINT', 'MISSING') . "<br>";
+    
+    // 2. Test connection
+    $output .= "<h3>Connection Test:</h3>";
+    try {
+        $disk = \Storage::disk('b2');
+        $output .= "✅ B2 disk ipo<br>";
+        
+        // Test write
+        $testFile = 'debug/test-' . time() . '.txt';
+        $disk->put($testFile, 'Hello B2 - ' . date('Y-m-d H:i:s'));
+        $output .= "✅ Write test: OK ($testFile)<br>";
+        
+        // Test read
+        $exists = $disk->exists($testFile);
+        $output .= "✅ Exists test: " . ($exists ? 'YES' : 'NO') . "<br>";
+        
+        // Test delete
+        $disk->delete($testFile);
+        $output .= "✅ Delete test: OK<br>";
+        
+        $output .= "<br><b style='color:green'>🎉 B2 inafanya kazi!</b>";
+    } catch (\Exception $e) {
+        $output .= "<b style='color:red'>❌ ERROR: " . $e->getMessage() . "</b><br>";
+        $output .= "<pre>" . $e->getTraceAsString() . "</pre>";
+    }
+    
+    return $output;
+});
