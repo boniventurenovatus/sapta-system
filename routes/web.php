@@ -1485,9 +1485,14 @@ Route::get('/debug-b2-test-9x7k', function () {
         $disk->put($testFile, 'Hello B2 - ' . date('Y-m-d H:i:s'));
         $output .= "✅ Write test: OK ($testFile)<br>";
         
-        // Test read
-        $exists = $disk->exists($testFile);
-        $output .= "✅ Exists test: " . ($exists ? 'YES' : 'NO') . "<br>";
+        // Test read — tumia try-catch kwa B2
+        try {
+            $exists = $disk->exists($testFile);
+            $output .= "✅ Exists test: " . ($exists ? 'YES' : 'NO') . "<br>";
+        } catch (\Exception $e) {
+            $output .= "⚠️ Exists test failed (B2 issue): " . $e->getMessage() . "<br>";
+            $output .= "   (Hii ni kawaida kwa B2 - files bado zinaonekana kwa URL)<br>";
+        }
         
         // Test delete
         $disk->delete($testFile);

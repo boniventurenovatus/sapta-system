@@ -45,7 +45,7 @@ return [
             'bucket' => env('B2_BUCKET_NAME'),
             'endpoint' => env('B2_ENDPOINT'),
             'url' => env('B2_PUBLIC_URL'),
-            'use_path_style_endpoint' => false,
+            'use_path_style_endpoint' => true,
             'visibility' => 'public',
             'throw' => false,
         ],
