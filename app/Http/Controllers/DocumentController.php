@@ -268,15 +268,14 @@ class DocumentController extends Controller
      */
     public function preview(Document $document)
     {
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        if (!Storage::disk(config('filesystems.default', 'public'))->exists($document->file_path)) {
             return back()->with('error', 'File not found.');
         }
 
-        $filePath = storage_path('app/public/' . $document->file_path);
-        $mimeType = $document->file_type ?? Storage::disk('public')->mimeType($document->file_path);
+        $disk = Storage::disk(config('filesystems.default', 'public'));
+        $mimeType = $document->file_type ?? $disk->mimeType($document->file_path);
         $fileName = $document->file_name ?? basename($document->file_path);
 
-        // Aina za files zinazoweza ku-display inline
         $inlineTypes = [
             'application/pdf',
             'image/jpeg', 'image/jpg', 'image/png',
@@ -284,7 +283,6 @@ class DocumentController extends Controller
             'text/plain', 'text/html',
         ];
 
-        // Aina za files zinazohitaji external viewer
         $officeTypes = [
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -294,30 +292,41 @@ class DocumentController extends Controller
             'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         ];
 
-        // Kama ni PDF/image — display inline
+        // PDF/image — display inline
         if (in_array($mimeType, $inlineTypes)) {
-            return response()->file($filePath, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-            ]);
+            try {
+                $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
+                return redirect($signedUrl);
+            } catch (\Exception $e) {
+                // Local disk haitoi temporaryUrl — tumia response()->file
+                $filePath = $disk->path($document->file_path);
+                return response()->file($filePath, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                ]);
+            }
         }
 
-        // Kama ni Office file — tumia Google Docs Viewer
+        // Office file — tumia Google Docs Viewer + signed URL
         if (in_array($mimeType, $officeTypes)) {
-            // Unda signed URL ya muda mfupi
-            $publicUrl = \URL::temporarySignedRoute(
-                'documents.raw',
-                now()->addMinutes(30),
-                ['document' => $document->id]
-            );
+            try {
+                $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
+            } catch (\Exception $e) {
+                // Local fallback — public URL
+                $signedUrl = url('/storage/' . $document->file_path);
+            }
             
-            $googleViewerUrl = 'https://docs.google.com/viewer?url=' . urlencode($publicUrl) . '&embedded=true';
+            $googleViewerUrl = 'https://docs.google.com/viewer?url=' . urlencode($signedUrl) . '&embedded=true';
             
             return view('documents.preview-office', compact('document', 'googleViewerUrl'));
         }
 
         // Aina nyingine — download
-        return response()->download($filePath, $fileName);
+        try {
+            return redirect($disk->temporaryUrl($document->file_path, now()->addMinutes(30)));
+        } catch (\Exception $e) {
+            return $disk->download($document->file_path, $fileName);
+        }
     }
 
     /**
