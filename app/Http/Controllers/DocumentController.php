@@ -281,6 +281,7 @@ class DocumentController extends Controller
         $mimeType = $document->file_type ?? 'application/octet-stream';
         $fileName = $document->file_name ?? basename($document->file_path);
 
+        // Aina za files zinazoweza ku-display inline
         $inlineTypes = [
             'application/pdf',
             'image/jpeg', 'image/jpg', 'image/png',
@@ -288,18 +289,7 @@ class DocumentController extends Controller
             'text/plain', 'text/html',
         ];
 
-        $officeTypes = [
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.ms-powerpoint',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        ];
-
-        // ============================================================
-        // PDF/IMAGE — display inline kwa signed URL
-        // ============================================================
+        // Kama ni PDF/Image — display inline kwa signed URL
         if (in_array($mimeType, $inlineTypes)) {
             try {
                 $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
@@ -307,7 +297,6 @@ class DocumentController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Preview inline error: ' . $e->getMessage());
                 
-                // Fallback: kama ni local disk, tumia response()->file
                 try {
                     $filePath = $disk->path($document->file_path);
                     return response()->file($filePath, [
@@ -320,28 +309,12 @@ class DocumentController extends Controller
             }
         }
 
-        // ============================================================
-        // OFFICE FILE — Google Docs Viewer + signed URL
-        // ============================================================
-        if (in_array($mimeType, $officeTypes)) {
-            try {
-                $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
-                $googleViewerUrl = 'https://docs.google.com/viewer?url=' . urlencode($signedUrl) . '&embedded=true';
-                return view('documents.preview-office', compact('document', 'googleViewerUrl'));
-            } catch (\Exception $e) {
-                \Log::error('Preview office error: ' . $e->getMessage());
-                return back()->with('error', 'File haipatikani: ' . $e->getMessage());
-            }
-        }
-
-        // ============================================================
-        // AINA NYINGINE — download kwa signed URL
-        // ============================================================
+        // Kwa Word/Excel/PPT — DOWNLOAD (browser haiwezi display)
+        // Google Docs Viewer inahitaji public bucket — hatuna
         try {
-            $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
-            return redirect($signedUrl);
-        } catch (\Exception $e) {
             return $disk->download($document->file_path, $fileName);
+        } catch (\Exception $e) {
+            return back()->with('error', 'File haipatikani: ' . $e->getMessage());
         }
     }
 
