@@ -82,7 +82,6 @@ class FullAccessSeeder extends Seeder
                 'is_first_login' => false,
             ]);
         } else {
-            $user->password_hash = Hash::make('Sapta@2026!');
             $user->account_status = 'active';
             $user->save();
         }

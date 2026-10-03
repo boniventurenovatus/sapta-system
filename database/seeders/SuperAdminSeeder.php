@@ -103,11 +103,10 @@ class SuperAdminSeeder extends Seeder
 
             $this->command->info('✅ SuperAdmin imeundwa: superadmin / Sapta@2026!');
         } else {
-            // Update password
-            $user->password_hash = Hash::make('Sapta@2026!');
+            // User ipo — usibadilishe password, tu-update status
             $user->account_status = 'active';
             $user->save();
-            $this->command->info('✅ SuperAdmin password imewekwa upya: superadmin / Sapta@2026!');
+            $this->command->info('✅ SuperAdmin ipo tayari — password haijabadilishwa');
         }
 
         // ============================================================
