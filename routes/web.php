@@ -1506,3 +1506,33 @@ Route::get('/debug-b2-test-9x7k', function () {
     
     return $output;
 });
+// ⚠️ TEMPORARY DEBUG — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-check-user-9x7k', function () {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    
+    if (!$user) {
+        return "User superadmin HAIPO kwenye database!";
+    }
+    
+    $output = "<h2>User Info</h2>";
+    $output .= "ID: " . $user->id . "<br>";
+    $output .= "Username: " . $user->username . "<br>";
+    $output .= "Email: " . $user->email . "<br>";
+    $output .= "Status: " . $user->account_status . "<br>";
+    $output .= "First login: " . ($user->is_first_login ? 'YES' : 'NO') . "<br>";
+    $output .= "Failed attempts: " . $user->failed_login_attempts . "<br>";
+    $output .= "Locked until: " . ($user->locked_until ?? 'NOT LOCKED') . "<br>";
+    $output .= "Password hash (first 30): " . substr($user->password_hash, 0, 30) . "...<br>";
+    $output .= "Updated at: " . $user->updated_at . "<br>";
+    
+    // Test password
+    $testPassword = 'sapta2026';
+    $matches = \Hash::check($testPassword, $user->password_hash);
+    $output .= "<br><b>Password 'sapta2026' matches: " . ($matches ? '✅ YES' : '❌ NO') . "</b><br>";
+    
+    if (!$matches) {
+        $output .= "<br><a href='/debug-reset-pw-9x7k'>🔧 RESET PASSWORD</a>";
+    }
+    
+    return $output;
+});
