@@ -172,6 +172,9 @@ Route::middleware(['auth'])->prefix('documents')->name('documents.')->group(func
     Route::get('/{document}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('download');
     Route::get('/{document}/preview', [\App\Http\Controllers\DocumentController::class, 'preview'])->name('preview');
     Route::get('/{document}/raw', [\App\Http\Controllers\DocumentController::class, 'raw'])
+        ->name('raw');
+    Route::get('/{document}/raw-download', [\App\Http\Controllers\DocumentController::class, 'rawDownload'])
+        ->name('raw-download');    Route::get('/{document}/raw', [\App\Http\Controllers\DocumentController::class, 'raw'])
         ->name('raw')
         ->middleware('signed');    Route::post('/{document}/replace', [\App\Http\Controllers\DocumentController::class, 'replace'])->name('replace');
     Route::post('/{document}/approve', [\App\Http\Controllers\DocumentController::class, 'approve'])->name('approve');

@@ -277,11 +277,8 @@ class DocumentController extends Controller
      */
     public function preview(Document $document)
     {
-        $disk = Storage::disk(config('filesystems.default', 'public'));
         $mimeType = $document->file_type ?? 'application/octet-stream';
-        $fileName = $document->file_name ?? basename($document->file_path);
 
-        // Aina za files zinazoweza ku-display inline
         $inlineTypes = [
             'application/pdf',
             'image/jpeg', 'image/jpg', 'image/png',
@@ -289,51 +286,69 @@ class DocumentController extends Controller
             'text/plain', 'text/html',
         ];
 
-        // Kama ni PDF/Image — display inline kwa signed URL
         if (in_array($mimeType, $inlineTypes)) {
-            try {
-                $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
-                return redirect($signedUrl);
-            } catch (\Exception $e) {
-                \Log::error('Preview inline error: ' . $e->getMessage());
-                
-                try {
-                    $filePath = $disk->path($document->file_path);
-                    return response()->file($filePath, [
-                        'Content-Type' => $mimeType,
-                        'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-                    ]);
-                } catch (\Exception $e2) {
-                    return back()->with('error', 'File haipatikani: ' . $e->getMessage());
-                }
-            }
+            return redirect()->route('documents.raw', $document->id);
         }
 
-        // Kwa Word/Excel/PPT — DOWNLOAD (browser haiwezi display)
-        // Google Docs Viewer inahitaji public bucket — hatuna
+        return redirect()->route('documents.raw-download', $document->id);
+    }
+
+    /**
+     * Serve raw document (proxy) — display inline
+     */
+    public function raw(Document $document)
+    {
+        $disk = Storage::disk(config('filesystems.default', 'public'));
+        $mimeType = $document->file_type ?? 'application/octet-stream';
+        $fileName = $document->file_name ?? basename($document->file_path);
+
         try {
-            return $disk->download($document->file_path, $fileName);
+            $stream = $disk->readStream($document->file_path);
+            if (!$stream) {
+                abort(404, 'File haipatikani.');
+            }
+
+            return response()->stream(function () use ($stream) {
+                fpassthru($stream);
+                fclose($stream);
+            }, 200, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                'Cache-Control' => 'private, max-age=300',
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'File haipatikani: ' . $e->getMessage());
+            \Log::error('Raw stream error: ' . $e->getMessage());
+            abort(404, 'File haipatikani: ' . $e->getMessage());
         }
     }
 
     /**
-     * Serve raw document (for Google Docs Viewer)
+     * Serve raw document (proxy) — download
      */
-    public function raw(Document $document)
+    public function rawDownload(Document $document)
     {
-        if (!Storage::disk(config('filesystems.default', 'public'))->exists($document->file_path)) {
-            abort(404);
-        }
+        $disk = Storage::disk(config('filesystems.default', 'public'));
+        $fileName = $document->file_name ?? basename($document->file_path);
 
-        $filePath = storage_path('app/public/' . $document->file_path);
-        
-        return response()->file($filePath, [
-            'Content-Type' => $document->file_type,
-            'Content-Disposition' => 'inline; filename="' . $document->file_name . '"',
-        ]);
+        try {
+            $stream = $disk->readStream($document->file_path);
+            if (!$stream) {
+                return back()->with('error', 'File haipatikani.');
+            }
+
+            return response()->stream(function () use ($stream) {
+                fpassthru($stream);
+                fclose($stream);
+            }, 200, [
+                'Content-Type' => 'application/octet-stream',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Raw download error: ' . $e->getMessage());
+            return back()->with('error', 'File haipatikani: ' . $e->getMessage());
+        }
     }
+
 
     /**
      * Replace document file
