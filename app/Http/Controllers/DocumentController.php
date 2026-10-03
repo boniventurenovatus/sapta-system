@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Services\B2StorageService;
 
 class DocumentController extends Controller
 {
@@ -128,7 +129,25 @@ class DocumentController extends Controller
         // ============================================================
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $path = $file->store('documents/' . date('Y/m'), config('filesystems.default', 'public'));
+        try {
+            $b2 = new B2StorageService();
+            $storedName = \Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $path = 'documents/' . date('Y/m') . '/' . $storedName;
+            
+            $uploaded = $b2->putFile($path, $file->getRealPath(), $file->getMimeType());
+            
+            if (!$uploaded) {
+                \Log::error('B2 upload failed', ['path' => $path]);
+                return back()->with('error', 'File upload imeshindwa.')->withInput();
+            }
+            if (!$path || $path === 0 || $path === '0') {
+                \Log::error('File store failed: path empty', ['file' => $originalName]);
+                return back()->with('error', 'File upload imeshindwa. Jaribu tena.')->withInput();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Store exception: ' . $e->getMessage());
+            return back()->with('error', 'Upload error: ' . $e->getMessage())->withInput();
+        }
 
         // ============================================================
         // AUTO-GENERATE DOCUMENT NUMBER
@@ -256,7 +275,20 @@ class DocumentController extends Controller
      */
     public function download(Document $document)
     {
-        return redirect()->route('documents.raw-download', $document->id);
+        $b2 = new B2StorageService();
+        $fileName = $document->file_name ?? basename($document->file_path);
+        $mimeType = $document->file_type ?? 'application/octet-stream';
+
+        $contents = $b2->get($document->file_path);
+
+        if ($contents === null) {
+            return back()->with('error', 'File haipatikani kwenye B2.');
+        }
+
+        return response($contents)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', strlen($contents));
     }
 
     /**
@@ -265,6 +297,8 @@ class DocumentController extends Controller
     public function preview(Document $document)
     {
         $mimeType = $document->file_type ?? 'application/octet-stream';
+        $fileName = $document->file_name ?? basename($document->file_path);
+        $b2 = new B2StorageService();
 
         $inlineTypes = [
             'application/pdf',
@@ -273,11 +307,24 @@ class DocumentController extends Controller
             'text/plain', 'text/html',
         ];
 
-        if (in_array($mimeType, $inlineTypes)) {
-            return redirect()->route('documents.raw', $document->id);
+        $contents = $b2->get($document->file_path);
+
+        if ($contents === null) {
+            return back()->with('error', 'File haipatikani kwenye B2.');
         }
 
-        return redirect()->route('documents.raw-download', $document->id);
+        if (in_array($mimeType, $inlineTypes)) {
+            return response($contents)
+                ->header('Content-Type', $mimeType)
+                ->header('Content-Disposition', 'inline; filename="' . $fileName . '"')
+                ->header('Content-Length', strlen($contents))
+                ->header('Cache-Control', 'no-cache, must-revalidate');
+        }
+
+        return response($contents)
+            ->header('Content-Type', 'application/octet-stream')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', strlen($contents));
     }
 
     /**
@@ -285,23 +332,21 @@ class DocumentController extends Controller
      */
     public function raw(Document $document)
     {
-        $disk = Storage::disk(config('filesystems.default', 'public'));
+        $b2 = new B2StorageService();
         $mimeType = $document->file_type ?? 'application/octet-stream';
         $fileName = $document->file_name ?? basename($document->file_path);
 
-        try {
-            // Tumia get() — haitumii exists() (ambayo inashindwa kwa B2)
-            $contents = $disk->get($document->file_path);
+        $contents = $b2->get($document->file_path);
 
-            return response($contents, 200, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-                'Cache-Control' => 'private, max-age=300',
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Raw get error: ' . $e->getMessage());
-            abort(404, 'File haipatikani: ' . $e->getMessage());
+        if ($contents === null) {
+            abort(404, 'File haipatikani kwenye B2.');
         }
+
+        return response($contents)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', 'inline; filename="' . $fileName . '"')
+            ->header('Content-Length', strlen($contents))
+            ->header('Cache-Control', 'no-cache');
     }
 
     /**
@@ -309,22 +354,20 @@ class DocumentController extends Controller
      */
     public function rawDownload(Document $document)
     {
-        $disk = Storage::disk(config('filesystems.default', 'public'));
+        $b2 = new B2StorageService();
         $fileName = $document->file_name ?? basename($document->file_path);
         $mimeType = $document->file_type ?? 'application/octet-stream';
 
-        try {
-            // Tumia get() — haitumii exists()
-            $contents = $disk->get($document->file_path);
+        $contents = $b2->get($document->file_path);
 
-            return response($contents, 200, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Raw download error: ' . $e->getMessage());
-            return back()->with('error', 'File haipatikani: ' . $e->getMessage());
+        if ($contents === null) {
+            return back()->with('error', 'File haipatikani kwenye B2.');
         }
+
+        return response($contents)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', strlen($contents));
     }
 
 
@@ -337,16 +380,25 @@ class DocumentController extends Controller
             'file' => 'required|file|max:51200',
         ]);
 
-        // Futa file ya zamani
-        if (Storage::disk(config('filesystems.default', 'public'))->exists($document->file_path)) {
-            Storage::disk(config('filesystems.default', 'public'))->delete($document->file_path);
+        $b2 = new B2StorageService();
+
+        // Futa file ya zamani kutoka B2
+        if ($document->file_path && $document->file_path !== '0') {
+            $b2->delete($document->file_path);
         }
 
-        // Upload file mpya
+        // Upload file mpya kwa B2
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $storedName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('documents/' . date('Y/m'), $storedName, config('filesystems.default', 'public'));
+        $storedName = \Str::random(40) . '.' . $file->getClientOriginalExtension();
+        $path = 'documents/' . date('Y/m') . '/' . $storedName;
+
+        $uploaded = $b2->putFile($path, $file->getRealPath(), $file->getMimeType());
+
+        if (!$uploaded) {
+            \Log::error('B2 replace failed', ['path' => $path]);
+            return back()->with('error', 'File replace imeshindwa.')->withInput();
+        }
 
         // Version bump
         $newVersion = number_format((float) $document->version + 0.1, 1);
@@ -369,9 +421,10 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        // Futa file
-        if (Storage::disk(config('filesystems.default', 'public'))->exists($document->file_path)) {
-            Storage::disk(config('filesystems.default', 'public'))->delete($document->file_path);
+        $b2 = new B2StorageService();
+        
+        if ($document->file_path && $document->file_path !== '0') {
+            $b2->delete($document->file_path);
         }
 
         $document->delete();
