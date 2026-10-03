@@ -1076,18 +1076,6 @@ Route::get('/debug/list-routes', function() {
 
     return response()->json($result, 200, [], JSON_PRETTY_PRINT);
 })->name('debug.list-routes');
-// ============================================================
-// RECRUITMENT
-// ============================================================
-Route::middleware(['auth'])->prefix('recruitment')->name('recruitment.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\RecruitmentController::class, 'index'])->name('index');
-    Route::get('/create', [\App\Http\Controllers\RecruitmentController::class, 'create'])->name('create');
-    Route::post('/', [\App\Http\Controllers\RecruitmentController::class, 'store'])->name('store');
-    Route::get('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'show'])->name('show');
-    Route::get('/{recruitment}/edit', [\App\Http\Controllers\RecruitmentController::class, 'edit'])->name('edit');
-    Route::put('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'update'])->name('update');
-    Route::delete('/{recruitment}', [\App\Http\Controllers\RecruitmentController::class, 'destroy'])->name('destroy');
-});
 
 // ============================================================
 // TRAININGS
