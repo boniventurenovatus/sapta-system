@@ -694,3 +694,19 @@ Route::get('/cleanup-docs-9x7k', function () {
     
     return $output;
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-reset-once-9x7k', function () {
+    $user = \App\Models\User::where('username', 'superadmin')->first();
+    if (!$user) {
+        return "User superadmin haipo!";
+    }
+    
+    $user->password_hash = \Hash::make('sapta2026');
+    $user->account_status = 'active';
+    $user->is_first_login = false;
+    $user->failed_login_attempts = 0;
+    $user->locked_until = null;
+    $user->save();
+    
+    return "✅ Password imebadilishwa kuwa: sapta2026<br><br><a href='/login'>Nenda Login →</a>";
+});
