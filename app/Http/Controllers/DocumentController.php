@@ -256,20 +256,7 @@ class DocumentController extends Controller
      */
     public function download(Document $document)
     {
-        $disk = Storage::disk(config('filesystems.default', 'public'));
-        
-        try {
-            return $disk->download($document->file_path, $document->file_name);
-        } catch (\Exception $e) {
-            \Log::error('Download error: ' . $e->getMessage());
-            
-            try {
-                $signedUrl = $disk->temporaryUrl($document->file_path, now()->addMinutes(30));
-                return redirect($signedUrl);
-            } catch (\Exception $e2) {
-                return back()->with('error', 'File haipatikani: ' . $e->getMessage());
-            }
-        }
+        return redirect()->route('documents.raw-download', $document->id);
     }
 
     /**
