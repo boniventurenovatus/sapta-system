@@ -52,19 +52,129 @@ public function create()
     {
         $validated = $request->validated();
 
+        // ============================================================
+        // AUTO-GENERATE USERNAME
+        // ============================================================
+        $firstName = $validated['first_name'] ?? '';
+        $lastName = $validated['last_name'] ?? '';
+        
+        // Kama first_name/last_name hazipo, tumia username
+        if (empty($firstName) && !empty($validated['username'])) {
+            $parts = explode('.', $validated['username']);
+            $firstName = $parts[0] ?? 'user';
+            $lastName = $parts[1] ?? '';
+        }
+        
+        $username = $this->generateUsername($firstName, $lastName, $validated['username'] ?? null);
+
+        // ============================================================
+        // AUTO-GENERATE PASSWORD
+        // ============================================================
+        $plainPassword = $validated['password'] ?? $this->generatePassword();
+
+        // ============================================================
+        // CREATE USER
+        // ============================================================
         $user = User::create([
             'employee_id' => $validated['employee_id'] ?? null,
-            'username' => $validated['username'],
+            'username' => $username,
             'email' => $validated['email'],
-            'password_hash' => Hash::make($validated['password']),
-            'account_status' => $validated['account_status'],
+            'password_hash' => Hash::make($plainPassword),
+            'account_status' => 'active',
+            'is_first_login' => true,  // Lazimisha kubadilisha password
+            'first_password_expires_at' => now()->addDays(7),  // Expire baada ya siku 7
+            'credentials_sent_at' => now(),
+            'credentials_expires_at' => now()->addDays(7),
+            'credentials_channel' => 'manual',  // Au 'email', 'sms'
         ]);
 
+        // ============================================================
+        // ATTACH ROLE
+        // ============================================================
         if ($request->role_id) {
             $user->roles()->attach($request->role_id);
         }
 
-        return redirect()->route('users.index')->with('success', 'User created successfully');
+        // ============================================================
+        // LOG ACTIVITY
+        // ============================================================
+        \App\Models\UserActivityLog::log(
+            action: 'user_create',
+            module: 'user',
+            description: 'Created user: ' . $username,
+            subjectId: $user->id,
+            subjectType: 'App\Models\User'
+        );
+
+        // ============================================================
+        // REDIRECT NA CREDENTIALS
+        // ============================================================
+        return redirect()->route('users.show', $user->id)
+            ->with('success', 'User created successfully!')
+            ->with('generated_credentials', [
+                'username' => $username,
+                'password' => $plainPassword,
+                'email' => $validated['email'],
+                'expires_at' => now()->addDays(7)->format('d M Y H:i'),
+            ]);
+    }
+
+    /**
+     * Generate unique username
+     */
+    private function generateUsername(string $firstName, string $lastName, ?string $custom = null): string
+    {
+        // Kama admin ameweka username manually
+        if ($custom && !User::where('username', $custom)->exists()) {
+            return $custom;
+        }
+
+        // Auto-generate: firstname.lastname
+        // strtolower KWANZA, kisha preg_replace
+        $firstClean = preg_replace('/[^a-z0-9]/', '', strtolower($firstName));
+        $lastClean = preg_replace('/[^a-z0-9]/', '', strtolower($lastName));
+        $base = $firstClean . '.' . $lastClean;
+
+        if (empty($base) || $base === '.') {
+            $base = 'user';
+        }
+
+        $username = $base;
+        $counter = 1;
+
+        // Hakikisha ni unique
+        while (User::where('username', $username)->exists()) {
+            $username = $base . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
+
+    /**
+     * Generate strong password
+     */
+    private function generatePassword(): string
+    {
+        $uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $lowercase = 'abcdefghjkmnpqrstuvwxyz';
+        $numbers = '23456789';
+        $symbols = '!@#$%';
+
+        $password = '';
+        $password .= $uppercase[rand(0, strlen($uppercase) - 1)];
+        $password .= $lowercase[rand(0, strlen($lowercase) - 1)];
+        $password .= $lowercase[rand(0, strlen($lowercase) - 1)];
+        $password .= $numbers[rand(0, strlen($numbers) - 1)];
+        $password .= $symbols[rand(0, strlen($symbols) - 1)];
+
+        // Ongeza characters za random
+        $all = $uppercase . $lowercase . $numbers . $symbols;
+        for ($i = 0; $i < 5; $i++) {
+            $password .= $all[rand(0, strlen($all) - 1)];
+        }
+
+        return str_shuffle($password);
     }
 
     public function show(User $user)

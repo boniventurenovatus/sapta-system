@@ -16,13 +16,15 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'employee_id' => 'nullable|exists:employees,id|unique:users,employee_id',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
             'username' => [
-                'required', 'string', 'min:3', 'max:50',
+                'nullable', 'string', 'min:3', 'max:50',
                 'regex:/^[a-zA-Z0-9_\.]+$/',
                 'unique:users,username',
             ],
             'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'nullable|exists:roles,id',
             'account_status' => 'required|in:active,inactive,suspended',
         ];

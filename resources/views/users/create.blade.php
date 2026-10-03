@@ -28,14 +28,43 @@
 
         <div class="space-y-6">
 
-            {{-- USERNAME --}}
+            {{-- FIRST NAME + LAST NAME --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        First Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="first_name" value="{{ old('first_name') }}" required
+                        class="w-full px-4 py-3 border @error('first_name') border-red-500 bg-red-50 @else border-slate-300 @enderror rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="e.g., John">
+                    @error('first_name')
+                        <div class="text-red-500 text-xs mt-1 font-semibold"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</div>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Last Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                        class="w-full px-4 py-3 border @error('last_name') border-red-500 bg-red-50 @else border-slate-300 @enderror rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="e.g., Doe">
+                    @error('last_name')
+                        <div class="text-red-500 text-xs mt-1 font-semibold"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- USERNAME (Optional — auto-generate kama wazi) --}}
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">
-                    Username <span class="text-red-500">*</span>
+                    Username
+                    <span class="text-slate-400 text-xs font-normal ml-2">
+                        (Acha wazi — system ita-generate: <code class="bg-slate-100 px-1 rounded">firstname.lastname</code>)
+                    </span>
                 </label>
-                <input type="text" name="username" value="{{ old('username') }}" required
+                <input type="text" name="username" value="{{ old('username') }}"
                     class="w-full px-4 py-3 border @error('username') border-red-500 bg-red-50 @else border-slate-300 @enderror rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="e.g., jdoe">
+                    placeholder="jdoe (au acha wazi)">
                 @error('username')
                     <div class="text-red-500 text-xs mt-1 font-semibold"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</div>
                 @enderror
@@ -58,9 +87,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">
-                        Password <span class="text-red-500">*</span>
+                        Password
+                        <span class="text-slate-400 text-xs font-normal ml-2">(Acha wazi — system ita-generate)</span>
                     </label>
-                    <input type="password" name="password" required
+                    <input type="password" name="password"
                         class="w-full px-4 py-3 border @error('password') border-red-500 bg-red-50 @else border-slate-300 @enderror rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="Min 8 characters">
                     @error('password')
@@ -69,9 +99,9 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">
-                        Confirm Password <span class="text-red-500">*</span>
+                        Confirm Password
                     </label>
-                    <input type="password" name="password_confirmation" required
+                    <input type="password" name="password_confirmation"
                         class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="Repeat password">
                 </div>

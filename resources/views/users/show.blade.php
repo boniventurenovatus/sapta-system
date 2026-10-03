@@ -33,6 +33,69 @@
     </div>
 </div>
 
+{{-- GENERATED CREDENTIALS (BAADA YA KUUNDA USER) --}}
+@if(session('generated_credentials'))
+    @php $creds = session('generated_credentials'); @endphp
+    <div class="bg-green-50 border-2 border-green-300 rounded-2xl p-6 mb-6 max-w-2xl mx-auto">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl">
+                <i class="fas fa-check"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-green-800">User Created Successfully!</h3>
+                <p class="text-green-700 text-sm">Credentials zimeundwa. Tafadhali copy na mpe user.</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 space-y-3 font-mono text-sm">
+            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                <span class="text-slate-500 font-sans font-bold">Username:</span>
+                <span class="font-bold text-slate-900 text-lg" id="gen-username">{{ $creds['username'] }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                <span class="text-slate-500 font-sans font-bold">Password:</span>
+                <span class="font-bold text-red-600 text-lg" id="gen-password">{{ $creds['password'] }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                <span class="text-slate-500 font-sans font-bold">Email:</span>
+                <span class="text-slate-900">{{ $creds['email'] }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+                <span class="text-slate-500 font-sans font-bold">Expires:</span>
+                <span class="text-slate-900">{{ $creds['expires_at'] }}</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-3 mt-4">
+            <button onclick="copyCredentials()" 
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-copy"></i> Copy Credentials
+            </button>
+            <button onclick="window.print()" 
+                class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+        
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mt-4 text-xs text-yellow-800">
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            <b>MUHIMU:</b> Password hii haitaonekana tena. Copy na mpe user sasa hivi. User atalazimika kubadilisha password mara ya kwanza.
+        </div>
+    </div>
+    
+    <script>
+    function copyCredentials() {
+        const username = document.getElementById('gen-username').innerText;
+        const password = document.getElementById('gen-password').innerText;
+        const text = `SAPTA System Credentials\n\nUsername: ${username}\nPassword: ${password}\nLogin: {{ url('/login') }}\n\nTafadhali badilisha password yako mara ya kwanza.`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Credentials copied to clipboard!');
+        });
+    }
+    </script>
+@endif
+
 <div class="detail-card">
     <div class="detail-row">
         <div class="detail-label" data-en="ID" data-sw="Nambari">ID</div>
