@@ -290,21 +290,16 @@ class DocumentController extends Controller
         $fileName = $document->file_name ?? basename($document->file_path);
 
         try {
-            $stream = $disk->readStream($document->file_path);
-            if (!$stream) {
-                abort(404, 'File haipatikani.');
-            }
+            // Tumia get() — haitumii exists() (ambayo inashindwa kwa B2)
+            $contents = $disk->get($document->file_path);
 
-            return response()->stream(function () use ($stream) {
-                fpassthru($stream);
-                fclose($stream);
-            }, 200, [
+            return response($contents, 200, [
                 'Content-Type' => $mimeType,
                 'Content-Disposition' => 'inline; filename="' . $fileName . '"',
                 'Cache-Control' => 'private, max-age=300',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Raw stream error: ' . $e->getMessage());
+            \Log::error('Raw get error: ' . $e->getMessage());
             abort(404, 'File haipatikani: ' . $e->getMessage());
         }
     }
@@ -316,18 +311,14 @@ class DocumentController extends Controller
     {
         $disk = Storage::disk(config('filesystems.default', 'public'));
         $fileName = $document->file_name ?? basename($document->file_path);
+        $mimeType = $document->file_type ?? 'application/octet-stream';
 
         try {
-            $stream = $disk->readStream($document->file_path);
-            if (!$stream) {
-                return back()->with('error', 'File haipatikani.');
-            }
+            // Tumia get() — haitumii exists()
+            $contents = $disk->get($document->file_path);
 
-            return response()->stream(function () use ($stream) {
-                fpassthru($stream);
-                fclose($stream);
-            }, 200, [
-                'Content-Type' => 'application/octet-stream',
+            return response($contents, 200, [
+                'Content-Type' => $mimeType,
                 'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
             ]);
         } catch (\Exception $e) {
