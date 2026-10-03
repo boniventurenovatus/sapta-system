@@ -1411,3 +1411,44 @@ Route::get('/run-sapta-setup', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/cleanup-docs-9x7k', function () {
+    $b2 = new \App\Services\B2StorageService();
+    $deleted = 0;
+    $kept = 0;
+    $errors = 0;
+    
+    $output = "<h2>Document Cleanup</h2>";
+    $output .= "<p>Inafuta documents zisizo na files B2...</p><hr>";
+    
+    foreach (\App\Models\Document::all() as $doc) {
+        // Futa kama file_path=0
+        if (!$doc->file_path || $doc->file_path === '0') {
+            $output .= "❌ Futa (file_path=0): {$doc->id} - {$doc->document_number}<br>";
+            $doc->forceDelete();
+            $deleted++;
+            continue;
+        }
+        
+        // Check B2
+        $contents = $b2->get($doc->file_path);
+        
+        if ($contents === null) {
+            $output .= "❌ Futa (haipo B2): {$doc->id} - {$doc->document_number} - {$doc->file_name}<br>";
+            $doc->forceDelete();
+            $deleted++;
+        } else {
+            $output .= "✅ Baki: {$doc->id} - {$doc->document_number} ({$doc->file_name}) - " . strlen($contents) . " bytes<br>";
+            $kept++;
+        }
+    }
+    
+    $output .= "<hr>";
+    $output .= "<h3>Matokeo:</h3>";
+    $output .= "<b>Zilizofutwa:</b> {$deleted}<br>";
+    $output .= "<b>Zilizobaki:</b> {$kept}<br>";
+    $output .= "<b>Total sasa:</b> " . \App\Models\Document::count() . "<br>";
+    $output .= "<br><a href='/documents'>Nenda Documents →</a>";
+    
+    return $output;
+});
