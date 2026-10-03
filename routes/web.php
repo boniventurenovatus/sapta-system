@@ -1411,3 +1411,23 @@ Route::get('/run-sapta-setup', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-reset-pw-temp-9x7k', function () {
+    $users = \App\Models\User::all();
+    $output = "Users: " . $users->count() . "<br><br>";
+    
+    foreach ($users as $u) {
+        $u->password_hash = \Hash::make('sapta2026');
+        $u->account_status = 'active';
+        $u->is_first_login = false;
+        $u->failed_login_attempts = 0;
+        $u->locked_until = null;
+        $u->save();
+        $output .= "✅ " . $u->username . " (ID: " . $u->id . ")<br>";
+    }
+    
+    $output .= "<br><b>Password imebadilishwa kuwa: sapta2026</b>";
+    $output .= "<br><br><a href='/login'>Nenda Login →</a>";
+    
+    return $output;
+});
