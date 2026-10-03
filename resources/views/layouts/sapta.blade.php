@@ -224,14 +224,9 @@
                                 <a href="{{ route('settings.index') }}"><i class="fas fa-gear"></i> Settings</a>
                                 <a href="{{ route('profile.change-password') }}"><i class="fas fa-key"></i> Change Password</a>
                                 <div class="tb-profile-divider"></div>
-                                <form method="POST" action="{{ route('logout') }}" style="margin:0;">
-                                    @csrf
-                                    <button type="submit" style="width:100%; border:none; background:none; cursor:pointer; text-align:left;" class="tb-profile-menu-link">
-                                        <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="logout">
-                                            <i class="fas fa-right-from-bracket"></i> Logout
-                                        </a>
-                                    </button>
-                                </form>
+                                <a href="{{ route('logout.get') }}" class="logout tb-profile-menu-link" style="width:100%; text-align:left;">
+                                    <i class="fas fa-right-from-bracket"></i> Logout
+                                </a>
                             </div>
                         </div>
                     </div>

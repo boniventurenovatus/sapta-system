@@ -653,3 +653,10 @@ Route::get('/run-sapta-setup', function () {
         return 'Error: ' . $e->getMessage();
     }
 });
+// GET Logout (fallback kwa 419 issues)
+Route::get('/logout', function () {
+    \Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout.get');
