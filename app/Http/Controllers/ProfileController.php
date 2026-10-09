@@ -227,5 +227,36 @@ class ProfileController extends Controller
             ->route('profile.show')
             ->with('success', 'Password imebadilishwa kikamilifu.');
     }
-}
 
+    /**
+     * Serve profile image from B2 (proxy)
+     */
+    public function image(User $user)
+    {
+        if (!$user->profile_image) {
+            abort(404, 'Picha haipo.');
+        }
+
+        $b2 = new B2StorageService();
+        $contents = $b2->get($user->profile_image);
+
+        if ($contents === null) {
+            abort(404, 'Picha haipatikani B2.');
+        }
+
+        // Detect mime type
+        $ext = strtolower(pathinfo($user->profile_image, PATHINFO_EXTENSION));
+        $mimeType = match($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            default => 'image/jpeg',
+        };
+
+        return response($contents)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Length', strlen($contents))
+            ->header('Cache-Control', 'public, max-age=3600');
+    }
+}
