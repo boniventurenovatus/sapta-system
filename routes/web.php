@@ -660,3 +660,49 @@ Route::get('/logout', function () {
     request()->session()->regenerateToken();
     return redirect()->route('login');
 })->name('logout.get');
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-check-orgs-9x7k', function () {
+    $output = "<h2>Organizations Check</h2>";
+    
+    // Check table
+    if (!\Schema::hasTable('organizations')) {
+        return "❌ Table 'organizations' HAIPO kwenye Render!";
+    }
+    
+    $count = \DB::table('organizations')->count();
+    $output .= "<b>Total Organizations:</b> " . $count . "<br><br>";
+    
+    if ($count == 0) {
+        $output .= "⚠️ <b>Hakuna organizations!</b> Tunahitaji ku-seed.<br><br>";
+        $output .= "<a href='/debug-seed-orgs-9x7k' style='background:blue;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>🔧 SEED ORGANIZATIONS</a>";
+    } else {
+        $output .= "<b>Organizations zilizopo:</b><br>";
+        foreach (\DB::table('organizations')->get() as $o) {
+            $output .= "✅ " . $o->id . " | " . $o->name . "<br>";
+        }
+    }
+    
+    return $output;
+});
+
+Route::get('/debug-seed-orgs-9x7k', function () {
+    // Check kama organization ipo
+    $exists = \DB::table('organizations')->where('name', 'Soil-Animals Power Tanzania')->exists();
+    
+    if ($exists) {
+        return "⚠️ Organization ipo tayari!<br><a href='/debug-check-orgs-9x7k'>Angalia</a>";
+    }
+    
+    \DB::table('organizations')->insert([
+        'name' => 'Soil-Animals Power Tanzania',
+        'code' => 'SAPTA',
+        'email' => 'info@sapta.co.tz',
+        'phone' => '+255 000 000 000',
+        'address' => 'P.O Box 149, Morogoro, Tanzania',
+        'is_active' => true,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    
+    return "✅ Organization imeundwa!<br><br><a href='/debug-check-orgs-9x7k'>Angalia →</a>";
+});
