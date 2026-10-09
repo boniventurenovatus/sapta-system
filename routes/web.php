@@ -49,7 +49,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 
 // DASHBOARDS ZOTE
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('/admin', [DashboardController::class, 'admin'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager')->name('admin');
+    Route::get('/admin', [DashboardController::class, 'admin'])->middleware('role:super_admin,admin')->name('admin');
     Route::get('/director', [DashboardController::class, 'director'])->middleware('role:ceo,bod,director,super_admin,admin')->name('director');
     Route::get('/executive', [DashboardController::class, 'executive'])->middleware('role:ceo,bod,director,super_admin,admin')->name('executive');
     Route::get('/hr', [DashboardController::class, 'hr'])->middleware('role:hr_manager,hr_officer,admin_director,super_admin,admin')->name('hr');
@@ -62,37 +62,37 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 });
 
 // MANAGEMENT
-Route::resource('employees', EmployeeController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,program_director,hr_manager,hr_officer,ceo,bod,manager');
-Route::resource('organizations', OrganizationController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
-Route::resource('departments', DepartmentController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
-Route::resource('positions', PositionController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo,bod,manager');
-Route::resource('employee-positions', EmployeePositionController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
+Route::resource('employees', EmployeeController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,program_director,hr_manager,hr_officer,ceo,bod,manager');
+Route::resource('organizations', OrganizationController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
+Route::resource('departments', DepartmentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
+Route::resource('positions', PositionController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo,bod,manager');
+Route::resource('employee-positions', EmployeePositionController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
 
 // ORGANOGRAM
 Route::get('/organogram', [OrganogramController::class, 'index'])->middleware('auth')->name('organogram.index');
 
 // SETTINGS
-Route::get('/settings', [SettingController::class, 'index'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager')->name('settings.index');
-Route::put('/settings', [SettingController::class, 'update'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager')->name('settings.update');
+Route::get('/settings', [SettingController::class, 'index'])->middleware('role:super_admin,admin')->name('settings.index');
+Route::put('/settings', [SettingController::class, 'update'])->middleware('role:super_admin,admin')->name('settings.update');
 
 // HR
 Route::resource('attendances', AttendanceController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,manager,staff');
 Route::resource('leave-requests', LeaveRequestController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,manager,staff');
 
 // USER & RBAC
-Route::resource('users', UserController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
-Route::resource('roles', RoleController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
-Route::resource('permissions', PermissionController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
+Route::resource('users', UserController::class)->middleware('role:super_admin,admin');
+Route::resource('roles', RoleController::class)->middleware('role:super_admin,admin');
+Route::resource('permissions', PermissionController::class)->middleware('role:super_admin,admin');
 
 // EMPLOYEE STATUS ACTIONS
-Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.deactivate');
-Route::post('employees/{employee}/terminate', [EmployeeController::class, 'terminate'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.terminate');
-Route::post('employees/{employee}/activate', [EmployeeController::class, 'activate'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.activate');
-Route::post('employees/{employee}/suspend', [EmployeeController::class, 'suspend'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.suspend');
+Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.deactivate');
+Route::post('employees/{employee}/terminate', [EmployeeController::class, 'terminate'])->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.terminate');
+Route::post('employees/{employee}/activate', [EmployeeController::class, 'activate'])->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.activate');
+Route::post('employees/{employee}/suspend', [EmployeeController::class, 'suspend'])->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer,ceo')->name('employees.suspend');
 
 // USER SUSPEND/ACTIVATE
-Route::post('users/{user}/suspend', [UserController::class, 'suspend'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager')->name('users.suspend');
-Route::post('users/{user}/activate', [UserController::class, 'activate'])->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager')->name('users.activate');
+Route::post('users/{user}/suspend', [UserController::class, 'suspend'])->middleware('role:super_admin,admin')->name('users.suspend');
+Route::post('users/{user}/activate', [UserController::class, 'activate'])->middleware('role:super_admin,admin')->name('users.activate');
 
 // PROFILE
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
@@ -138,17 +138,17 @@ Route::middleware(['auth'])->group(function () {
 // ============================================================
 // BUDGETS
 // ============================================================
-Route::resource('budgets', \App\Http\Controllers\BudgetController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant,procurement_manager');
+Route::resource('budgets', \App\Http\Controllers\BudgetController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant,procurement_manager');
 
 // ============================================================
 // RECEIPTS
 // ============================================================
-Route::resource('receipts', \App\Http\Controllers\ReceiptController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant');
+Route::resource('receipts', \App\Http\Controllers\ReceiptController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant');
 
 // ============================================================
 // PAYMENT VOUCHERS
 // ============================================================
-Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant,procurement_manager');
+Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant,procurement_manager');
 
 // ============================================================
 // PAYROLL
@@ -158,7 +158,7 @@ Route::resource('payment-vouchers', \App\Http\Controllers\PaymentVoucherControll
 // ============================================================
 // TRAININGS
 // ============================================================
-Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
+Route::resource('trainings', \App\Http\Controllers\TrainingController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
 
 // ============================================================
 // DOCUMENTS
@@ -184,22 +184,22 @@ Route::middleware(['auth'])->prefix('documents')->name('documents.')->group(func
 // ============================================================
 // RECRUITMENT
 // ============================================================
-Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
+Route::resource('recruitment', \App\Http\Controllers\RecruitmentController::class)->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
 
 // ============================================================
 // PERFORMANCE REVIEWS
 // ============================================================
-Route::resource('performance-reviews', \App\Http\Controllers\PerformanceReviewController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer,manager');
+Route::resource('performance-reviews', \App\Http\Controllers\PerformanceReviewController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer,manager');
 
 // ============================================================
 // EXPENSE CLAIMS
 // ============================================================
-Route::resource('expense-claims', \App\Http\Controllers\ExpenseClaimController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant');
+Route::resource('expense-claims', \App\Http\Controllers\ExpenseClaimController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,accountant');
 
 // ============================================================
 // PROCUREMENT REQUESTS
 // ============================================================
-Route::resource('procurement-requests', \App\Http\Controllers\ProcurementRequestController::class)->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,procurement_manager');
+Route::resource('procurement-requests', \App\Http\Controllers\ProcurementRequestController::class)->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,finance_manager,procurement_manager');
 
 // ============================================================
 // AUDIT LOGS
@@ -265,12 +265,12 @@ Route::middleware(['auth'])->group(function () {
     // Credentials — Admin anaona
     Route::get('employees/{employee}/credentials', [\App\Http\Controllers\EmployeeController::class, 'credentials'])
         ->name('employees.credentials')
-        ->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer');
+        ->middleware('role:super_admin,admin,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,director,admin_director,hr_manager,hr_officer');
     
     // Reset Password — Admin
     Route::post('employees/{employee}/reset-password', [\App\Http\Controllers\EmployeeController::class, 'resetPassword'])
         ->name('employees.reset-password')
-        ->middleware('role:super_admin,admin,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager,hr_manager,hr_officer');
+        ->middleware('role:super_admin,admin,hr_manager,hr_officer,field_trainer,research_officer,community_manager,partnerships_manager,meal_officer,project_officer,staff,manager');
 });
 // ============================================================
 // ============================================================
