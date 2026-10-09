@@ -203,8 +203,15 @@
                     {{-- PROFILE --}}
                     <div class="tb-dropdown-wrap" id="profileWrap">
                         <button type="button" class="tb-profile" onclick="toggleDropdown('profileWrap')">
-                            <div class="tb-avatar">
-                                {{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 2)) }}
+                            <div class="tb-avatar" style="overflow:hidden; position:relative;">
+                                @if(auth()->user()->profile_image)
+                                    <img src="{{ \Storage::disk(config('filesystems.default'))->url(auth()->user()->profile_image) }}" 
+                                         alt="{{ auth()->user()->username }}" 
+                                         style="width:100%; height:100%; object-fit:cover; border-radius:50%;"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='{{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 2)) }}';">
+                                @else
+                                    {{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 2)) }}
+                                @endif
                             </div>
                             <div class="tb-profile-info">
                                 <strong>{{ auth()->user()->username ?? 'User' }}</strong>

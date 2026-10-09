@@ -65,11 +65,10 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (
-            !empty($user->profile_image) &&
-            Storage::disk('public')->exists($user->profile_image)
-        ) {
-            Storage::disk('public')->delete($user->profile_image);
+        $b2 = new \App\Services\B2StorageService();
+        
+        if (!empty($user->profile_image)) {
+            $b2->delete($user->profile_image);
         }
 
         /*
@@ -78,9 +77,16 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $path = $request
-            ->file('profile_image')
-            ->store('profile-images', 'public');
+        $b2 = new \App\Services\B2StorageService();
+        $file = $request->file('profile_image');
+        $storedName = \Str::random(40) . '.' . $file->getClientOriginalExtension();
+        $path = 'profile-images/' . $storedName;
+        
+        $uploaded = $b2->putFile($path, $file->getRealPath(), $file->getMimeType());
+        
+        if (!$uploaded) {
+            return back()->with('error', 'Profile image upload imeshindwa. Jaribu tena.')->withInput();
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -135,15 +141,8 @@ class ProfileController extends Controller
 
         if (!empty($user->profile_image)) {
 
-            if (
-                Storage::disk('public')->exists(
-                    $user->profile_image
-                )
-            ) {
-                Storage::disk('public')->delete(
-                    $user->profile_image
-                );
-            }
+            $b2 = new \App\Services\B2StorageService();
+            $b2->delete($user->profile_image);
 
             /*
             |--------------------------------------------------------------------------

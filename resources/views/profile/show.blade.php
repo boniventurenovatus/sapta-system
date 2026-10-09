@@ -138,7 +138,10 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 @if(auth()->user()->profile_image)
-                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="{{ auth()->user()->username }}">
+                    <img src="{{ \Storage::disk(config('filesystems.default'))->url(auth()->user()->profile_image) }}" 
+                         alt="{{ auth()->user()->username }}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <span style="display:none; font-size:2rem; font-weight:700; color:#2563eb;">{{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 1)) }}</span>
                 @else
                     {{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 1)) }}
                 @endif
@@ -173,7 +176,7 @@
                 </div>
                 <div class="profile-item">
                     <div class="label">Account Created</div>
-                    <div class="value">{{ auth()->user()->created_at?->format('d M Y, H:i') ?? '—' }}</div>
+                    <div class="value">{{ auth()->user()->created_at?->format('d M Y, H:i') ?? 'ï¿½' }}</div>
                 </div>
                 <div class="profile-item">
                     <div class="label">Last Login</div>
