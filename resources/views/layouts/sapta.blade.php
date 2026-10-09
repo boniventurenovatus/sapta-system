@@ -205,7 +205,7 @@
                         <button type="button" class="tb-profile" onclick="toggleDropdown('profileWrap')">
                             <div class="tb-avatar" style="overflow:hidden; position:relative;">
                                 @if(auth()->user()->profile_image)
-                                    <img src="{{ \Storage::disk(config('filesystems.default'))->url(auth()->user()->profile_image) }}" 
+                                    <img src="{{ route('profile.image', auth()->user()->id) }}" 
                                          alt="{{ auth()->user()->username }}" 
                                          style="width:100%; height:100%; object-fit:cover; border-radius:50%;"
                                          onerror="this.style.display='none'; this.parentElement.innerHTML='{{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 2)) }}';">

@@ -739,3 +739,6 @@ Route::get('/debug-check-profile-9x7k', function () {
     
     return $output;
 });
+// Profile image proxy (from B2)
+Route::get('/profile-image/{user}', [\App\Http\Controllers\ProfileController::class, 'image'])
+    ->name('profile.image');

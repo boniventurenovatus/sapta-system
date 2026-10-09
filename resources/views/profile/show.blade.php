@@ -138,7 +138,7 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 @if(auth()->user()->profile_image)
-                    <img src="{{ \Storage::disk(config('filesystems.default'))->url(auth()->user()->profile_image) }}" 
+                    <img src="{{ route('profile.image', auth()->user()->id) }}" 
                          alt="{{ auth()->user()->username }}"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span style="display:none; font-size:2rem; font-weight:700; color:#2563eb;">{{ strtoupper(substr(auth()->user()->username ?? 'U', 0, 1)) }}</span>
