@@ -686,3 +686,28 @@ Route::get('/debug-check-constraint-9x7k', function () {
         return "❌ ERROR: " . $e->getMessage();
     }
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-reset-ft-9x7k', function () {
+    $user = \App\Models\User::where('username', 'LIKE', '%mkude%')
+        ->orWhere('email', 'LIKE', '%soilanimals%')
+        ->first();
+    
+    if (!$user) {
+        $output = "<h2>User haipo!</h2>";
+        $output .= "<p>Watumiaji wote:</p><ul>";
+        foreach (\App\Models\User::all() as $u) {
+            $output .= "<li>" . $u->id . " | " . $u->username . " | " . $u->email . "</li>";
+        }
+        $output .= "</ul>";
+        return $output;
+    }
+    
+    $user->password_hash = \Hash::make('Test@2026');
+    $user->account_status = 'active';
+    $user->is_first_login = false;
+    $user->failed_login_attempts = 0;
+    $user->locked_until = null;
+    $user->save();
+    
+    return "✅ User: <b>" . $user->username . "</b><br>Email: " . $user->email . "<br>Password: <b>Test@2026</b><br><br><a href='/login'>Nenda Login →</a>";
+});
