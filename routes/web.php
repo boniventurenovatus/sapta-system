@@ -660,3 +660,29 @@ Route::get('/logout', function () {
     request()->session()->regenerateToken();
     return redirect()->route('login');
 })->name('logout.get');
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-run-migration-9x7k', function () {
+    try {
+        \Artisan::call('migrate', ['--force' => true]);
+        $output = \Artisan::output();
+        return "<h3>Migration Output:</h3><pre>" . $output . "</pre><br><a href='/employees/create'>Test Employee Create →</a>";
+    } catch (\Exception $e) {
+        return "❌ ERROR: " . $e->getMessage();
+    }
+});
+
+Route::get('/debug-check-constraint-9x7k', function () {
+    try {
+        $result = \DB::select("SELECT conname, pg_get_constraintdef(oid) as definition FROM pg_constraint WHERE conrelid = 'employees'::regclass AND conname LIKE '%employment_type%'");
+        $output = "<h3>Employment Type Constraints:</h3>";
+        foreach ($result as $r) {
+            $output .= "<b>" . $r->conname . ":</b><br>" . $r->definition . "<br><br>";
+        }
+        if (empty($result)) {
+            $output .= "Hakuna constraints zilizopatikana.";
+        }
+        return $output;
+    } catch (\Exception $e) {
+        return "❌ ERROR: " . $e->getMessage();
+    }
+});
