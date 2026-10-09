@@ -706,3 +706,29 @@ Route::get('/debug-seed-orgs-9x7k', function () {
     
     return "✅ Organization imeundwa!<br><br><a href='/debug-check-orgs-9x7k'>Angalia →</a>";
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-add-sapta-9x7k', function () {
+    $exists = \DB::table('organizations')->where('name', 'Soil-Animals Power Tanzania')->exists();
+    
+    if ($exists) {
+        return "⚠️ Organization ipo tayari!<br><a href='/debug-check-orgs-9x7k'>Angalia</a>";
+    }
+    
+    // Pata ID inayofuata
+    $maxId = \DB::table('organizations')->max('id');
+    $newId = $maxId + 1;
+    
+    \DB::table('organizations')->insert([
+        'id' => $newId,
+        'name' => 'Soil-Animals Power Tanzania',
+        'code' => 'SAPTA',
+        'email' => 'info@sapta.co.tz',
+        'phone' => '+255 000 000 000',
+        'address' => 'P.O Box 149, Morogoro, Tanzania',
+        'is_active' => true,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    
+    return "✅ Organization imeundwa (ID: " . $newId . ")!<br><br><a href='/debug-check-orgs-9x7k'>Angalia →</a>";
+});
