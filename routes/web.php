@@ -711,3 +711,29 @@ Route::get('/debug-reset-ft-9x7k', function () {
     
     return "✅ User: <b>" . $user->username . "</b><br>Email: " . $user->email . "<br>Password: <b>Test@2026</b><br><br><a href='/login'>Nenda Login →</a>";
 });
+// ⚠️ TEMPORARY — ONDOA BAADA YA KUTUMIA!
+Route::get('/debug-check-profile-9x7k', function () {
+    $user = \App\Models\User::where('username', 'mkude@sapta2024S')->first();
+    
+    if (!$user) {
+        return "User haipo!";
+    }
+    
+    $output = "<h2>Profile Image Check</h2>";
+    $output .= "<b>Username:</b> " . $user->username . "<br>";
+    $output .= "<b>profile_image (DB):</b> " . ($user->profile_image ?? 'NULL') . "<br>";
+    $output .= "<b>FILESYSTEM_DISK:</b> " . config('filesystems.default') . "<br><br>";
+    
+    if ($user->profile_image) {
+        $b2 = new \App\Services\B2StorageService();
+        $contents = $b2->get($user->profile_image);
+        $output .= "<b>File ipo B2:</b> " . ($contents ? 'YES (' . strlen($contents) . ' bytes)' : 'NO') . "<br>";
+        
+        // Jaribu URLs
+        $output .= "<br><b>URLs:</b><br>";
+        $output .= "Storage::url(): " . \Storage::disk(config('filesystems.default'))->url($user->profile_image) . "<br>";
+        $output .= "asset(storage): " . asset('storage/' . $user->profile_image) . "<br>";
+    }
+    
+    return $output;
+});
